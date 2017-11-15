@@ -50,7 +50,7 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/password"
+                    android:id="@+id/editPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_password"
@@ -68,7 +68,7 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/password_confirm"
+                    android:id="@+id/editPasswordConfirm"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_password_confirm"
@@ -86,14 +86,14 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/birthday"
+                    android:id="@+id/editName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_name"
                     android:imeActionId="6"
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
-                    android:inputType="date"
+                    android:inputType="text"
                     android:maxLines="1"
                     android:singleLine="true" />
 
@@ -105,7 +105,7 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/name"
+                    android:id="@+id/editBirthday"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_birthday"

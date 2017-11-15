@@ -3,18 +3,16 @@ package nova.typoapp;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
-
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -28,6 +26,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -42,6 +42,11 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
     private static final String[] DUMMY_CREDENTIALS = new String[]{
             "foo@example.com:hello", "bar@example.com:world"
     };
+
+    ///TODO 각종 정규식들. 별도 파일에 저장할 것@@, 암호는 조합이 되도록 할 것.(필수 조합입력)
+    public static final Pattern VALID_PASSWOLD_REGEX_ALPHA_NUM = Pattern.compile("^[a-zA-Z0-9!@.#$%^&*?_~]{4,16}$");// 4자리 ~ 16자리까지 가능
+    public static final Pattern VALID_NAME = Pattern.compile("^[가-힣a-zA-Z]{1,10}$");
+
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -49,7 +54,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
 
     // UI references.
     private AutoCompleteTextView mEmailView;
-    private EditText mPasswordView;
+    private EditText mPasswordView, mPasswordConfirmView, mName;
     private View mProgressView;
     private View mLoginFormView;
 
@@ -61,8 +66,20 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
 
-        mPasswordView = (EditText) findViewById(R.id.password);
+        mPasswordView = (EditText) findViewById(R.id.editPassword);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+                    attemptLogin();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        mPasswordConfirmView = (EditText)findViewById(R.id.editPasswordConfirm);
+        mPasswordConfirmView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
@@ -80,6 +97,8 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
                 attemptLogin();
             }
         });
+
+        mName = (EditText)findViewById(R.id.editName);
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
@@ -107,16 +126,70 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
+        String passwordConfirm = mPasswordConfirmView.getText().toString();
+        String memberName = mName.getText().toString();
+
 
         boolean cancel = false;
         View focusView = null;
 
-        // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
+        //형식검사 예외처리 들어간다. 밑칸 -> 위칸 순으로 처리하여, 포커스가 위에 것이 최종 포커스가 되도록 하자.
+
+
+        //이름 형식 확인하기.
+        if( TextUtils.isEmpty(memberName) || !isNameValid(memberName) ){
+
+            if(TextUtils.isEmpty(memberName)){
+                mName.setError(getString(R.string.error_field_required));
+            }
+            else{
+                mName.setError(getString(R.string.error_invalid_name));
+            }
+
+            focusView = mName;
+            cancel = true;
+
+        }
+
+        //패스워드 확인과 패스워드 일치 확인하기.
+        if ( !password.equals(passwordConfirm) ) {
+
+            mPasswordView.setError(getString(R.string.error_different_password));
+            mPasswordConfirmView.setError(getString(R.string.error_different_password));
+
             focusView = mPasswordView;
             cancel = true;
         }
+
+        //패스워드 확인 형식 확인하기.
+        if (TextUtils.isEmpty(passwordConfirm) || !isPasswordValid(passwordConfirm)) {
+            if(TextUtils.isEmpty(passwordConfirm)){
+                mPasswordConfirmView.setError(getString(R.string.error_field_required));
+            }
+            else{
+                mPasswordConfirmView.setError(getString(R.string.error_invalid_password));
+            }
+
+            focusView = mPasswordConfirmView;
+            cancel = true;
+        }
+
+        // 패스워드 형식 확인하기.
+        if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
+            if(TextUtils.isEmpty(password)){
+                mPasswordView.setError(getString(R.string.error_field_required));
+            }
+            else{
+                mPasswordView.setError(getString(R.string.error_invalid_password));
+            }
+
+            focusView = mPasswordView;
+            cancel = true;
+        }
+
+
+
+
 
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
@@ -144,13 +217,35 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-        return email.contains("@");
+
+
+//        return email.contains("@");
+        return  android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
+        //비밀번호정규식
+
+        Matcher matcher = VALID_PASSWOLD_REGEX_ALPHA_NUM.matcher(password);
+        return matcher.matches();
+
+
+//        Util.validatePassword("가나다라"); // => false
+//        Util.validatePassword("aaa"); // => false
+//
+//        //TODO: Replace this with your own logic
+//        return password.length() > 4;
     }
+
+    private boolean isNameValid(String name){
+
+        Matcher matcher = VALID_NAME.matcher(name);
+        return matcher.matches();
+
+    }
+
+
 
     /**
      * Shows the progress UI and hides the login form.

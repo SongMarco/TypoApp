@@ -21,10 +21,15 @@
     <string name="action_sign_in_short">Sign in</string>
 
 
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_invalid_email">올바른 형식의 이메일을 입력해주세요</string>
+    <string name="error_invalid_password">올바른 형식의 비밀번호를 입력해주세요</string>
+    <string name="error_invalid_name">올바른 형식의 이름을 입력해주세요</string>
+
     <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
+    <string name="error_field_required">필수 항목을 반드시 입력해주세요</string>
+
+    <string name="error_different_password">비밀번호와 비밀번호 확인이 일치하지 않습니다.</string>
+
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
