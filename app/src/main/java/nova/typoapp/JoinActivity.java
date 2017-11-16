@@ -3,6 +3,7 @@ package nova.typoapp;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.DatePickerDialog;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
 import android.content.Loader;
@@ -21,6 +22,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -54,7 +56,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
 
     // UI references.
     private AutoCompleteTextView mEmailView;
-    private EditText mPasswordView, mPasswordConfirmView, mName;
+    private EditText mPasswordView, mPasswordConfirmView, mName, mBirthday;
     private View mProgressView;
     private View mLoginFormView;
 
@@ -98,11 +100,35 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
             }
         });
 
+        mBirthday = (EditText)findViewById(R.id.editBirthday);
+        mBirthday.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerDialog dialog = new DatePickerDialog(JoinActivity.this, listener, 1992, 5, 27);
+                dialog.show();
+            }
+        });
+
+
+
+
+
         mName = (EditText)findViewById(R.id.editName);
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
+
+    private DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
+        @Override
+        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+            monthOfYear++;
+
+            mBirthday.setText(year + "." + monthOfYear + "." + dayOfMonth);
+//            Toast.makeText(getApplicationContext(), year + "년" + monthOfYear + "월" + dayOfMonth +"일", Toast.LENGTH_SHORT).show();
+        }
+    };
+
 
     private void populateAutoComplete() {
         getLoaderManager().initLoader(0, null, this);
@@ -128,12 +154,24 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         String password = mPasswordView.getText().toString();
         String passwordConfirm = mPasswordConfirmView.getText().toString();
         String memberName = mName.getText().toString();
+        String birthday = mBirthday.getText().toString();
 
 
         boolean cancel = false;
         View focusView = null;
 
         //형식검사 예외처리 들어간다. 밑칸 -> 위칸 순으로 처리하여, 포커스가 위에 것이 최종 포커스가 되도록 하자.
+
+
+        //생년월일 입력여부 확인하기.
+        if( TextUtils.isEmpty(birthday) ){
+
+            mBirthday.setError(getString(R.string.error_field_required));
+
+            focusView = mBirthday;
+            cancel = true;
+
+        }
 
 
         //이름 형식 확인하기.

@@ -115,6 +115,7 @@
                     android:inputType="date"
                     android:maxLines="1"
                     android:singleLine="true"
+                    android:focusable="false"
                     />
 
             </android.support.design.widget.TextInputLayout>
