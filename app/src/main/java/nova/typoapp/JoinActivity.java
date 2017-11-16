@@ -13,8 +13,9 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,6 +27,14 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -52,13 +61,17 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private UserLoginTask mAuthTask = null;
+    private userJoinTask mAuthTask = null;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView, mPasswordConfirmView, mName, mBirthday;
     private View mProgressView;
     private View mLoginFormView;
+
+    String email, password, name, birthday;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +110,8 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
             @Override
             public void onClick(View view) {
                 attemptLogin();
+
+
             }
         });
 
@@ -150,95 +165,95 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        email = mEmailView.getText().toString();
+        password = mPasswordView.getText().toString();
         String passwordConfirm = mPasswordConfirmView.getText().toString();
-        String memberName = mName.getText().toString();
-        String birthday = mBirthday.getText().toString();
+        name = mName.getText().toString();
+        birthday = mBirthday.getText().toString();
 
 
         boolean cancel = false;
         View focusView = null;
 
-        //형식검사 예외처리 들어간다. 밑칸 -> 위칸 순으로 처리하여, 포커스가 위에 것이 최종 포커스가 되도록 하자.
-
-
-        //생년월일 입력여부 확인하기.
-        if( TextUtils.isEmpty(birthday) ){
-
-            mBirthday.setError(getString(R.string.error_field_required));
-
-            focusView = mBirthday;
-            cancel = true;
-
-        }
-
-
-        //이름 형식 확인하기.
-        if( TextUtils.isEmpty(memberName) || !isNameValid(memberName) ){
-
-            if(TextUtils.isEmpty(memberName)){
-                mName.setError(getString(R.string.error_field_required));
-            }
-            else{
-                mName.setError(getString(R.string.error_invalid_name));
-            }
-
-            focusView = mName;
-            cancel = true;
-
-        }
-
-        //패스워드 확인과 패스워드 일치 확인하기.
-        if ( !password.equals(passwordConfirm) ) {
-
-            mPasswordView.setError(getString(R.string.error_different_password));
-            mPasswordConfirmView.setError(getString(R.string.error_different_password));
-
-            focusView = mPasswordView;
-            cancel = true;
-        }
-
-        //패스워드 확인 형식 확인하기.
-        if (TextUtils.isEmpty(passwordConfirm) || !isPasswordValid(passwordConfirm)) {
-            if(TextUtils.isEmpty(passwordConfirm)){
-                mPasswordConfirmView.setError(getString(R.string.error_field_required));
-            }
-            else{
-                mPasswordConfirmView.setError(getString(R.string.error_invalid_password));
-            }
-
-            focusView = mPasswordConfirmView;
-            cancel = true;
-        }
-
-        // 패스워드 형식 확인하기.
-        if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
-            if(TextUtils.isEmpty(password)){
-                mPasswordView.setError(getString(R.string.error_field_required));
-            }
-            else{
-                mPasswordView.setError(getString(R.string.error_invalid_password));
-            }
-
-            focusView = mPasswordView;
-            cancel = true;
-        }
-
-
-
-
-
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
-            cancel = true;
-        }
+//        //형식검사 예외처리 들어간다. 밑칸 -> 위칸 순으로 처리하여, 포커스가 위에 것이 최종 포커스가 되도록 하자.
+//
+//
+//        //생년월일 입력여부 확인하기.
+//        if( TextUtils.isEmpty(birthday) ){
+//
+//            mBirthday.setError(getString(R.string.error_field_required));
+//
+//            focusView = mBirthday;
+//            cancel = true;
+//
+//        }
+//
+//
+//        //이름 형식 확인하기.
+//        if( TextUtils.isEmpty(name) || !isNameValid(name) ){
+//
+//            if(TextUtils.isEmpty(name)){
+//                mName.setError(getString(R.string.error_field_required));
+//            }
+//            else{
+//                mName.setError(getString(R.string.error_invalid_name));
+//            }
+//
+//            focusView = mName;
+//            cancel = true;
+//
+//        }
+//
+//        //패스워드 확인과 패스워드 일치 확인하기.
+//        if ( !password.equals(passwordConfirm) ) {
+//
+//            mPasswordView.setError(getString(R.string.error_different_password));
+//            mPasswordConfirmView.setError(getString(R.string.error_different_password));
+//
+//            focusView = mPasswordView;
+//            cancel = true;
+//        }
+//
+//        //패스워드 확인 형식 확인하기.
+//        if (TextUtils.isEmpty(passwordConfirm) || !isPasswordValid(passwordConfirm)) {
+//            if(TextUtils.isEmpty(passwordConfirm)){
+//                mPasswordConfirmView.setError(getString(R.string.error_field_required));
+//            }
+//            else{
+//                mPasswordConfirmView.setError(getString(R.string.error_invalid_password));
+//            }
+//
+//            focusView = mPasswordConfirmView;
+//            cancel = true;
+//        }
+//
+//        // 패스워드 형식 확인하기.
+//        if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
+//            if(TextUtils.isEmpty(password)){
+//                mPasswordView.setError(getString(R.string.error_field_required));
+//            }
+//            else{
+//                mPasswordView.setError(getString(R.string.error_invalid_password));
+//            }
+//
+//            focusView = mPasswordView;
+//            cancel = true;
+//        }
+//
+//
+//
+//
+//
+//        // Check for a valid email address.
+//        if (TextUtils.isEmpty(email)) {
+//            mEmailView.setError(getString(R.string.error_field_required));
+//            focusView = mEmailView;
+//            cancel = true;
+//        } else if (!isEmailValid(email)) {
+//            mEmailView.setError(getString(R.string.error_invalid_email));
+//            focusView = mEmailView;
+//            cancel = true;
+//        }
 
         if (cancel) {
             // There was an error; don't attempt login and focus the first
@@ -248,13 +263,15 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+
+            mAuthTask = new userJoinTask(email, password, name, birthday);
+
+
             mAuthTask.execute((Void) null);
         }
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
 
 
 //        return email.contains("@");
@@ -379,34 +396,35 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class userJoinTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mEmail;
         private final String mPassword;
+        private final String mName;
+        private final String mBirthday;
 
-        UserLoginTask(String email, String password) {
+        userJoinTask(String email, String password, String name, String birthday) {
             mEmail = email;
             mPassword = password;
+            mName = name;
+            mBirthday = birthday;
+
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
 
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
+            registDB rdb = new registDB();
+            rdb.execute();
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
+//            for (String credential : DUMMY_CREDENTIALS) {
+//                String[] pieces = credential.split(":");
+//                if (pieces[0].equals(mEmail)) {
+//                    // Account exists, return true if the password matches.
+//                    return pieces[1].equals(mPassword);
+//                }
+//            }
 
             // TODO: register the new account here.
             return true;
@@ -418,7 +436,11 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
             showProgress(false);
 
             if (success) {
-                finish();
+
+                Snackbar.make(getWindow().getDecorView().getRootView(), "계정"+email+"으로 가입 성공", Snackbar.LENGTH_SHORT).show();
+
+//
+//                finish();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
@@ -431,5 +453,57 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
             showProgress(false);
         }
     }
+
+    public class registDB extends AsyncTask<Void, Integer, Void>
+    {
+
+        @Override
+        protected Void doInBackground(Void... unused) {
+
+/* 인풋 파라메터값 생성 */
+            String param = "u_email=" + email + "&u_pw=" + password + "&u_name=" + name + "&u_birthday=" + birthday ;
+            try {
+/* 서버연결 */
+                URL url = new URL(
+                        "http://115.68.231.13/project/android/join.php");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                conn.setRequestMethod("POST");
+                conn.setDoInput(true);
+                conn.connect();
+
+/* 안드로이드 -> 서버 파라메터값 전달 */
+                OutputStream outs = conn.getOutputStream();
+                outs.write(param.getBytes("UTF-8"));
+                outs.flush();
+                outs.close();
+
+/* 서버 -> 안드로이드 파라메터값 전달 */
+                InputStream is = null;
+                BufferedReader in = null;
+                String data = "";
+
+                is = conn.getInputStream();
+                in = new BufferedReader(new InputStreamReader(is), 8 * 1024);
+                String line = null;
+                StringBuffer buff = new StringBuffer();
+                while ( ( line = in.readLine() ) != null )
+                {
+                    buff.append(line + "\n");
+                }
+                data = buff.toString().trim();
+                Log.e("RECV DATA",data);
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+    }
+
 }
 
