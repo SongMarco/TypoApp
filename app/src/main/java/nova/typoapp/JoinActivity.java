@@ -14,13 +14,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -56,8 +56,11 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
     };
 
     ///TODO 각종 정규식들. 별도 파일에 저장할 것@@, 암호는 조합이 되도록 할 것.(필수 조합입력)
-    public static final Pattern VALID_PASSWOLD_REGEX_ALPHA_NUM = Pattern.compile("^[a-zA-Z0-9!@.#$%^&*?_~]{4,16}$");// 4자리 ~ 16자리까지 가능
+
     public static final Pattern VALID_NAME = Pattern.compile("^[가-힣a-zA-Z]{1,10}$");
+
+
+
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -66,11 +69,12 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
 
     // UI references.
     private AutoCompleteTextView mEmailView;
+    private TextInputLayout textEmail, textPassword, textPasswordConf, textName, textBirthday;
     private EditText mPasswordView, mPasswordConfirmView, mName, mBirthday;
     private View mProgressView;
     private View mLoginFormView;
 
-    String email, password, name, birthday;
+    String email, password, passwordConfirm, name, birthday;
 
 
 
@@ -83,29 +87,34 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         populateAutoComplete();
 
         mPasswordView = (EditText) findViewById(R.id.editPassword);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    attemptJoin();
-                    return true;
-                }
-                return false;
-            }
-        });
-
-
         mPasswordConfirmView = (EditText)findViewById(R.id.editPasswordConfirm);
-        mPasswordConfirmView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    attemptJoin();
-                    return true;
-                }
-                return false;
-            }
-        });
+        mBirthday = (EditText)findViewById(R.id.editBirthday);
+        mName = (EditText)findViewById(R.id.editName);
+
+
+//        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//            @Override
+//            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+//                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+//                    attemptJoin();
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
+
+
+
+//        mPasswordConfirmView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//            @Override
+//            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+//                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+//                    attemptJoin();
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
 
         Button buttonSignUp = (Button) findViewById(R.id.email_sign_in_button);
         buttonSignUp.setOnClickListener(new OnClickListener() {
@@ -117,7 +126,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
             }
         });
 
-        mBirthday = (EditText)findViewById(R.id.editBirthday);
+
         mBirthday.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,19 +138,161 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
 
 
 
+        textEmail = (TextInputLayout)findViewById(R.id.textEmail);
+        textPassword= (TextInputLayout)findViewById(R.id.textPassword);
+        textPasswordConf = (TextInputLayout)findViewById(R.id.textPasswordConf);
+        textName = (TextInputLayout)findViewById(R.id.textName);
+        textBirthday = (TextInputLayout)findViewById(R.id.textBirthday);
 
-        mName = (EditText)findViewById(R.id.editName);
+
+        mEmailView.setOnFocusChangeListener(focusChangeListener);
+        mPasswordView.setOnFocusChangeListener(focusChangeListener);
+        mPasswordConfirmView.setOnFocusChangeListener(focusChangeListener);
+        mName.setOnFocusChangeListener(focusChangeListener);
+        mBirthday.setOnFocusChangeListener(focusChangeListener);
+
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
+
+    View.OnFocusChangeListener focusChangeListener = new View.OnFocusChangeListener() {
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+
+            if(!hasFocus){
+
+
+                switch (v.getId()) {
+
+                    // 주의 : 생년 월일은 다이얼로그에서 처리하였다. 입력 완료 -> 에러 널로!
+                    case R.id.editName:
+
+                        textName.setErrorEnabled(true);
+                        name = mName.getText().toString();
+
+                        if( TextUtils.isEmpty(name) || !isNameValid(name) ){
+
+                            if(TextUtils.isEmpty(name)){
+                                textName.setError(getString(R.string.error_field_required));
+                            }
+                            else{
+                                textName.setError(getString(R.string.error_invalid_name));
+                            }
+
+
+                        }
+                        //no Error
+                        else{
+                            textName.setError(null);
+                            textName.setErrorEnabled(false);
+                        }
+
+                        break;
+
+
+                    case R.id.email:
+                        textEmail.setErrorEnabled(true);
+                        email = mEmailView.getText().toString();
+
+                        // Check for a valid email address.
+                        if (TextUtils.isEmpty(email)) {
+                            textEmail.setError(getString(R.string.error_field_required));
+
+
+                        } else if (!isEmailValid(email)) {
+                            textEmail.setError(getString(R.string.error_invalid_email));
+
+                        }
+                        //에러가 없다
+                        else {
+
+                            textEmail.setError(null);
+                            textEmail.setErrorEnabled(false);
+                        }
+
+
+                        break;
+                    case R.id.editPassword:
+
+                        textPassword.setErrorEnabled(true);
+                        password = mPasswordView.getText().toString();
+
+                        // 패스워드 형식 확인하기.
+                        if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
+                            if(TextUtils.isEmpty(password)){
+                                textPassword.setError(getString(R.string.error_field_required));
+                            }
+                            else if(!isPasswordValid(password)){
+                                textPassword.setError(getString(R.string.error_invalid_password));
+                            }
+
+                        }
+                        //no error
+                        else{
+
+                            textPassword.setError(null);
+                            textPassword.setErrorEnabled(false);
+                        }
+
+
+                        mPasswordView.setNextFocusDownId(R.id.editPasswordConfirm);
+
+                        break;
+                    case R.id.editPasswordConfirm:
+
+                        // 암호 확인은 입력이 마지막꺼라서 안되니까 컨펌할때 한번더 입력한다.
+                        textPasswordConf.setErrorEnabled(true);
+                        passwordConfirm = mPasswordConfirmView.getText().toString();
+
+                        //패스워드 확인 형식 확인하기.
+                        if (TextUtils.isEmpty(passwordConfirm) || !isPasswordValid(passwordConfirm)) {
+                            if(TextUtils.isEmpty(passwordConfirm)){
+                                textPasswordConf.setError(getString(R.string.error_field_required));
+                            }
+                            else{
+                                textPasswordConf.setError(getString(R.string.error_invalid_password));
+                            }
+
+                        }
+                        //no error
+                        else{
+
+                            textPasswordConf.setError(null);
+                            textPasswordConf.setErrorEnabled(false);
+                        }
+
+                        break;
+
+
+                }
+            }
+
+        }
+    };
+
+    TextView.OnEditorActionListener editorActionListener = new TextView.OnEditorActionListener() {
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            //입력 후 에러 체크하기
+
+
+
+            return false;
+        }
+    };
 
     private DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
             monthOfYear++;
 
-            mBirthday.setText(year + "." + monthOfYear + "." + dayOfMonth);
+            birthday = year + "." + monthOfYear + "." + dayOfMonth;
+            mBirthday.setText(birthday);
+
+            textBirthday.setError(null);
+            textBirthday.setErrorEnabled(false);
+
 //            Toast.makeText(getApplicationContext(), year + "년" + monthOfYear + "월" + dayOfMonth +"일", Toast.LENGTH_SHORT).show();
         }
     };
@@ -163,15 +314,16 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         }
 
         // Reset errors.
-        mEmailView.setError(null);
-        mPasswordView.setError(null);
+//        mEmailView.setError(null);
+//        mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        email = mEmailView.getText().toString();
-        password = mPasswordView.getText().toString();
-        String passwordConfirm = mPasswordConfirmView.getText().toString();
-        name = mName.getText().toString();
-        birthday = mBirthday.getText().toString();
+
+
+        textPasswordConf.setErrorEnabled(true);
+        passwordConfirm = mPasswordConfirmView.getText().toString();
+
+
 
 
         boolean cancel = false;
@@ -183,9 +335,9 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         //생년월일 입력여부 확인하기.
         if( TextUtils.isEmpty(birthday) ){
 
-            mBirthday.setError(getString(R.string.error_field_required));
+            textBirthday.setError(getString(R.string.error_field_required));
 
-            focusView = mBirthday;
+            focusView = textBirthday;
             cancel = true;
 
         }
@@ -195,64 +347,65 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         if( TextUtils.isEmpty(name) || !isNameValid(name) ){
 
             if(TextUtils.isEmpty(name)){
-                mName.setError(getString(R.string.error_field_required));
+                textName.setError(getString(R.string.error_field_required));
             }
             else{
-                mName.setError(getString(R.string.error_invalid_name));
+                textName.setError(getString(R.string.error_invalid_name));
             }
 
-            focusView = mName;
+            focusView = textName;
             cancel = true;
 
         }
 
-        //패스워드 확인과 패스워드 일치 확인하기.
-        if ( !password.equals(passwordConfirm) ) {
 
-            mPasswordView.setError(getString(R.string.error_different_password));
-            mPasswordConfirmView.setError(getString(R.string.error_different_password));
-
-            focusView = mPasswordView;
-            cancel = true;
-        }
 
         //패스워드 확인 형식 확인하기.
         if (TextUtils.isEmpty(passwordConfirm) || !isPasswordValid(passwordConfirm)) {
             if(TextUtils.isEmpty(passwordConfirm)){
-                mPasswordConfirmView.setError(getString(R.string.error_field_required));
+                textPasswordConf.setError(getString(R.string.error_field_required));
             }
             else{
-                mPasswordConfirmView.setError(getString(R.string.error_invalid_password));
+                textPasswordConf.setError(getString(R.string.error_invalid_password));
             }
 
-            focusView = mPasswordConfirmView;
+            focusView = textPasswordConf;
             cancel = true;
         }
 
         // 패스워드 형식 확인하기.
         if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
             if(TextUtils.isEmpty(password)){
-                mPasswordView.setError(getString(R.string.error_field_required));
+                textPassword.setError(getString(R.string.error_field_required));
             }
             else{
-                mPasswordView.setError(getString(R.string.error_invalid_password));
+                textPassword.setError(getString(R.string.error_invalid_password));
             }
 
-            focusView = mPasswordView;
+            focusView = textPassword;
+            cancel = true;
+        }
+
+        //패스워드 확인과 패스워드 일치 확인하기.
+        if (  (password!=null && passwordConfirm!=null) && !password.equals(passwordConfirm) ) {
+
+            textPassword.setError(getString(R.string.error_different_password));
+            textPasswordConf.setError(getString(R.string.error_different_password));
+
+            focusView = textPassword;
             cancel = true;
         }
 
 
 
 
-
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
+            textEmail.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
         } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
+            textEmail.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
         }
@@ -267,11 +420,11 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
             showProgress(true);
 
             mAuthTask = new userJoinTask(email, password, name, birthday);
-
-
             mAuthTask.execute((Void) null);
         }
     }
+
+
 
     private boolean isEmailValid(String email) {
 
@@ -282,25 +435,32 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
     }
 
     private boolean isPasswordValid(String password) {
-        //비밀번호정규식
+        Pattern pattern;
+        Matcher matcher;
 
-        Matcher matcher = VALID_PASSWOLD_REGEX_ALPHA_NUM.matcher(password);
+        final String PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^*()&+=])(?=\\S+$).{4,}$";
+        final String PASSWORD_PATTERN_noBig = "^(?=.*[0-9])(?=.*[a-z])(?=.*[!@#$%^*()&+=])(?=\\S+$).{4,16}$";
+        pattern = Pattern.compile(PASSWORD_PATTERN_noBig);
+        matcher = pattern.matcher(password);
+
         return matcher.matches();
-
-
-//        Util.validatePassword("가나다라"); // => false
-//        Util.validatePassword("aaa"); // => false
-//
-//        //TODO: Replace this with your own logic
-//        return password.length() > 4;
     }
 
     private boolean isNameValid(String name){
 
-        Matcher matcher = VALID_NAME.matcher(name);
+        Pattern pattern;
+        Matcher matcher;
+
+        final String NAME_PATTERN = "^[가-힣a-zA-Z]{1,10}$";
+
+        pattern = Pattern.compile(NAME_PATTERN);
+        matcher = pattern.matcher(name);
+
         return matcher.matches();
 
     }
+
+
 
 
 

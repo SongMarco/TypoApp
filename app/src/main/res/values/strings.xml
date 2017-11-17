@@ -10,11 +10,12 @@
 
     <!-- Strings related to login -->
     <string name="prompt_email">이메일</string>
-    <string name="prompt_password">비밀번호</string>
+    <string name="prompt_password">비밀번호(영문+숫자+특수문자 조합, 6~16자리)</string>
     <string name="prompt_password_confirm">비밀번호 확인</string>
 
-    <string name="prompt_birthday">생년월일</string>
-    <string name="prompt_name">사용자 이름</string>
+    <string name="prompt_birthday">생년월일 (터치하여 날짜 입력)</string>
+    <string name="prompt_name">사용자 이름(한글 / 영어 대문자, 소문자 1~10자)</string>
+
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_join">회원 가입</string>
 
@@ -22,8 +23,8 @@
 
 
     <string name="error_invalid_email">올바른 형식의 이메일을 입력해주세요</string>
-    <string name="error_invalid_password">올바른 형식의 비밀번호를 입력해주세요</string>
-    <string name="error_invalid_name">올바른 형식의 이름을 입력해주세요</string>
+    <string name="error_invalid_password">올바른 형식의 비밀번호를 입력해주세요 (영문 + 숫자 + 특수문자 조합, 6~16자리) </string>
+    <string name="error_invalid_name">올바른 형식의 이름을 입력해주세요 (한글 / 영어 대문자, 소문자 1~10자)</string>
 
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">필수 항목을 반드시 입력해주세요</string>
