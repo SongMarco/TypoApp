@@ -47,4 +47,6 @@
     <!--내가 만든 문자열들-->
 
     <string name="login_Or">또는</string>
+
+    <string name="facebook_app_id">367488190367299</string>
 </resources>

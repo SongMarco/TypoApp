@@ -3,9 +3,11 @@ package nova.typoapp;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -19,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -68,7 +71,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
 
     String email, password, passwordConfirm, name, birthday;
 
-
+    DatePicker datepicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,8 +125,42 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         mBirthday.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatePickerDialog dialog = new DatePickerDialog(JoinActivity.this, listener, 1992, 5, 27);
-                dialog.show();
+
+//                DatePickerDialog dialog = new DatePickerDialog(JoinActivity.this, listener, 1992, 5, 27);
+//                dialog.set
+//
+//                dialog.show();
+
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(JoinActivity.this);
+                LayoutInflater inflater = getLayoutInflater();
+                View view = inflater.inflate(R.layout.dialog_datepick, null);
+
+                //todo 와 이거진짜 돌았어!! 내가 inflate 시킨 view에서 findVB처리해야지 변수가 잡히는구나@@@@
+                datepicker = (DatePicker)view.findViewById(R.id.datePicker);
+
+                builder.setView(view);
+                builder.setPositiveButton("확인", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int year, monthOfYear, dayOfMonth;
+                        year = datepicker.getYear();
+                        monthOfYear = datepicker.getMonth()+1;
+                        dayOfMonth = datepicker.getDayOfMonth();
+
+                        birthday = year + "." + monthOfYear + "." + dayOfMonth;
+            mBirthday.setText(birthday);
+
+            textBirthday.setError(null);
+            textBirthday.setErrorEnabled(false);
+                        dialog.dismiss();
+                    }});
+                builder.setNeutralButton("취소", null);
+
+
+
+                final AlertDialog customDialog = builder.create();
+                customDialog.show();
             }
         });
 
@@ -147,6 +184,25 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
+
+//    DialogInterface.OnClickListener dateListener = new DialogInterface.OnClickListener() {
+//        @Override
+//        public void onClick(DialogInterface dialog, int which) {
+//
+//
+//            year = datepicker.getYear();
+//            monthOfYear = datepicker.getMonth();
+//            dayOfMonth = datepicker.getDayOfMonth();
+//
+//            birthday = year + "." + monthOfYear + "." + dayOfMonth;
+//            mBirthday.setText(birthday);
+//
+//            textBirthday.setError(null);
+//            textBirthday.setErrorEnabled(false);
+//        }
+//
+//    };
+
 
     View.OnFocusChangeListener focusChangeListener = new View.OnFocusChangeListener() {
         @Override

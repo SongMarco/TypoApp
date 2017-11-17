@@ -1,22 +1,23 @@
 package nova.typoapp;
 
-import android.support.design.widget.TabLayout;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -119,8 +120,24 @@ public class MainActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
+            WebView mWebView = (WebView)rootView.findViewById(R.id.webView);
+            WebSettings mWebSettings; //웹뷰세팅
+
+
+            if(getArguments().getInt(ARG_SECTION_NUMBER) == 1){
+                // 웹뷰 세팅
+               //레이어와 연결
+                mWebView .setWebViewClient(new WebViewClient()); // 클릭시 새창 안뜨게
+                mWebSettings = mWebView.getSettings(); //세부 세팅 등록
+                mWebSettings.setJavaScriptEnabled(true); // 자바스크립트 사용 허용
+
+                mWebView.loadUrl("http://115.68.231.13/"); //원하는 URL  입력
+            }
             textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+
+
             return rootView;
         }
     }
