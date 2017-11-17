@@ -95,7 +95,7 @@
 
                 <AutoCompleteTextView
                     style="@style/textForm"
-                    android:id="@+id/email"
+                    android:id="@+id/loginEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_email"

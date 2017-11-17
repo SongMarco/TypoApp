@@ -18,6 +18,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -27,7 +28,16 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,13 +53,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private static final int REQUEST_READ_CONTACTS = 0;
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
+
+
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -61,15 +66,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
 
+    String email, password;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mEmailView = (AutoCompleteTextView) findViewById(R.id.loginEmail);
         populateAutoComplete();
 
-        mPasswordView = (EditText) findViewById(R.id.passwordLogin);
+        mPasswordView = (EditText) findViewById(R.id.loginPassword);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -117,11 +123,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             switch (v.getId()) {
 
 //   buttonLogin은 위에서 이미 리스너가 지정되있다.
-//        case R.id.buttonLogin:
+                case R.id.buttonLogin:
 //                    Toast.makeText(LoginActivity.this, "로그인 되었습니다.", Toast.LENGTH_SHORT).show();
-////                    intent = new Intent(getApplicationContext(), WorkoutActivity.class);
-////                    startActivityForResult(intent, REQUEST_CODE_WORKOUT);
-//                    break;
+
+                    attemptLogin();
+
+
+                    break;
                 case R.id.buttonJoin:
                     intent = new Intent(getApplicationContext(), JoinActivity.class);
                     startActivity(intent);
@@ -190,8 +198,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        email = mEmailView.getText().toString();
+        password = mPasswordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -345,23 +353,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
 
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
+            //DB에서 회원 정보를 확인하고 로그인하라
+            CheckDB cdb = new CheckDB();
+            cdb.execute();
 
-            // TODO: register the new account here.
             return true;
+
+
         }
 
         @Override
@@ -369,18 +368,94 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mAuthTask = null;
             showProgress(false);
 
-            if (success) {
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
         }
 
         @Override
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
+        }
+    }
+    public class CheckDB extends AsyncTask<Void, Integer, Boolean>
+    {
+        String msg_result = "";
+        @Override
+        protected Boolean doInBackground(Void... unused) {
+
+/* 인풋 파라메터값 생성 */
+            String param = "u_email=" + email + "&u_pw=" + password;
+
+            boolean success = false;
+
+            try {
+/* 서버연결 */
+                URL url = new URL(
+                        "http://115.68.231.13/project/android/login.php");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                conn.setRequestMethod("POST");
+                conn.setDoInput(true);
+                conn.connect();
+
+/* 안드로이드 -> 서버 파라메터값 전달 */
+                OutputStream outs = conn.getOutputStream();
+                outs.write(param.getBytes("UTF-8"));
+                outs.flush();
+                outs.close();
+
+/* 서버 -> 안드로이드 파라메터값 전달 */
+                InputStream is = null;
+                BufferedReader in = null;
+
+
+                is = conn.getInputStream();
+                in = new BufferedReader(new InputStreamReader(is), 8 * 1024);
+                String line = null;
+                StringBuffer buff = new StringBuffer();
+                while ( ( line = in.readLine() ) != null )
+                {
+                    buff.append(line + "\n");
+                }
+                msg_result = buff.toString().trim();
+                // RECV 데이터에 php에서 뱉은 echo가 들어간다!
+                Log.e("RECV DATA",msg_result);
+
+                if(msg_result.contains("success")){
+                    success = true;
+                }
+
+                Log.e("success", String.valueOf(success));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            return success;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            super.onPostExecute(success);
+
+            if(success){
+//                Snackbar.make(findViewById(R.id.email_sign_in_button), "환영합니다. 계정"+email+"으로 가입하셨습니다.", Snackbar.LENGTH_LONG).show();
+
+                Toast.makeText(LoginActivity.this, "환영합니다. 계정"+email+"으로 로그인하셨습니다.", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+
+
+            }
+            //로그인이 실패하였다.
+            //에러메시지를 확인하고, 해당 에러를 텍스트뷰에 세팅한다.
+            else{
+
+                Toast.makeText(LoginActivity.this, "이메일 또는 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
+
+            }
+
         }
     }
 }

@@ -11,6 +11,8 @@
     <!-- Strings related to login -->
     <string name="prompt_email">이메일</string>
     <string name="prompt_password">비밀번호(영문+숫자+특수문자 조합, 6~16자리)</string>
+
+    <string name="hint_password">비밀번호</string>
     <string name="prompt_password_confirm">비밀번호 확인</string>
 
     <string name="prompt_birthday">생년월일 (터치하여 날짜 입력)</string>

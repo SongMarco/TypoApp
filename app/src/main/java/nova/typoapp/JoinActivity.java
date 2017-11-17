@@ -27,6 +27,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -47,15 +48,6 @@ import java.util.regex.Pattern;
  */
 public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
-
-    ///TODO 각종 정규식들. 별도 파일에 저장할 것@@, 암호는 조합이 되도록 할 것.(필수 조합입력)
 
     public static final Pattern VALID_NAME = Pattern.compile("^[가-힣a-zA-Z]{1,10}$");
 
@@ -83,7 +75,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join);
         // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mEmailView = (AutoCompleteTextView) findViewById(R.id.loginEmail);
         populateAutoComplete();
 
         mPasswordView = (EditText) findViewById(R.id.editPassword);
@@ -191,7 +183,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
                         break;
 
 
-                    case R.id.email:
+                    case R.id.loginEmail:
                         textEmail.setErrorEnabled(true);
                         email = mEmailView.getText().toString();
 
@@ -575,7 +567,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
+
 
             //DB에 회원 정보를 중복체크 후 기입한다.
             registDB rdb = new registDB();
@@ -589,14 +581,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
             mAuthTask = null;
             showProgress(false);
 
-            if (success) {
 
-
-//                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
         }
 
         @Override
@@ -670,19 +655,18 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
             super.onPostExecute(success);
 
             if(success){
-                Snackbar.make(findViewById(R.id.email_sign_in_button), "환영합니다. 계정"+email+"으로 가입하셨습니다.", Snackbar.LENGTH_LONG).show();
+//                Snackbar.make(findViewById(R.id.email_sign_in_button), "환영합니다. 계정"+email+"으로 가입하셨습니다.", Snackbar.LENGTH_LONG).show();
+
+                Toast.makeText(JoinActivity.this, "환영합니다. 계정"+email+"으로 가입하셨습니다.", Toast.LENGTH_SHORT).show();
+
+                finish();
             }
-            //아이디 중복, 생년월일+이름 중복으로 가입이 실패하였다.
+            //아이디 중복으로 가입이 실패하였다.
             //에러메시지를 확인하고, 해당 에러를 텍스트뷰에 세팅한다.
             else{
                 if(msg_result.contains("email")){
                     Snackbar.make(findViewById(R.id.email_sign_in_button), "이미 가입된 이메일입니다.", Snackbar.LENGTH_LONG).show();
                     textEmail.setErrorEnabled(true);
-                    textEmail.setError(getString(R.string.error_mail_exists));
-                }
-                else if(msg_result.contains("name_birthday")){
-                    Snackbar.make(findViewById(R.id.email_sign_in_button), "이미 가입된 사람입니다.(생일/이름 존재)", Snackbar.LENGTH_LONG).show();
-                    textName.setErrorEnabled(true);
                     textEmail.setError(getString(R.string.error_mail_exists));
 
                 }
