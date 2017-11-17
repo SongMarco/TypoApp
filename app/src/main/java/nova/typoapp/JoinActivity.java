@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -86,19 +87,20 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
+                    attemptJoin();
                     return true;
                 }
                 return false;
             }
         });
 
+
         mPasswordConfirmView = (EditText)findViewById(R.id.editPasswordConfirm);
         mPasswordConfirmView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
+                    attemptJoin();
                     return true;
                 }
                 return false;
@@ -109,7 +111,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         buttonSignUp.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                attemptJoin();
 
 
             }
@@ -155,7 +157,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptLogin() {
+    private void attemptJoin() {
         if (mAuthTask != null) {
             return;
         }
@@ -175,85 +177,85 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         boolean cancel = false;
         View focusView = null;
 
-//        //형식검사 예외처리 들어간다. 밑칸 -> 위칸 순으로 처리하여, 포커스가 위에 것이 최종 포커스가 되도록 하자.
-//
-//
-//        //생년월일 입력여부 확인하기.
-//        if( TextUtils.isEmpty(birthday) ){
-//
-//            mBirthday.setError(getString(R.string.error_field_required));
-//
-//            focusView = mBirthday;
-//            cancel = true;
-//
-//        }
-//
-//
-//        //이름 형식 확인하기.
-//        if( TextUtils.isEmpty(name) || !isNameValid(name) ){
-//
-//            if(TextUtils.isEmpty(name)){
-//                mName.setError(getString(R.string.error_field_required));
-//            }
-//            else{
-//                mName.setError(getString(R.string.error_invalid_name));
-//            }
-//
-//            focusView = mName;
-//            cancel = true;
-//
-//        }
-//
-//        //패스워드 확인과 패스워드 일치 확인하기.
-//        if ( !password.equals(passwordConfirm) ) {
-//
-//            mPasswordView.setError(getString(R.string.error_different_password));
-//            mPasswordConfirmView.setError(getString(R.string.error_different_password));
-//
-//            focusView = mPasswordView;
-//            cancel = true;
-//        }
-//
-//        //패스워드 확인 형식 확인하기.
-//        if (TextUtils.isEmpty(passwordConfirm) || !isPasswordValid(passwordConfirm)) {
-//            if(TextUtils.isEmpty(passwordConfirm)){
-//                mPasswordConfirmView.setError(getString(R.string.error_field_required));
-//            }
-//            else{
-//                mPasswordConfirmView.setError(getString(R.string.error_invalid_password));
-//            }
-//
-//            focusView = mPasswordConfirmView;
-//            cancel = true;
-//        }
-//
-//        // 패스워드 형식 확인하기.
-//        if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
-//            if(TextUtils.isEmpty(password)){
-//                mPasswordView.setError(getString(R.string.error_field_required));
-//            }
-//            else{
-//                mPasswordView.setError(getString(R.string.error_invalid_password));
-//            }
-//
-//            focusView = mPasswordView;
-//            cancel = true;
-//        }
-//
-//
-//
-//
-//
-//        // Check for a valid email address.
-//        if (TextUtils.isEmpty(email)) {
-//            mEmailView.setError(getString(R.string.error_field_required));
-//            focusView = mEmailView;
-//            cancel = true;
-//        } else if (!isEmailValid(email)) {
-//            mEmailView.setError(getString(R.string.error_invalid_email));
-//            focusView = mEmailView;
-//            cancel = true;
-//        }
+        //형식검사 예외처리 들어간다. 밑칸 -> 위칸 순으로 처리하여, 포커스가 위에 것이 최종 포커스가 되도록 하자.
+
+
+        //생년월일 입력여부 확인하기.
+        if( TextUtils.isEmpty(birthday) ){
+
+            mBirthday.setError(getString(R.string.error_field_required));
+
+            focusView = mBirthday;
+            cancel = true;
+
+        }
+
+
+        //이름 형식 확인하기.
+        if( TextUtils.isEmpty(name) || !isNameValid(name) ){
+
+            if(TextUtils.isEmpty(name)){
+                mName.setError(getString(R.string.error_field_required));
+            }
+            else{
+                mName.setError(getString(R.string.error_invalid_name));
+            }
+
+            focusView = mName;
+            cancel = true;
+
+        }
+
+        //패스워드 확인과 패스워드 일치 확인하기.
+        if ( !password.equals(passwordConfirm) ) {
+
+            mPasswordView.setError(getString(R.string.error_different_password));
+            mPasswordConfirmView.setError(getString(R.string.error_different_password));
+
+            focusView = mPasswordView;
+            cancel = true;
+        }
+
+        //패스워드 확인 형식 확인하기.
+        if (TextUtils.isEmpty(passwordConfirm) || !isPasswordValid(passwordConfirm)) {
+            if(TextUtils.isEmpty(passwordConfirm)){
+                mPasswordConfirmView.setError(getString(R.string.error_field_required));
+            }
+            else{
+                mPasswordConfirmView.setError(getString(R.string.error_invalid_password));
+            }
+
+            focusView = mPasswordConfirmView;
+            cancel = true;
+        }
+
+        // 패스워드 형식 확인하기.
+        if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
+            if(TextUtils.isEmpty(password)){
+                mPasswordView.setError(getString(R.string.error_field_required));
+            }
+            else{
+                mPasswordView.setError(getString(R.string.error_invalid_password));
+            }
+
+            focusView = mPasswordView;
+            cancel = true;
+        }
+
+
+
+
+
+        // Check for a valid email address.
+        if (TextUtils.isEmpty(email)) {
+            mEmailView.setError(getString(R.string.error_field_required));
+            focusView = mEmailView;
+            cancel = true;
+        } else if (!isEmailValid(email)) {
+            mEmailView.setError(getString(R.string.error_invalid_email));
+            focusView = mEmailView;
+            cancel = true;
+        }
 
         if (cancel) {
             // There was an error; don't attempt login and focus the first
