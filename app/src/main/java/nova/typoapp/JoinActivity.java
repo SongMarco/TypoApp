@@ -577,18 +577,10 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
 
+            //DB에 회원 정보를 중복체크 후 기입한다.
             registDB rdb = new registDB();
             rdb.execute();
 
-//            for (String credential : DUMMY_CREDENTIALS) {
-//                String[] pieces = credential.split(":");
-//                if (pieces[0].equals(mEmail)) {
-//                    // Account exists, return true if the password matches.
-//                    return pieces[1].equals(mPassword);
-//                }
-//            }
-
-            // TODO: register the new account here.
             return true;
         }
 
@@ -599,9 +591,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
 
             if (success) {
 
-                Snackbar.make(getWindow().getDecorView().getRootView(), "계정"+email+"으로 가입 성공", Snackbar.LENGTH_SHORT).show();
 
-//
 //                finish();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
@@ -616,18 +606,21 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         }
     }
 
-    public class registDB extends AsyncTask<Void, Integer, Void>
+    public class registDB extends AsyncTask<Void, Integer, Boolean>
     {
-
+        String msg_result = "";
         @Override
-        protected Void doInBackground(Void... unused) {
+        protected Boolean doInBackground(Void... unused) {
 
 /* 인풋 파라메터값 생성 */
             String param = "u_email=" + email + "&u_pw=" + password + "&u_name=" + name + "&u_birthday=" + birthday ;
+
+            boolean success = false;
+
             try {
 /* 서버연결 */
                 URL url = new URL(
-                        "http://115.68.231.13/project/android/join.php");
+                        "http://115.68.231.13/project/android/join2.php");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                 conn.setRequestMethod("POST");
@@ -643,7 +636,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
 /* 서버 -> 안드로이드 파라메터값 전달 */
                 InputStream is = null;
                 BufferedReader in = null;
-                String data = "";
+
 
                 is = conn.getInputStream();
                 in = new BufferedReader(new InputStreamReader(is), 8 * 1024);
@@ -653,18 +646,50 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
                 {
                     buff.append(line + "\n");
                 }
-                data = buff.toString().trim();
-                Log.e("RECV DATA",data);
+                msg_result = buff.toString().trim();
+                // RECV 데이터에 php에서 뱉은 echo가 들어간다!
+                Log.e("RECV DATA",msg_result);
 
+                if(msg_result.contains("success")){
+                    success = true;
+                }
+
+                Log.e("success", String.valueOf(success));
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            return null;
+
+            return success;
         }
 
+        @Override
+        protected void onPostExecute(Boolean success) {
+            super.onPostExecute(success);
+
+            if(success){
+                Snackbar.make(findViewById(R.id.email_sign_in_button), "환영합니다. 계정"+email+"으로 가입하셨습니다.", Snackbar.LENGTH_LONG).show();
+            }
+            //아이디 중복, 생년월일+이름 중복으로 가입이 실패하였다.
+            //에러메시지를 확인하고, 해당 에러를 텍스트뷰에 세팅한다.
+            else{
+                if(msg_result.contains("email")){
+                    Snackbar.make(findViewById(R.id.email_sign_in_button), "이미 가입된 이메일입니다.", Snackbar.LENGTH_LONG).show();
+                    textEmail.setErrorEnabled(true);
+                    textEmail.setError(getString(R.string.error_mail_exists));
+                }
+                else if(msg_result.contains("name_birthday")){
+                    Snackbar.make(findViewById(R.id.email_sign_in_button), "이미 가입된 사람입니다.(생일/이름 존재)", Snackbar.LENGTH_LONG).show();
+                    textName.setErrorEnabled(true);
+                    textEmail.setError(getString(R.string.error_mail_exists));
+
+                }
+
+            }
+
+        }
     }
 
 }
