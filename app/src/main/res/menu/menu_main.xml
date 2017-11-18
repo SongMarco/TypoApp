@@ -7,4 +7,24 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+
+    <item
+        android:title="@string/action_profile"
+        android:id="@+id/action_profile"
+
+        android:orderInCategory="99"
+        app:showAsAction="never"
+        />
+
+    <item
+        android:title="@string/action_logout"
+        android:id="@+id/action_logout"
+
+        android:orderInCategory="101"
+        app:showAsAction="never"
+        />
+
+
+
+
 </menu>

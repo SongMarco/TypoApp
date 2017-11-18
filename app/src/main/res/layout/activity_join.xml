@@ -102,6 +102,8 @@
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:singleLine="true"
+
+                    android:imeOptions="actionNext"
                     android:nextFocusDown="@+id/editPassword"/>
 
             </android.support.design.widget.TextInputLayout>

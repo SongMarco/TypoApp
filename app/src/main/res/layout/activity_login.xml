@@ -112,14 +112,17 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="10dp"/>
 
-            <com.facebook.login.widget.LoginButton
 
-                android:id="@+id/login_facebook"
+                <Button
+                android:id="@+id/buttonFacebookLogin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="30dp"
-                android:layout_marginTop="30dp" />
+                android:layout_marginBottom="10dp"
+                android:backgroundTint="@color/colorAccent"
+                android:text="페이스북으로 로그인"
+                android:textColor="#ffffff"
+                android:textStyle="bold"
+                />
 
         </LinearLayout>
 

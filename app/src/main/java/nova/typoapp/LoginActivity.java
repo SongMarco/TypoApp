@@ -30,15 +30,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -77,7 +79,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+
     private CallbackManager callbackManager;
+
+    private List<String> permissionNeeds = Arrays.asList("email");
+    Button buttonFacebook;
 
     String email, password;
     @Override
@@ -86,42 +92,61 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         FacebookSdk.sdkInitialize(this.getApplicationContext());
         setContentView(R.layout.activity_login);
 
-        //페북 버튼 활성화 관련부분
+        buttonFacebook = (Button)findViewById(R.id.buttonFacebookLogin);
+        setLoginButton();
+
         callbackManager = CallbackManager.Factory.create();
-
-        LoginButton loginButton = (LoginButton) findViewById(R.id.login_facebook);
-        loginButton.setReadPermissions(Arrays.asList("public_profile", "email"));
-        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
-            public void onSuccess(LoginResult loginResult) {
-                GraphRequest graphRequest = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(JSONObject object, GraphResponse response) {
-                        Log.v("result",object.toString());
+            public void onSuccess(final LoginResult result) {
 
-                        Toast.makeText(LoginActivity.this, "페이스북 계정으로 로그인합니다.", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        startActivity(intent);
+                GraphRequest request;
+                request = GraphRequest.newMeRequest(result.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+
+                    @Override
+                    public void onCompleted(JSONObject userObject, GraphResponse response) {
+
+
+                        if (response.getError() != null) {
+
+                        } else {
+                            Log.i("TAG", "user: " + userObject.toString());
+                            Log.i("TAG", "AccessToken: " + result.getAccessToken().getToken());
+
+                            try {
+                                email = userObject.getString("email");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            Toast.makeText(LoginActivity.this, "페이스북 계정"+email+"으로 로그인하였습니다.", Toast.LENGTH_SHORT).show();
+                            setResult(RESULT_OK);
+
+                            Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(i);
+
+                            finish();
+                        }
                     }
                 });
-
                 Bundle parameters = new Bundle();
                 parameters.putString("fields", "id,name,email,gender,birthday");
-                graphRequest.setParameters(parameters);
-                graphRequest.executeAsync();
+                request.setParameters(parameters);
+                request.executeAsync();
+
+
             }
 
             @Override
             public void onCancel() {
-
+                Log.d("Tag", "로그인 하려다 맘");
             }
 
             @Override
             public void onError(FacebookException error) {
-                Log.e("LoginErr",error.toString());
+                Log.d("Tag", "에러 : " + error.getLocalizedMessage());
             }
         });
-
 
 
 
@@ -163,15 +188,35 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         findViewById(R.id.buttonJoin).setOnClickListener(mClickListener);
 
 
-
-
-
-
-
-
-
-
     }
+
+    private void setLoginButton() {
+        if (AccessToken.getCurrentAccessToken() != null) {
+            buttonFacebook.setText("로그아웃");
+            buttonFacebook.setOnClickListener(new View.OnClickListener() {
+                @Override
+
+
+                public void onClick(View view) {
+
+                    Toast.makeText(LoginActivity.this, "로그아웃되었습니다.", Toast.LENGTH_SHORT).show();
+
+                    LoginManager.getInstance().logOut();
+                    setLoginButton();
+                }
+            });
+        } else {
+            buttonFacebook.setText("페이스북으로 로그인");
+            buttonFacebook.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    LoginManager.getInstance().logInWithReadPermissions(LoginActivity.this, permissionNeeds);
+                }
+            });
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -199,6 +244,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         }
     };
+
+
 
 
     private void populateAutoComplete() {
@@ -499,11 +546,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             if(success){
 //                Snackbar.make(findViewById(R.id.email_sign_in_button), "환영합니다. 계정"+email+"으로 가입하셨습니다.", Snackbar.LENGTH_LONG).show();
 
+
+                LauncherActivity.LoginToken = true;
                 Toast.makeText(LoginActivity.this, "환영합니다. 계정"+email+"으로 로그인하셨습니다.", Toast.LENGTH_SHORT).show();
+
+
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
 
-
+                finish();
             }
             //로그인이 실패하였다.
             //에러메시지를 확인하고, 해당 에러를 텍스트뷰에 세팅한다.

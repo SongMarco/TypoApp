@@ -139,6 +139,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
                 //todo 와 이거진짜 돌았어!! 내가 inflate 시킨 view에서 findVB처리해야지 변수가 잡히는구나@@@@
                 datepicker = (DatePicker)view.findViewById(R.id.datePicker);
 
+
                 builder.setView(view);
                 builder.setPositiveButton("확인", new DialogInterface.OnClickListener(){
                     @Override
@@ -149,14 +150,15 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
                         dayOfMonth = datepicker.getDayOfMonth();
 
                         birthday = year + "." + monthOfYear + "." + dayOfMonth;
-            mBirthday.setText(birthday);
+                        mBirthday.setText(birthday);
 
-            textBirthday.setError(null);
-            textBirthday.setErrorEnabled(false);
+                        textBirthday.setError(null);
+                        textBirthday.setErrorEnabled(false);
                         dialog.dismiss();
                     }});
                 builder.setNeutralButton("취소", null);
 
+                datepicker.updateDate(1992, 4, 27);
 
 
                 final AlertDialog customDialog = builder.create();
@@ -209,8 +211,6 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         public void onFocusChange(View v, boolean hasFocus) {
 
             if(!hasFocus){
-
-
                 switch (v.getId()) {
 
                     // 주의 : 생년 월일은 다이얼로그에서 처리하였다. 입력 완료 -> 에러 널로!
@@ -315,6 +315,61 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
 
                 }
             }
+            else{
+
+
+                switch (v.getId()) {
+
+                    // 주의 : 생년 월일은 다이얼로그에서 처리하였다. 입력 완료 -> 에러 널로!
+                    case R.id.editName:
+
+
+                        textName.setError(null);
+                        textName.setErrorEnabled(false);
+
+                        break;
+
+
+                    case R.id.loginEmail:
+
+
+
+                        textEmail.setError(null);
+                        textEmail.setErrorEnabled(false);
+
+
+
+                        break;
+                    case R.id.editPassword:
+
+
+
+                        textPassword.setError(null);
+                        textPassword.setErrorEnabled(false);
+
+
+                        break;
+                    case R.id.editPasswordConfirm:
+
+
+
+
+                        textPasswordConf.setError(null);
+                        textPasswordConf.setErrorEnabled(false);
+
+
+                        break;
+
+
+                }
+
+
+
+
+
+
+            }
+
 
         }
     };
@@ -380,31 +435,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         //형식검사 예외처리 들어간다. 밑칸 -> 위칸 순으로 처리하여, 포커스가 위에 것이 최종 포커스가 되도록 하자.
 
 
-        //생년월일 입력여부 확인하기.
-        if( TextUtils.isEmpty(birthday) ){
 
-            textBirthday.setError(getString(R.string.error_field_required));
-
-            focusView = textBirthday;
-            cancel = true;
-
-        }
-
-
-        //이름 형식 확인하기.
-        if( TextUtils.isEmpty(name) || !isNameValid(name) ){
-
-            if(TextUtils.isEmpty(name)){
-                textName.setError(getString(R.string.error_field_required));
-            }
-            else{
-                textName.setError(getString(R.string.error_invalid_name));
-            }
-
-            focusView = textName;
-            cancel = true;
-
-        }
 
 
 
@@ -445,9 +476,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         }
 
 
-
-
-        // Check for a valid email address.
+        // 이메일 형식 확인하기
         if (TextUtils.isEmpty(email)) {
             textEmail.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
@@ -456,6 +485,31 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
             textEmail.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
+        }
+
+
+        //이름 형식 확인하기.
+        if( TextUtils.isEmpty(name) || !isNameValid(name) ){
+
+            if(TextUtils.isEmpty(name)){
+                textName.setError(getString(R.string.error_field_required));
+            }
+            else{
+                textName.setError(getString(R.string.error_invalid_name));
+            }
+
+            focusView = textName;
+            cancel = true;
+
+        }
+        //생년월일 입력여부 확인하기.
+        if( TextUtils.isEmpty(birthday) ){
+
+            textBirthday.setError(getString(R.string.error_field_required));
+
+            focusView = textBirthday;
+            cancel = true;
+
         }
 
         if (cancel) {

@@ -1,5 +1,8 @@
 package nova.typoapp;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -10,6 +13,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +23,12 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.facebook.AccessToken;
+import com.facebook.login.LoginManager;
+
+import static nova.typoapp.LauncherActivity.LoginToken;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -83,10 +93,66 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+
+        switch(id){
+            case R.id.action_settings:
+
+                Toast.makeText(this, "설정을 클릭함", Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.action_profile:
+
+                Toast.makeText(this, "프로필을 클릭함", Toast.LENGTH_SHORT).show();
+                break;
+
+
+            case R.id.action_logout:
+
+                //페이스북 로그아웃처리하기.
+                if (AccessToken.getCurrentAccessToken() != null) {
+
+
+                    Toast.makeText(MainActivity.this, "로그아웃되었습니다.", Toast.LENGTH_SHORT).show();
+
+
+                    LoginManager.getInstance().logOut();
+
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(intent);
+
+                    finish();
+
+                }
+                else if(LoginToken){
+
+                    Toast.makeText(MainActivity.this, "로그아웃되었습니다.", Toast.LENGTH_SHORT).show();
+
+                    LoginToken = false;
+
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(intent);
+
+                    finish();
+                }
+
+
+
+
+
+
+                break;
+
+
+
+
+
+
+            //noinspection SimplifiableIfStatement
         }
+
+
+
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -128,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
 
             if(getArguments().getInt(ARG_SECTION_NUMBER) == 1){
                 // 웹뷰 세팅
-               //레이어와 연결
+                //레이어와 연결
                 mWebView .setWebViewClient(new WebViewClient()); // 클릭시 새창 안뜨게
                 mWebSettings = mWebView.getSettings(); //세부 세팅 등록
                 mWebSettings.setJavaScriptEnabled(true); // 자바스크립트 사용 허용
@@ -164,5 +230,25 @@ public class MainActivity extends AppCompatActivity {
             // Show 3 total pages.
             return 3;
         }
+    }
+
+    public void saveLogin(){
+
+        SharedPreferences prefLogin = getSharedPreferences( getString(R.string.key_pref_Login) , Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefLogin.edit();
+
+        editor.putBoolean("LoginToken", LauncherActivity.LoginToken);
+        Log.i("tokenSaved", String.valueOf(LoginToken));
+        editor.apply();
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        saveLogin();
+
+
     }
 }

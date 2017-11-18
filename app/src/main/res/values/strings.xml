@@ -4,13 +4,19 @@
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
     <string name="tab_text_3">Tab 3</string>
-    <string name="action_settings">Settings</string>
+
+
+    <string name="action_settings">설정</string>
+    <string name="action_profile">프로필 보기</string>
+    <string name="action_logout">로그아웃</string>
+
+
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_login">Sign in</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">이메일</string>
-    <string name="prompt_password">비밀번호(영문+숫자+특수문자 조합, 6~16자리)</string>
+    <string name="prompt_password">비밀번호(영어 소문자+숫자+특수문자 조합, 6~16자리)</string>
 
     <string name="hint_password">비밀번호</string>
     <string name="prompt_password_confirm">비밀번호 확인</string>
@@ -21,8 +27,11 @@
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_join">회원 가입</string>
 
+
     <string name="action_sign_in_short">Sign in</string>
 
+
+    <!--회원가입 예외처리 -->
 
     <string name="error_invalid_email">올바른 형식의 이메일을 입력해주세요</string>
     <string name="error_invalid_password">올바른 형식의 비밀번호를 입력해주세요 (영문 + 숫자 + 특수문자 조합, 6~16자리) </string>
@@ -44,9 +53,25 @@
     <string name="title_activity_join">JoinActivity</string>
 
 
+
+
+    <!--쉐어드 프리퍼런스 키값들-->
+
+
+    <string name="key_pref_Login">pref_login</string>
+
+
+
+
+
+
+
+
     <!--내가 만든 문자열들-->
 
     <string name="login_Or">또는</string>
 
     <string name="facebook_app_id">367488190367299</string>
+
+
 </resources>
