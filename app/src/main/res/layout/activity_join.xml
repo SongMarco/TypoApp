@@ -25,6 +25,27 @@
         android:layout_marginBottom="8dp"
         android:visibility="gone" />
 
+    <Button
+
+        android:id="@+id/buttonFacebookJoin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+
+        android:backgroundTint="#3b5998"
+        android:drawableLeft="@drawable/com_facebook_button_icon"
+
+
+        android:drawableStart="@drawable/com_facebook_button_icon"
+        android:text="페이스북으로 간편가입"
+
+
+        android:textColor="#ffffff"
+        android:textStyle="bold" />
+
     <ScrollView
         android:id="@+id/login_form"
         android:layout_width="match_parent"
@@ -167,6 +188,8 @@
                 android:layout_marginTop="16dp"
                 android:text="@string/action_join"
                 android:textStyle="bold" />
+
+
         </LinearLayout>
 
 

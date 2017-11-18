@@ -8,6 +8,7 @@ import android.app.DatePickerDialog;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -32,6 +33,19 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +55,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -71,13 +86,88 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
 
     String email, password, passwordConfirm, name, birthday;
 
+    int setYear = 1992;
+    int setMonth = 5;
+    int setDay = 27;
+
+    Button buttonFacebookJoin;
+    CallbackManager callbackManager;
+    private List<String> permissionNeeds = Arrays.asList("email");
+
     DatePicker datepicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FacebookSdk.sdkInitialize(this.getApplicationContext());
         setContentView(R.layout.activity_join);
         // Set up the login form.
+
+
+        buttonFacebookJoin = (Button)findViewById(R.id.buttonFacebookJoin);
+
+        setLoginButton();
+
+        callbackManager = CallbackManager.Factory.create();
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(final LoginResult result) {
+
+                GraphRequest request;
+                request = GraphRequest.newMeRequest(result.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+
+                    @Override
+                    public void onCompleted(JSONObject userObject, GraphResponse response) {
+
+
+                        if (response.getError() != null) {
+
+                        } else {
+                            Log.i("TAG", "user: " + userObject.toString());
+                            Log.i("TAG", "AccessToken: " + result.getAccessToken().getToken());
+
+                            try {
+                                email = userObject.getString("email");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            Toast.makeText(JoinActivity.this, "페이스북 계정"+email+"으로 간편가입/로그인 하였습니다.", Toast.LENGTH_SHORT).show();
+                            setResult(RESULT_OK);
+
+                            //액티비티 스택을 초기화시킨다@@
+
+                            Intent intent = new Intent(JoinActivity.this, MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+
+
+                            finish();
+                        }
+                    }
+                });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,name,email,gender,birthday");
+                request.setParameters(parameters);
+                request.executeAsync();
+
+
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d("Tag", "로그인 하려다 맘");
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.d("Tag", "에러 : " + error.getLocalizedMessage());
+            }
+        });
+
+
+
         mEmailView = (AutoCompleteTextView) findViewById(R.id.loginEmail);
         populateAutoComplete();
 
@@ -149,16 +239,22 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
                         monthOfYear = datepicker.getMonth()+1;
                         dayOfMonth = datepicker.getDayOfMonth();
 
+                        setYear = year;
+                        setMonth = monthOfYear;
+                        setDay = dayOfMonth;
+
                         birthday = year + "." + monthOfYear + "." + dayOfMonth;
                         mBirthday.setText(birthday);
 
                         textBirthday.setError(null);
                         textBirthday.setErrorEnabled(false);
+
                         dialog.dismiss();
                     }});
+
                 builder.setNeutralButton("취소", null);
 
-                datepicker.updateDate(1992, 4, 27);
+                datepicker.updateDate(setYear, setMonth-1, setDay);
 
 
                 final AlertDialog customDialog = builder.create();
@@ -187,6 +283,38 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         mProgressView = findViewById(R.id.login_progress);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void setLoginButton() {
+        if (AccessToken.getCurrentAccessToken() != null) {
+            buttonFacebookJoin.setText("로그아웃");
+            buttonFacebookJoin.setOnClickListener(new View.OnClickListener() {
+                @Override
+
+
+                public void onClick(View view) {
+
+                    Toast.makeText(JoinActivity.this, "로그아웃되었습니다.", Toast.LENGTH_SHORT).show();
+
+                    LoginManager.getInstance().logOut();
+                    setLoginButton();
+                }
+            });
+        } else {
+            buttonFacebookJoin.setText("페이스북으로 간편 가입");
+            buttonFacebookJoin.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    LoginManager.getInstance().logInWithReadPermissions(JoinActivity.this, permissionNeeds);
+                }
+            });
+        }
+    }
 //    DialogInterface.OnClickListener dateListener = new DialogInterface.OnClickListener() {
 //        @Override
 //        public void onClick(DialogInterface dialog, int which) {
@@ -541,7 +669,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         Matcher matcher;
 
         final String PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^*()&+=])(?=\\S+$).{4,}$";
-        final String PASSWORD_PATTERN_noBig = "^(?=.*[0-9])(?=.*[a-z])(?=.*[!@#$%^*()&+=])(?=\\S+$).{4,16}$";
+        final String PASSWORD_PATTERN_noBig = "^(?=.*[0-9])(?=.*[a-z])(?=.*[!@#$%^*()&+=])(?=\\S+$).{6,16}$";
         pattern = Pattern.compile(PASSWORD_PATTERN_noBig);
         matcher = pattern.matcher(password);
 

@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">TypoApp</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="app_name">타이포셔너리</string>
+    <string name="title_activity_main">타이포셔너리</string>
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
     <string name="tab_text_3">Tab 3</string>
@@ -12,7 +12,7 @@
 
 
     <string name="section_format">Hello World from section: %1$d</string>
-    <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_login">로그인</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">이메일</string>
@@ -50,7 +50,7 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-    <string name="title_activity_join">JoinActivity</string>
+    <string name="title_activity_join">회원 가입</string>
 
 
 

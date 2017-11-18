@@ -16,18 +16,17 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -79,6 +78,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+
+    TextInputLayout textLoginEmail, textLoginPassword;
+
 
     private CallbackManager callbackManager;
 
@@ -155,20 +157,21 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.loginEmail);
         populateAutoComplete();
-
+        mLoginFormView = findViewById(R.id.login_form);
         mPasswordView = (EditText) findViewById(R.id.loginPassword);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
-
         Button mEmailSignInButton = (Button) findViewById(R.id.buttonLogin);
+        mProgressView = findViewById(R.id.login_progress);
+
+        textLoginEmail = (TextInputLayout)findViewById(R.id.textLoginEmail);
+        textLoginPassword = (TextInputLayout)findViewById(R.id.textLoginPassword);
+
+
+
+        mPasswordView.setOnFocusChangeListener(focusChangeListener);
+        mEmailView.setOnFocusChangeListener(focusChangeListener);
+
+
+
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -176,8 +179,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
+
+
 
 
         ///////////////////////////////// 나의 고유 코드
@@ -292,6 +295,96 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
 
+
+    View.OnFocusChangeListener focusChangeListener = new View.OnFocusChangeListener() {
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+
+            if(!hasFocus){
+                switch (v.getId()) {
+
+
+
+                    case R.id.loginEmail:
+
+                        textLoginEmail.setErrorEnabled(true);
+                        email = mEmailView.getText().toString();
+
+                        if (TextUtils.isEmpty(email) || !isEmailValid(email)) {
+
+                            if (TextUtils.isEmpty(email)) {
+                                textLoginEmail.setError(getString(R.string.error_field_required));
+                            } else {
+                                textLoginEmail.setError(getString(R.string.error_invalid_email));
+                            }
+
+
+                        }
+                        //no Error
+                        else {
+                            textLoginEmail.setError(null);
+                            textLoginEmail.setErrorEnabled(false);
+                        }
+
+                        break;
+
+
+                    case R.id.loginPassword:
+                        textLoginPassword.setErrorEnabled(true);
+                        password = mPasswordView.getText().toString();
+
+                        // 패스워드 빈 것만 확인. 형식 확인 필요없다
+                        if (TextUtils.isEmpty(password)) {
+                            textLoginPassword.setError(getString(R.string.error_field_required));
+
+                        }
+                        //에러가 없다
+                        else {
+                            textLoginPassword.setError(null);
+                            textLoginPassword.setErrorEnabled(false);
+                        }
+
+
+                        break;
+                }
+            }
+            else{
+
+
+                switch (v.getId()) {
+
+                    // 주의 : 생년 월일은 다이얼로그에서 처리하였다. 입력 완료 -> 에러 널로!
+                    case R.id.loginEmail:
+
+
+                        textLoginEmail.setError(null);
+                        textLoginEmail.setErrorEnabled(false);
+
+                        break;
+
+
+                    case R.id.loginPassword:
+
+
+
+                        textLoginPassword.setError(null);
+                        textLoginPassword.setErrorEnabled(false);
+
+
+
+
+                }
+
+
+
+
+
+
+            }
+
+
+        }
+    };
     /**
      * Attempts to sign in or register the account specified by the login form.
      * If there are form errors (invalid email, missing fields, etc.), the
@@ -305,6 +398,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
+        textLoginPassword.setError(null);
+        textLoginPassword.setError(null);
 
         // Store values at the time of the login attempt.
         email = mEmailView.getText().toString();
@@ -316,12 +411,29 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
         // Check for a valid email address.
+
+        // 패스워드 형식 확인하기.
+        if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
+            if(TextUtils.isEmpty(password)){
+                textLoginPassword.setError(getString(R.string.error_field_required));
+            }
+            else{
+                textLoginPassword.setError(getString(R.string.error_invalid_password));
+            }
+
+            focusView = textLoginPassword;
+            cancel = true;
+        }
+        //이메일 형식 확인하기
+
         if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
+
+            textLoginEmail.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
         } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
+
+            textLoginEmail.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
         }
@@ -560,7 +672,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             //에러메시지를 확인하고, 해당 에러를 텍스트뷰에 세팅한다.
             else{
 
-                Toast.makeText(LoginActivity.this, "이메일 또는 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
+                Toast toast = Toast.makeText(LoginActivity.this, "등록되지 않은 계정이거나, 아이디 혹은 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT);
+                int offsetX = 0;
+                int offsetY = 0;
+                toast.setGravity(Gravity.CENTER, offsetX, offsetY);
+                toast.show();
 
             }
 

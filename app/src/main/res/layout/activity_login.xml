@@ -41,6 +41,7 @@
             android:orientation="vertical">
 
             <android.support.design.widget.TextInputLayout
+                android:id="@+id/textLoginEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -56,6 +57,7 @@
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
+                android:id="@+id/textLoginPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -113,16 +115,25 @@
                 android:layout_marginBottom="10dp"/>
 
 
+
+
                 <Button
-                android:id="@+id/buttonFacebookLogin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:backgroundTint="@color/colorAccent"
-                android:text="페이스북으로 로그인"
-                android:textColor="#ffffff"
-                android:textStyle="bold"
-                />
+
+                    android:id="@+id/buttonFacebookLogin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:backgroundTint="#3b5998"
+                    android:text="페이스북으로 로그인"
+
+
+                    android:textColor="#ffffff"
+                    android:textStyle="bold"
+
+
+                    android:drawableStart="@drawable/com_facebook_button_icon"
+                    android:drawableLeft="@drawable/com_facebook_button_icon" />
+
 
         </LinearLayout>
 
