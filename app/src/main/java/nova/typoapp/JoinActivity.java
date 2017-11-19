@@ -832,11 +832,15 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
     public class registDB extends AsyncTask<Void, Integer, Boolean>
     {
         String msg_result = "";
+        String passwordEnc = "";
         @Override
         protected Boolean doInBackground(Void... unused) {
 
 /* 인풋 파라메터값 생성 */
-            String param = "u_email=" + email + "&u_pw=" + password + "&u_name=" + name + "&u_birthday=" + birthday ;
+
+
+            passwordEnc = LoginActivity.md5(password);
+            String param = "u_email=" + email + "&u_pw=" + passwordEnc + "&u_name=" + name + "&u_birthday=" + birthday ;
 
             boolean success = false;
 
