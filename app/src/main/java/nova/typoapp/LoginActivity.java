@@ -50,6 +50,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -121,7 +123,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                 e.printStackTrace();
                             }
 
-                            Toast.makeText(LoginActivity.this, "페이스북 계정"+email+"으로 로그인하였습니다.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "페이스북 계정 "+email+" 으로 로그인하였습니다.", Toast.LENGTH_SHORT).show();
                             setResult(RESULT_OK);
 
                             Intent i = new Intent(LoginActivity.this, MainActivity.class);
@@ -202,7 +204,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                 public void onClick(View view) {
 
-                    Toast.makeText(LoginActivity.this, "로그아웃되었습니다.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "로그아웃 하셨습니다.", Toast.LENGTH_SHORT).show();
 
                     LoginManager.getInstance().logOut();
                     setLoginButton();
@@ -441,7 +443,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
-            focusView.requestFocus();
+//            focusView.requestFocus();
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
@@ -592,15 +594,48 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
         }
     }
+
+    public static final String md5(final String s) {
+        try {
+            // Create MD5 Hash
+            MessageDigest digest = java.security.MessageDigest
+                    .getInstance("MD5");
+            digest.update(s.getBytes());
+            byte messageDigest[] = digest.digest();
+
+            // Create Hex String
+            StringBuffer hexString = new StringBuffer();
+            for (int i = 0; i < messageDigest.length; i++) {
+                String h = Integer.toHexString(0xFF & messageDigest[i]);
+                while (h.length() < 2)
+                    h = "0" + h;
+                hexString.append(h);
+            }
+            return hexString.toString();
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+
+
+
+
     public class CheckDB extends AsyncTask<Void, Integer, Boolean>
     {
         String msg_result = "";
+        String passwordEnc = "";
         @Override
         protected Boolean doInBackground(Void... unused) {
 
 /* 인풋 파라메터값 생성 */
-            String param = "u_email=" + email + "&u_pw=" + password;
 
+            passwordEnc = md5(password);
+
+            String param = "u_email=" + email + "&u_pw=" + passwordEnc;
+            Log.e("passEnc", passwordEnc);
             boolean success = false;
 
             try {
