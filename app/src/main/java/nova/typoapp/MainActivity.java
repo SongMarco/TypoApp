@@ -67,6 +67,12 @@ public class MainActivity extends AppCompatActivity {
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
+
+//
+//        Toast.makeText(this, "email = "+email+" name = "+name+" birthday = "+birthday, Toast.LENGTH_SHORT).show();
+
+
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
 
+        Intent intent;
+
         switch(id){
             case R.id.action_settings:
 
@@ -102,7 +110,10 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.action_profile:
 
-                Toast.makeText(this, "프로필을 클릭함", Toast.LENGTH_SHORT).show();
+
+                intent = new Intent(MainActivity.this, ProfileActivity.class);
+                startActivity(intent);
+
                 break;
 
 
@@ -117,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
 
                     LoginManager.getInstance().logOut();
 
-                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(intent);
 
                     finish();
@@ -129,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
 
                     LoginToken = false;
 
-                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(intent);
 
                     finish();
@@ -237,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefLogin = getSharedPreferences( getString(R.string.key_pref_Login) , Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefLogin.edit();
 
-        editor.putBoolean("LoginToken", LauncherActivity.LoginToken);
+        editor.putBoolean(getString(R.string.LoginToken), LauncherActivity.LoginToken);
         Log.i("tokenSaved", String.valueOf(LoginToken));
         editor.apply();
     }

@@ -13,6 +13,7 @@
 
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_login">로그인</string>
+    <string name="title_activity_profile">프로필</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">이메일</string>
@@ -53,18 +54,15 @@
     <string name="title_activity_join">회원 가입</string>
 
 
-
-
     <!--쉐어드 프리퍼런스 키값들-->
 
 
     <string name="key_pref_Login">pref_login</string>
+    <string name="LoginToken">LoginToken</string>
 
-
-
-
-
-
+    <string name="cookie_email">cookie_email</string>
+    <string name="cookie_name">cookie_name</string>
+    <string name="cookie_birthday">cookie_birthday</string>
 
 
     <!--내가 만든 문자열들-->
@@ -72,6 +70,7 @@
     <string name="login_Or">또는</string>
 
     <string name="facebook_app_id">367488190367299</string>
+
 
 
 </resources>

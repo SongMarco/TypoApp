@@ -20,6 +20,6 @@
     <style name="textForm">
 
         <item name="android:textSize">14sp</item>
-        </style>
+    </style>
 
 </resources>

@@ -3,10 +3,12 @@ package nova.typoapp;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -625,7 +627,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     public class CheckDB extends AsyncTask<Void, Integer, Boolean>
     {
-        String msg_result = "";
+        String json_result = "";
         String passwordEnc = "";
         @Override
         protected Boolean doInBackground(Void... unused) {
@@ -641,7 +643,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             try {
 /* 서버연결 */
                 URL url = new URL(
-                        "http://115.68.231.13/project/android/login.php");
+                        "http://115.68.231.13/project/android/login2.php");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                 conn.setRequestMethod("POST");
@@ -667,13 +669,60 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 {
                     buff.append(line + "\n");
                 }
-                msg_result = buff.toString().trim();
-                // RECV 데이터에 php에서 뱉은 echo가 들어간다!
-                Log.e("RECV DATA",msg_result);
+                json_result = buff.toString().trim();
 
-                if(msg_result.contains("success")){
-                    success = true;
+                //<editor-fold desc="json 파싱 관련파트.">
+                // json_result는 결과값으로 가져온 json String이다. json오브젝트에 이 스트링을 담는다.
+
+
+                JSONObject jsonRes = null;
+                try {
+                    jsonRes = new JSONObject(json_result);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
+
+                // jsonRes오브젝트에서 로그인 메세지와, 로그인 정보가 담긴 쿠키를 추출한다.
+                JSONObject json_cookie = null;
+                String login_msg = null;
+                try {
+                    login_msg = jsonRes.getString("login_msg");
+                    json_cookie = jsonRes.getJSONObject("login_cookie");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                Log.e("parsed DATA", login_msg+json_cookie.toString());
+
+
+
+
+                // RECV 데이터에 php에서 뱉은 echo가 들어간다!
+                Log.e("RECV DATA", json_result);
+
+                //json을 성공적으로 서버에서 수신했다. 쿠키를 저장시키자
+                if(json_result.contains("success")){
+
+                    success = true;
+                    // 추출한 쿠키를 쉐어드에 저장시킨다.
+                    SharedPreferences pref_login = getSharedPreferences(getString(R.string.key_pref_Login), Activity.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = pref_login.edit();
+                    try {
+                        String cookie_email = json_cookie.getString("email");
+                        String cookie_name = json_cookie.getString("name");
+                        String cookie_birthday = json_cookie.getString("birthday");
+
+                        editor.putString(getString(R.string.cookie_email), cookie_email);
+                        editor.putString(getString(R.string.cookie_name),cookie_name);
+                        editor.putString(getString(R.string.cookie_birthday),cookie_birthday);
+
+                        editor.apply();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                //</editor-fold>
 
                 Log.e("success", String.valueOf(success));
             } catch (MalformedURLException e) {
@@ -696,6 +745,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                 LauncherActivity.LoginToken = true;
                 Toast.makeText(LoginActivity.this, "환영합니다. 계정"+email+"으로 로그인하셨습니다.", Toast.LENGTH_SHORT).show();
+
+
 
 
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);

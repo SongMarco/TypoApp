@@ -1,5 +1,6 @@
 package nova.typoapp;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -20,9 +21,9 @@ public class LauncherActivity extends AppCompatActivity {
 
 
         //셰어드에서 로그인토큰을 가져온다.
-        SharedPreferences pref_login = getSharedPreferences(getString(R.string.key_pref_Login), 0);
+        SharedPreferences pref_login = getSharedPreferences(getString(R.string.key_pref_Login), Activity.MODE_PRIVATE);
 
-        LoginToken = pref_login.getBoolean("LoginToken", false);
+        LoginToken = pref_login.getBoolean(getString(R.string.LoginToken), false);
 
         setContentView(R.layout.activity_launcher);
 

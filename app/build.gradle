@@ -1,6 +1,19 @@
 apply plugin: 'com.android.application'
 
 android {
+    flavorDimensions "stage"
+    productFlavors {
+        dev {
+            dimension "stage"
+            minSdkVersion 21
+        }
+        prd {
+            dimension "stage"
+            versionCode new Date().format('yyMMddHHmm').toInteger()
+        }
+
+    }
+
     compileSdkVersion 25
     buildToolsVersion "26.0.2"
     defaultConfig {
@@ -11,12 +24,18 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+
+
+
 }
 
 dependencies {
@@ -35,6 +54,10 @@ dependencies {
     compile 'com.github.bumptech.glide:glide:4.3.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.3.1'
     compile 'com.facebook.android:facebook-login:4.28.0'
+    compile 'com.google.code.gson:gson:2.8.2'
 
+//dependencies for butterKnife
+    compile 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 
 }

@@ -831,7 +831,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
 
     public class registDB extends AsyncTask<Void, Integer, Boolean>
     {
-        String msg_result = "";
+        String json_result = "";
         String passwordEnc = "";
         @Override
         protected Boolean doInBackground(Void... unused) {
@@ -873,13 +873,8 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
                 {
                     buff.append(line + "\n");
                 }
-                msg_result = buff.toString().trim();
-                // RECV 데이터에 php에서 뱉은 echo가 들어간다!
-                Log.e("RECV DATA",msg_result);
 
-                if(msg_result.contains("success")){
-                    success = true;
-                }
+                json_result = buff.toString().trim();
 
                 Log.e("success", String.valueOf(success));
             } catch (MalformedURLException e) {
@@ -906,7 +901,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
             //아이디 중복으로 가입이 실패하였다.
             //에러메시지를 확인하고, 해당 에러를 텍스트뷰에 세팅한다.
             else{
-                if(msg_result.contains("email")){
+                if(json_result.contains("email")){
                     Snackbar.make(findViewById(R.id.email_sign_in_button), "이미 가입된 이메일입니다.", Snackbar.LENGTH_LONG).show();
                     textEmail.setErrorEnabled(true);
                     textEmail.setError(getString(R.string.error_mail_exists));
