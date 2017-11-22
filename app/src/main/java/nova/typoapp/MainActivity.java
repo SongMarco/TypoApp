@@ -67,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
-
 //
 //        Toast.makeText(this, "email = "+email+" name = "+name+" birthday = "+birthday, Toast.LENGTH_SHORT).show();
 
@@ -138,7 +137,13 @@ public class MainActivity extends AppCompatActivity {
 
                     Toast.makeText(MainActivity.this, "로그아웃되었습니다.", Toast.LENGTH_SHORT).show();
 
-                    LoginToken = false;
+//                    LoginToken = false;
+                    SharedPreferences prefLogin = getSharedPreferences( getString(R.string.key_pref_Login) , Activity.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefLogin.edit();
+                    editor.clear();
+                    editor.apply();
+
+
 
                     intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(intent);
