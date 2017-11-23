@@ -625,6 +625,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
 
+
     public class CheckDB extends AsyncTask<Void, Integer, Boolean>
     {
         String json_result = "";

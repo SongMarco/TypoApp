@@ -38,7 +38,7 @@ public class DummyContent {
     }
 
     private static DummyItem createDummyItem(int position) {
-        return new DummyItem(String.valueOf(position), "Item " + position, makeDetails(position));
+        return new DummyItem("SongYC",String.valueOf(position), "Item " + position, makeDetails(position));
     }
 
     private static String makeDetails(int position) {
@@ -54,11 +54,18 @@ public class DummyContent {
      * A dummy item representing a piece of content.
      */
     public static class DummyItem {
+        public String writer;
         public final String id;
         public final String content;
         public final String details;
 
         public DummyItem(String id, String content, String details) {
+            this.id = id;
+            this.content = content;
+            this.details = details;
+        }
+        public DummyItem(String writer, String id, String content, String details) {
+            this.writer = writer;
             this.id = id;
             this.content = content;
             this.details = details;

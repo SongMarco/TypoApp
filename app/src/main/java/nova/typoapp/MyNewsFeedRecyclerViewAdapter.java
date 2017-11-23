@@ -6,10 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.List;
+
 import nova.typoapp.NewsFeedFragment.OnListFragmentInteractionListener;
 import nova.typoapp.dummy.DummyContent.DummyItem;
-
-import java.util.List;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
@@ -29,13 +29,17 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_newsfeed, parent, false);
+                .inflate(R.layout.fragment_newsfeed_item, parent, false);
         return new ViewHolder(view);
     }
 
+
+    //이곳에서 본격적으로 아이템의 뷰를 세팅한다.
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
+
+        holder.mWriterView.setText("SongYC");
         holder.mIdView.setText(mValues.get(position).id);
         holder.mContentView.setText(mValues.get(position).content);
 
@@ -58,6 +62,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
+        public TextView mWriterView;
         public final TextView mIdView;
         public final TextView mContentView;
         public DummyItem mItem;
@@ -65,6 +70,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
         public ViewHolder(View view) {
             super(view);
             mView = view;
+            mWriterView = (TextView)view.findViewById(R.id.feedWriter);
             mIdView = (TextView) view.findViewById(R.id.id);
             mContentView = (TextView) view.findViewById(R.id.content);
         }
