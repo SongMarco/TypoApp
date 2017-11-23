@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    //툴바 옵션아이템 선택시 이벤트
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -208,16 +209,30 @@ public class MainActivity extends AppCompatActivity {
             WebSettings mWebSettings; //웹뷰세팅
 
 
-            if(getArguments().getInt(ARG_SECTION_NUMBER) == 1){
-                // 웹뷰 세팅
-                //레이어와 연결
-                mWebView .setWebViewClient(new WebViewClient()); // 클릭시 새창 안뜨게
-                mWebSettings = mWebView.getSettings(); //세부 세팅 등록
-                mWebSettings.setJavaScriptEnabled(true); // 자바스크립트 사용 허용
+            int tabNum = getArguments().getInt(ARG_SECTION_NUMBER);
 
-                mWebView.loadUrl("http://115.68.231.13/"); //원하는 URL  입력
+            switch(tabNum){
+
+                case 1:
+
+                    break;
+
+
+                case 2:
+                    // 웹뷰 세팅
+                    //레이어와 연결
+                    mWebView .setWebViewClient(new WebViewClient()); // 클릭시 새창 안뜨게
+                    mWebSettings = mWebView.getSettings(); //세부 세팅 등록
+                    mWebSettings.setJavaScriptEnabled(true); // 자바스크립트 사용 허용
+
+                    mWebView.loadUrl("http://115.68.231.13/"); //원하는 URL  입력
+
+                    break;
+
+
+
             }
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+
 
 
             return rootView;

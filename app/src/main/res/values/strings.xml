@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">타이포셔너리</string>
     <string name="title_activity_main">타이포셔너리</string>
-    <string name="tab_text_1">Tab 1</string>
-    <string name="tab_text_2">Tab 2</string>
-    <string name="tab_text_3">Tab 3</string>
+    <string name="tab_text_1">뉴스피드</string>
+    <string name="tab_text_2">웹뷰</string>
+    <string name="tab_text_3">탭3</string>
 
 
     <string name="action_settings">설정</string>
