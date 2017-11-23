@@ -3,9 +3,8 @@ package nova.typoapp;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -19,18 +18,27 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 
+import nova.typoapp.dummy.DummyContent;
+
 import static nova.typoapp.LauncherActivity.LoginToken;
 
-public class MainActivity extends AppCompatActivity {
+
+
+
+//본 액티비티는 프래그먼트 3개를 품은 액티비티이다.
+//프래그먼트를 getItem으로 호출한다.
+//이 때 액티비티에 인터페이스를 적용하는 것을 잊지말라.
+public class MainActivity extends AppCompatActivity
+        implements
+        NewsFeedFragment.OnListFragmentInteractionListener,
+        WebFragment.OnFragmentInteractionListener,
+        BlankFragment.OnFragmentInteractionListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -72,14 +80,14 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//            }
+//        });
 
     }
 
@@ -174,6 +182,16 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -205,33 +223,11 @@ public class MainActivity extends AppCompatActivity {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            WebView mWebView = (WebView)rootView.findViewById(R.id.webView);
-            WebSettings mWebSettings; //웹뷰세팅
-
-
-            int tabNum = getArguments().getInt(ARG_SECTION_NUMBER);
-
-            switch(tabNum){
-
-                case 1:
-
-                    break;
-
-
-                case 2:
-                    // 웹뷰 세팅
-                    //레이어와 연결
-                    mWebView .setWebViewClient(new WebViewClient()); // 클릭시 새창 안뜨게
-                    mWebSettings = mWebView.getSettings(); //세부 세팅 등록
-                    mWebSettings.setJavaScriptEnabled(true); // 자바스크립트 사용 허용
-
-                    mWebView.loadUrl("http://115.68.231.13/"); //원하는 URL  입력
-
-                    break;
 
 
 
-            }
+
+
 
 
 
@@ -253,11 +249,34 @@ public class MainActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+
+            switch (position) {
+
+                case 0:
+
+                    return new NewsFeedFragment();
+
+
+                case 1:
+
+                    return new WebFragment();
+
+
+                case 2:
+
+                    return new BlankFragment();
+
+
+                default:
+                    return null;
+            }
+
         }
 
         @Override
         public int getCount() {
+
+
             // Show 3 total pages.
             return 3;
         }
