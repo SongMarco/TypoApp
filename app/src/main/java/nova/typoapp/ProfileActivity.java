@@ -47,6 +47,7 @@ public class ProfileActivity extends AppCompatActivity {
         profileName.setText(name);
         profileBirthday.setText(birthday);
 
+        //,프로필
 
 
     }
