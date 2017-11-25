@@ -28,6 +28,7 @@ import java.net.URL;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import nova.typoapp.dummy.NewsFeedContent;
 
 public class WriteActivity extends AppCompatActivity {
 
@@ -157,6 +158,8 @@ public class WriteActivity extends AppCompatActivity {
                 LauncherActivity.LoginToken = true;
                 Toast.makeText(WriteActivity.this, "글을 작성하였습니다.", Toast.LENGTH_SHORT).show();
 
+
+                NewsFeedContent.called = false;
 
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);

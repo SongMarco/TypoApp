@@ -49,6 +49,7 @@ public class NewsFeedContent {
         @Override
         protected Boolean doInBackground(Void... unused) {
 
+            ITEMS.clear();
             try {
 /* 서버연결 */
                 URL url = new URL(
