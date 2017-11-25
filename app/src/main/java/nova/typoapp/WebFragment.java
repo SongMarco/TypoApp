@@ -80,7 +80,7 @@ public class WebFragment extends Fragment {
 
         mWebView.loadUrl("http://115.68.231.13/"); //원하는 URL  입력
 
-
+//        MainActivity.fabAdd.setVisibility(View.GONE);
         return view;
     }
 

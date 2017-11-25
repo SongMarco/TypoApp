@@ -9,19 +9,19 @@ import android.widget.TextView;
 import java.util.List;
 
 import nova.typoapp.NewsFeedFragment.OnListFragmentInteractionListener;
-import nova.typoapp.dummy.DummyContent.DummyItem;
+import nova.typoapp.dummy.NewsFeedContent.FeedItem;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link FeedItem} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
 public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFeedRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
+    private final List<FeedItem> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public MyNewsFeedRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
+    public MyNewsFeedRecyclerViewAdapter(List<FeedItem> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -34,13 +34,13 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
     }
 
 
-    //이곳에서 본격적으로 아이템의 뷰를 세팅한다.
+
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
 
-        holder.mWriterView.setText("SongYC");
-        holder.mIdView.setText(mValues.get(position).id);
+        holder.mWriterView.setText(mValues.get(position).writer);
+        holder.mIdView.setText(mValues.get(position).title);
         holder.mContentView.setText(mValues.get(position).content);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -65,7 +65,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
         public TextView mWriterView;
         public final TextView mIdView;
         public final TextView mContentView;
-        public DummyItem mItem;
+        public FeedItem mItem;
 
         public ViewHolder(View view) {
             super(view);

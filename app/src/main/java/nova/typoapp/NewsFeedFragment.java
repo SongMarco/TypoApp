@@ -9,9 +9,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
-import nova.typoapp.dummy.DummyContent;
-import nova.typoapp.dummy.DummyContent.DummyItem;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import nova.typoapp.dummy.NewsFeedContent;
+import nova.typoapp.dummy.NewsFeedContent.FeedItem;
 
 /**
  * A fragment representing a list of Items.
@@ -53,22 +56,47 @@ public class NewsFeedFragment extends Fragment {
         }
     }
 
+
+    @BindView(R.id.list)
+    RecyclerView recyclerView;
+
+    @BindView(R.id.layoutAdd)
+    LinearLayout layoutAdd;
+
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_newsfeed_list, container, false);
 
+        ButterKnife.bind(this, view);
+
+
+        //DB에서 회원 정보를 확인하고 로그인하라
+        NewsFeedContent.taskCallFeeds taskCall = new NewsFeedContent.taskCallFeeds();
+        taskCall.execute();
+
+
         // Set the adapter
-        if (view instanceof RecyclerView) {
+        if (recyclerView != null) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyNewsFeedRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            recyclerView.setAdapter(new MyNewsFeedRecyclerViewAdapter(NewsFeedContent.ITEMS, mListener));
+            recyclerView.setNestedScrollingEnabled(false);
         }
+
+
+
+        //fab를 누르면 글쓰기로 넘어간다.
+//        MainActivity.fabAdd.setVisibility(View.VISIBLE);
+
+
         return view;
     }
 
@@ -76,8 +104,12 @@ public class NewsFeedFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
         if (context instanceof OnListFragmentInteractionListener) {
+
+
             mListener = (OnListFragmentInteractionListener) context;
+
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
@@ -87,6 +119,7 @@ public class NewsFeedFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+
         mListener = null;
     }
 
@@ -102,6 +135,6 @@ public class NewsFeedFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        void onListFragmentInteraction(FeedItem item);
     }
 }

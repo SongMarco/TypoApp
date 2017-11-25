@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,14 +19,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 
-import nova.typoapp.dummy.DummyContent;
+import butterknife.ButterKnife;
+import nova.typoapp.dummy.NewsFeedContent;
 
+import static android.view.View.GONE;
 import static nova.typoapp.LauncherActivity.LoginToken;
 
 
@@ -55,10 +57,14 @@ public class MainActivity extends AppCompatActivity
      */
     private ViewPager mViewPager;
 
+    public static FloatingActionButton fabAdd;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -70,11 +76,39 @@ public class MainActivity extends AppCompatActivity
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
+
+
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
+        fabAdd = (FloatingActionButton)findViewById(R.id.fabAdd);
 
+        fabAdd.setVisibility(GONE);
+
+//        // 뷰페이저에 onPageChangeL달아서 특정 페이지에서만 글쓰기 버튼이 보이게 하자.
+//        mViewPager.addOnPageChangeListener( new ViewPager.SimpleOnPageChangeListener() {
+//            @Override
+//            public void onPageSelected(int position) {
+//               switch(position){
+//
+//
+//                   case 0:
+//
+//                       fabAdd.setVisibility(View.VISIBLE);
+//                       break;
+//
+//                   case 1:
+//                       fabAdd.setVisibility(View.GONE);
+//                       break;
+//
+//                   case 2:
+//                       fabAdd.setVisibility(View.GONE);
+//                       break;
+//
+//               }
+//            }
+//        });
 //
 //        Toast.makeText(this, "email = "+email+" name = "+name+" birthday = "+birthday, Toast.LENGTH_SHORT).show();
 
@@ -183,7 +217,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+    public void onListFragmentInteraction(NewsFeedContent.FeedItem item) {
 
     }
 
@@ -222,18 +256,12 @@ public class MainActivity extends AppCompatActivity
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-
-
-
-
-
-
-
 
             return rootView;
         }
     }
+
+
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -254,16 +282,15 @@ public class MainActivity extends AppCompatActivity
 
                 case 0:
 
+
                     return new NewsFeedFragment();
 
 
                 case 1:
-
                     return new WebFragment();
 
 
                 case 2:
-
                     return new BlankFragment();
 
 
@@ -281,6 +308,7 @@ public class MainActivity extends AppCompatActivity
             return 3;
         }
     }
+
 
     public void saveLogin(){
 
