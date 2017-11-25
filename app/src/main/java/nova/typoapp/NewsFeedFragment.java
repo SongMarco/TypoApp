@@ -72,11 +72,14 @@ public class NewsFeedFragment extends Fragment {
 
         ButterKnife.bind(this, view);
 
+        //DB에서 회원 정보를 확인하고 로그인하라. 단, 두번은 안하게!
 
-        //DB에서 회원 정보를 확인하고 로그인하라
-        NewsFeedContent.taskCallFeeds taskCall = new NewsFeedContent.taskCallFeeds();
-        taskCall.execute();
+        //call이 되었다면 해당 어싱크를 수행하지 않는다.
+        if(! NewsFeedContent.called ){
+            NewsFeedContent.taskCallFeeds taskCall = new NewsFeedContent.taskCallFeeds();
+            taskCall.execute();
 
+        }
 
         // Set the adapter
         if (recyclerView != null) {
@@ -91,14 +94,13 @@ public class NewsFeedFragment extends Fragment {
             recyclerView.setNestedScrollingEnabled(false);
         }
 
-
-
         //fab를 누르면 글쓰기로 넘어간다.
 //        MainActivity.fabAdd.setVisibility(View.VISIBLE);
 
 
         return view;
     }
+
 
 
     @Override

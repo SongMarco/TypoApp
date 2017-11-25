@@ -33,6 +33,7 @@ public class NewsFeedContent {
      */
     public static final List<FeedItem> ITEMS = new ArrayList<FeedItem>();
 
+    public static boolean called = false;
     /**
      * A map of sample (dummy) items, by ID.
      */
@@ -118,7 +119,8 @@ public class NewsFeedContent {
                 e.printStackTrace();
             }
 
-            return true;
+            called = true;
+            return called;
         }
 
         //post에서 받아온 json을 아이템으로 전환

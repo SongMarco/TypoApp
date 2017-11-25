@@ -1,83 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:layout_height="match_parent">
 
-    <android.support.v4.widget.NestedScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
 
+
+        <!-- 주의@@@@@@@@@ android:focusableInTouchMode="true" 이거 없으면 포커스가 리사이클러뷰로 가버린다.-->
         <LinearLayout
+
+            android:focusableInTouchMode="true"
+
+            android:id="@+id/layoutAdd"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/layoutAdd"
-                android:layout_width="match_parent"
+
+            android:background="@color/cardview_shadow_start_color"
+            android:clickable="true"
+
+            android:focusable="true"
+            android:orientation="horizontal"
+            android:padding="@dimen/com_facebook_likeview_edge_padding">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/floatingActionButton"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-
-                android:background="@color/cardview_shadow_start_color"
-                android:clickable="true"
-
-                android:focusable="true"
-                android:orientation="horizontal"
-                android:padding="@dimen/com_facebook_likeview_edge_padding">
-
-                <android.support.design.widget.FloatingActionButton
-                    android:id="@+id/floatingActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    android:layout_weight="1"
-
-                    android:tint="@color/colorPrimary"
-                    app:backgroundTint="@android:color/white"
-                    app:elevation="3dp"
-                    app:srcCompat="@android:drawable/ic_input_add" />
-
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:text="당신만의 Typo를 추가해보세요~"
-                    android:textSize="18sp"
-
-
-                    />
-
-
-            </LinearLayout>
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/list"
-                android:name="nova.typoapp.NewsFeedFragment"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
                 android:layout_weight="1"
-                app:layoutManager="LinearLayoutManager"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:context="nova.typoapp.NewsFeedFragment"
-                tools:listitem="@layout/fragment_newsfeed_item"
-                >
 
-            </android.support.v7.widget.RecyclerView>
+                android:tint="@color/colorPrimary"
+                app:backgroundTint="@android:color/white"
+                app:elevation="3dp"
+                app:srcCompat="@android:drawable/ic_input_add" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:text="당신만의 Typo를 추가해보세요~"
+                android:textSize="18sp"
+
+
+                />
+
 
         </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
 
-</android.support.design.widget.CoordinatorLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/list"
+            android:name="nova.typoapp.NewsFeedFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_weight="1"
+            app:layoutManager="LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:context="nova.typoapp.NewsFeedFragment"
+            tools:listitem="@layout/fragment_newsfeed_item"
+            >
 
+        </android.support.v7.widget.RecyclerView>
+
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>
