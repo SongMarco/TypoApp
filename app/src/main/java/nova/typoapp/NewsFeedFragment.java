@@ -10,9 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import nova.typoapp.dummy.NewsFeedContent;
 import nova.typoapp.dummy.NewsFeedContent.FeedItem;
 
@@ -94,11 +96,20 @@ public class NewsFeedFragment extends Fragment {
             recyclerView.setNestedScrollingEnabled(false);
         }
 
+
         //fab를 누르면 글쓰기로 넘어간다.
 //        MainActivity.fabAdd.setVisibility(View.VISIBLE);
 
 
         return view;
+    }
+
+
+    @OnClick(R.id.layoutAdd)
+    void onAddClick(){
+        Toast.makeText(getContext(), "글을씁시다", Toast.LENGTH_SHORT).show();
+
+
     }
 
 
