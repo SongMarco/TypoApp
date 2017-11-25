@@ -1,6 +1,7 @@
 package nova.typoapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -109,6 +110,8 @@ public class NewsFeedFragment extends Fragment {
     void onAddClick(){
         Toast.makeText(getContext(), "글을씁시다", Toast.LENGTH_SHORT).show();
 
+        Intent intent = new Intent( getContext() ,WriteActivity.class);
+        startActivity(intent);
 
     }
 

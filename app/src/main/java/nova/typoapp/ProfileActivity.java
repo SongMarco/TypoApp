@@ -16,7 +16,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     @BindView(R.id.profileEmail)
     TextView profileEmail;
-
     @BindView(R.id.profileName)
     TextView profileName;
     @BindView(R.id.profileBirthday)
