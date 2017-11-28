@@ -39,9 +39,9 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
 
-        holder.mWriterView.setText(mValues.get(position).writer);
-        holder.mIdView.setText(mValues.get(position).title);
-        holder.mContentView.setText(mValues.get(position).content);
+        holder.mWriterView.setText( "작성자 : "+ mValues.get(position).writer);
+        holder.mIdView.setText("제목 : "+mValues.get(position).title);
+        holder.mContentView.setText("내용 : "+ mValues.get(position).content);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
