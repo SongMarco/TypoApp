@@ -39,6 +39,7 @@ android {
 dependencies {
 
 
+    //noinspection GradleCompatible
     implementation 'com.android.support:design:25.3.1'
     implementation 'com.android.support:support-v4:25.4.0'
     implementation 'com.android.support:recyclerview-v7:25.4.0'
@@ -59,5 +60,7 @@ dependencies {
 //dependencies for butterKnife
     compile 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
 
 }
