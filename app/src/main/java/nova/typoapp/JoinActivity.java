@@ -60,6 +60,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Retrofit;
+
 
 /**
  * A login screen that offers login via email/password.
@@ -808,8 +812,8 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
 
 
             //DB에 회원 정보를 중복체크 후 기입한다.
-            registDB rdb = new registDB();
-            rdb.execute();
+          JoinRetrofitTask jtask = new JoinRetrofitTask();
+          jtask.execute();
 
             return true;
         }
@@ -831,6 +835,71 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
 
 
     //todo 회원가입 레트로핏으로 구현하기ㅇ
+
+    String json_result = "";
+    public class JoinRetrofitTask extends AsyncTask<Void, String, String> {
+
+
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            //region//글쓰기
+
+            Retrofit retrofit = new Retrofit.Builder().baseUrl(ApiService.API_URL).build();
+            ApiService apiService = retrofit.create(ApiService.class);
+
+
+
+            String passwordEnc = LoginActivity.md5(password);
+
+            Call<ResponseBody> comment = apiService.joinMember(email, passwordEnc, name, birthday);
+
+            try {
+                json_result = comment.execute().body().string();
+                return json_result;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+
+        protected void onPostExecute(String result){
+
+            super.onPostExecute(result);
+
+            Log.e("wow", result);
+
+
+            if ( result.contains("success") ) {
+//                Snackbar.make(findViewById(R.id.email_sign_in_button), "환영합니다. 계정"+email+"으로 가입하셨습니다.", Snackbar.LENGTH_LONG).show();
+
+
+                LauncherActivity.LoginToken = true;
+                Toast.makeText(JoinActivity.this, "이메일 계정 "+email+" (으)로 회원 가입이 완료되었습니다.", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(intent);
+
+                finish();
+            }
+
+            //아이디 중복으로 가입이 실패하였다.
+            //에러메시지를 확인하고, 해당 에러를 텍스트뷰에 세팅한다.
+            else{
+                if( result.contains("email")){
+                    Snackbar.make(findViewById(R.id.email_sign_in_button), "이미 가입된 이메일입니다.", Snackbar.LENGTH_LONG).show();
+                    textEmail.setErrorEnabled(true);
+                    textEmail.setError(getString(R.string.error_mail_exists));
+
+                }
+
+            }
+
+        }
+
+    }
 
     public class registDB extends AsyncTask<Void, Integer, Boolean>
     {

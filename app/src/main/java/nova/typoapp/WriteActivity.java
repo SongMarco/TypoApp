@@ -60,7 +60,6 @@ public class WriteActivity extends AppCompatActivity {
 
     }
     String json_result = "";
-
     public class WriteTask extends AsyncTask<Void, String, String> {
 
 
