@@ -8,6 +8,10 @@ import com.google.gson.annotations.SerializedName;
 
 //{"login_msg":"login_success","login_cookie":{"email":"hh@hh.com","name":"김고","birthday":"1992.5.27"}}
 
+// okHttp의 ResponseBody와 별개로 나만의 클래스를 만들었다.
+// 스트링의 경우 SerializedName을 지정하지 않아도 되지만,
+// json의 경우 따로 SerializedName을 지정해주어야 객체가 json을 이식받게 된다.
+
 public class LoginResult {
 
     @SerializedName("login_msg")
