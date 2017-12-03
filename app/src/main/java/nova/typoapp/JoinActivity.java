@@ -850,7 +850,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
             try {
 /* 서버연결 */
                 URL url = new URL(
-                        "http://115.68.231.13/project/android/join2.php");
+                        "http://115.68.231.13/project/android/join.php");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                 conn.setRequestMethod("POST");
@@ -879,13 +879,16 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
 
                 json_result = buff.toString().trim();
 
-                Log.e("success", String.valueOf(success));
+                Log.e("success", String.valueOf(json_result));
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
+            if(json_result.contains("success")){
+                success = true;
+            }
 
             return success;
         }

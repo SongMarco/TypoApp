@@ -45,4 +45,11 @@ public interface ApiService {
     @POST("writeFeed.php")
     Call<ResponseBody>write (@Field("writer") String writer, @Field("title") String title, @Field("content") String content );
 
+    //회원가입
+    @FormUrlEncoded
+    @POST("join.php")
+    Call<ResponseBody> joinMember (@Field("u_email") String email, @Field("u_pw") String pw, @Field("u_name") String name ,@Field("u_birthday") String birthday );
+
+
+
 }
