@@ -13,22 +13,15 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import nova.typoapp.dummy.NewsFeedContent;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Retrofit;
 
 public class WriteActivity extends AppCompatActivity {
 
@@ -54,7 +47,7 @@ public class WriteActivity extends AppCompatActivity {
 
         SharedPreferences pref_login = getSharedPreferences(getString(R.string.key_pref_Login), Activity.MODE_PRIVATE);
 
-        writer = pref_login.getString(getString(R.string.cookie_name) , "");
+        writer = pref_login.getString(getString(R.string.cookie_name), "");
 
     }
 
@@ -66,92 +59,49 @@ public class WriteActivity extends AppCompatActivity {
         writeTask.execute();
 
     }
+    String json_result = "";
 
-
-
-    public class WriteTask extends AsyncTask<Void, Integer, Boolean> {
-        String json_result = "";
+    public class WriteTask extends AsyncTask<Void, String, String> {
 
 
         @Override
-        protected Boolean doInBackground(Void... unused) {
+        protected String doInBackground(Void... voids) {
 
-/* 인풋 파라메터값 생성 */
+            //region//글쓰기 - 시험삼아 get으로
 
+            Retrofit retrofit = new Retrofit.Builder().baseUrl(ApiService.API_URL).build();
+            ApiService apiService = retrofit.create(ApiService.class);
 
-            String param = "writer=" + writer + "&title=" + editTitle.getText().toString() + "&content=" + editContent.getText().toString();
+            Call<ResponseBody> comment = apiService.write(writer, editTitle.getText().toString(), editContent.getText().toString());
 
-            boolean success = false;
 
             try {
-/* 서버연결 */
-                URL url = new URL(
-                        "http://115.68.231.13/project/android/writeFeed.php");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                conn.setRequestMethod("POST");
-                conn.setDoInput(true);
-                conn.connect();
 
-/* 안드로이드 -> 서버 파라메터값 전달 */
-                OutputStream outs = conn.getOutputStream();
-                outs.write(param.getBytes("UTF-8"));
-                outs.flush();
-                outs.close();
-
-/* 서버 -> 안드로이드 파라메터값 전달 */
-                InputStream is = null;
-                BufferedReader in = null;
-
-
-                is = conn.getInputStream();
-                in = new BufferedReader(new InputStreamReader(is), 8 * 1024);
-                String line = null;
-                StringBuffer buff = new StringBuffer();
-                while ((line = in.readLine()) != null) {
-                    buff.append(line + "\n");
-                }
-                json_result = buff.toString().trim();
-
-                //<editor-fold desc="json 파싱 관련파트.">
-                // json_result는 결과값으로 가져온 json String이다. json오브젝트에 이 스트링을 담는다.
-
-
-                JSONObject jsonRes = null;
-                try {
-                    jsonRes = new JSONObject(json_result);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                // RECV 데이터에 php에서 뱉은 echo가 들어간다!
-                Log.e("RECV DATA", json_result);
-
-                //json을 성공적으로 서버에서 수신했다. 쿠키를 저장시키자
-                if (json_result.contains("success")) {
-
-                    success = true;
-
-                }
-
-                //</editor-fold>
-
-                Log.e("success", String.valueOf(success));
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
+                json_result = comment.execute().body().string();
+                return json_result;
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
 
-            return success;
+            //endregion
+
+
+
+            return null;
         }
 
-        @Override
-        protected void onPostExecute(Boolean success) {
-            super.onPostExecute(success);
 
-            if (success) {
+        @Override
+
+        protected void onPostExecute(String result){
+
+            super.onPostExecute(result);
+
+            Log.e("wow", result);
+
+
+            if ( result.contains("success") ) {
 //                Snackbar.make(findViewById(R.id.email_sign_in_button), "환영합니다. 계정"+email+"으로 가입하셨습니다.", Snackbar.LENGTH_LONG).show();
 
 
@@ -166,7 +116,7 @@ public class WriteActivity extends AppCompatActivity {
 
                 finish();
             }
-            //로그인이 실패하였다.
+            //글쓰기가 실패함
             //에러메시지를 확인하고, 해당 에러를 텍스트뷰에 세팅한다.
             else {
 
@@ -179,6 +129,7 @@ public class WriteActivity extends AppCompatActivity {
             }
 
         }
+
     }
 
     @Override
@@ -192,7 +143,6 @@ public class WriteActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
 
 
 }
