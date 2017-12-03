@@ -829,6 +829,9 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
         }
     }
 
+
+    //todo 회원가입 레트로핏으로 구현하기
+
     public class registDB extends AsyncTask<Void, Integer, Boolean>
     {
         String json_result = "";

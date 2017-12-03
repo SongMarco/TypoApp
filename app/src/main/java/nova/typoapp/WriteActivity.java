@@ -67,7 +67,7 @@ public class WriteActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(Void... voids) {
 
-            //region//글쓰기 - 시험삼아 get으로
+            //region//글쓰기
 
             Retrofit retrofit = new Retrofit.Builder().baseUrl(ApiService.API_URL).build();
             ApiService apiService = retrofit.create(ApiService.class);
@@ -85,8 +85,6 @@ public class WriteActivity extends AppCompatActivity {
 
 
             //endregion
-
-
 
             return null;
         }
