@@ -24,6 +24,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import nova.typoapp.dummy.NewsFeedContent;
 import nova.typoapp.dummy.NewsFeedContent.FeedItem;
+import nova.typoapp.retrofit.ApiService;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;

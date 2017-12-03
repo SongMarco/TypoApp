@@ -1,4 +1,4 @@
-package nova.typoapp;
+package nova.typoapp.retrofit;
 
 /**
  * Created by Administrator on 2017-12-02.
@@ -49,6 +49,11 @@ public interface ApiService {
     @FormUrlEncoded
     @POST("join.php")
     Call<ResponseBody> joinMember (@Field("u_email") String email, @Field("u_pw") String pw, @Field("u_name") String name ,@Field("u_birthday") String birthday );
+
+    //로그인
+    @FormUrlEncoded
+    @POST("login.php")
+    Call<LoginResult> loginMember (@Field("u_email") String email, @Field("u_pw") String pw);
 
 
 

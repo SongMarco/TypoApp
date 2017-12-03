@@ -60,6 +60,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import nova.typoapp.retrofit.ApiService;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -869,7 +870,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
 
             super.onPostExecute(result);
 
-            Log.e("wow", result);
+            Log.e("LogResult", result);
 
 
             if ( result.contains("success") ) {
@@ -892,10 +893,10 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
                     Snackbar.make(findViewById(R.id.email_sign_in_button), "이미 가입된 이메일입니다.", Snackbar.LENGTH_LONG).show();
                     textEmail.setErrorEnabled(true);
                     textEmail.setError(getString(R.string.error_mail_exists));
-
                 }
-
             }
+
+
 
         }
 

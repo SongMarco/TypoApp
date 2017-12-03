@@ -39,7 +39,6 @@ import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,6 +57,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import nova.typoapp.retrofit.ApiService;
+import nova.typoapp.retrofit.LoginInfo;
+import nova.typoapp.retrofit.LoginResult;
+import retrofit2.Call;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 import static android.Manifest.permission.READ_CONTACTS;
 
 /**
@@ -69,7 +75,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Id to identity READ_CONTACTS permission request.
      */
     private static final int REQUEST_READ_CONTACTS = 0;
-
 
 
     /**
@@ -92,19 +97,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     Button buttonFacebook;
 
     String email, password;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(this.getApplicationContext());
         setContentView(R.layout.activity_login);
 
-        buttonFacebook = (Button)findViewById(R.id.buttonFacebookLogin);
+        buttonFacebook = (Button) findViewById(R.id.buttonFacebookLogin);
         setLoginButton();
 
         callbackManager = CallbackManager.Factory.create();
-        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<com.facebook.login.LoginResult>() {
             @Override
-            public void onSuccess(final LoginResult result) {
+            public void onSuccess(final com.facebook.login.LoginResult result) {
 
                 GraphRequest request;
                 request = GraphRequest.newMeRequest(result.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
@@ -125,7 +131,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                 e.printStackTrace();
                             }
 
-                            Toast.makeText(LoginActivity.this, "페이스북 계정 "+email+" 으로 로그인하였습니다.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "페이스북 계정 " + email + " 으로 로그인하였습니다.", Toast.LENGTH_SHORT).show();
                             setResult(RESULT_OK);
 
                             Intent i = new Intent(LoginActivity.this, MainActivity.class);
@@ -155,9 +161,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         });
 
 
-
-
-
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.loginEmail);
         populateAutoComplete();
@@ -166,14 +169,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         Button mEmailSignInButton = (Button) findViewById(R.id.buttonLogin);
         mProgressView = findViewById(R.id.login_progress);
 
-        textLoginEmail = (TextInputLayout)findViewById(R.id.textLoginEmail);
-        textLoginPassword = (TextInputLayout)findViewById(R.id.textLoginPassword);
-
+        textLoginEmail = (TextInputLayout) findViewById(R.id.textLoginEmail);
+        textLoginPassword = (TextInputLayout) findViewById(R.id.textLoginPassword);
 
 
         mPasswordView.setOnFocusChangeListener(focusChangeListener);
         mEmailView.setOnFocusChangeListener(focusChangeListener);
-
 
 
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
@@ -184,11 +185,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         });
 
 
-
-
-
         ///////////////////////////////// 나의 고유 코드
-
 
 
         findViewById(R.id.buttonLogin).setOnClickListener(mClickListener);
@@ -253,8 +250,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     };
 
 
-
-
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
             return;
@@ -299,14 +294,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
 
-
     View.OnFocusChangeListener focusChangeListener = new View.OnFocusChangeListener() {
         @Override
         public void onFocusChange(View v, boolean hasFocus) {
 
-            if(!hasFocus){
+            if (!hasFocus) {
                 switch (v.getId()) {
-
 
 
                     case R.id.loginEmail:
@@ -351,8 +344,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                         break;
                 }
-            }
-            else{
+            } else {
 
 
                 switch (v.getId()) {
@@ -370,18 +362,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     case R.id.loginPassword:
 
 
-
                         textLoginPassword.setError(null);
                         textLoginPassword.setErrorEnabled(false);
 
 
-
-
                 }
-
-
-
-
 
 
             }
@@ -389,6 +374,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         }
     };
+
     /**
      * Attempts to sign in or register the account specified by the login form.
      * If there are form errors (invalid email, missing fields, etc.), the
@@ -413,15 +399,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         View focusView = null;
 
 
-
         // Check for a valid email address.
 
         // 패스워드 형식 확인하기.
         if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
-            if(TextUtils.isEmpty(password)){
+            if (TextUtils.isEmpty(password)) {
                 textLoginPassword.setError(getString(R.string.error_field_required));
-            }
-            else{
+            } else {
                 textLoginPassword.setError(getString(R.string.error_invalid_password));
             }
 
@@ -457,7 +441,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isEmailValid(String email) {
 
-        return  android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     private boolean isPasswordValid(String password) {
@@ -573,11 +557,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected Boolean doInBackground(Void... params) {
 
 
-
             //DB에서 회원 정보를 확인하고 로그인하라
-            CheckDB cdb = new CheckDB();
-            cdb.execute();
+//            CheckDB cdb = new CheckDB();
+//            cdb.execute();
 
+            LoginRetrofitTask rTask = new LoginRetrofitTask();
+            rTask.execute();
             return true;
 
 
@@ -622,14 +607,102 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
 
+    //todo 회원가입 레트로핏으로 구현하기ㅇ
+
+    String json_result = "";
+
+    public class LoginRetrofitTask extends AsyncTask<Void, String, String> {
 
 
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(ApiService.API_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
 
 
-    public class CheckDB extends AsyncTask<Void, Integer, Boolean>
-    {
+            ApiService apiService = retrofit.create(ApiService.class);
+
+            String passwordEnc = LoginActivity.md5(password);
+
+            Call<LoginResult> call = apiService.loginMember(email, passwordEnc);
+
+            try {
+
+                LoginResult loginResult = call.execute().body();
+
+                Log.e("info", loginResult.toString() );
+                json_result = loginResult.getLogin_msg();
+
+                LoginInfo login_info = loginResult.getInfo();
+                Log.e("info", login_info.getEmail() );
+
+
+                SharedPreferences pref_login = getSharedPreferences(getString(R.string.key_pref_Login), Activity.MODE_PRIVATE);
+                SharedPreferences.Editor editor = pref_login.edit();
+                String cookie_email = login_info.getEmail();
+                String cookie_name = login_info.getName();
+                String cookie_birthday = login_info.getBirthday();
+
+                editor.putString(getString(R.string.cookie_email), cookie_email);
+                editor.putString(getString(R.string.cookie_name), cookie_name);
+                editor.putString(getString(R.string.cookie_birthday), cookie_birthday);
+
+                editor.apply();
+
+                return json_result;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+
+            Log.e("LogResult", result);
+
+
+            if (result.contains("success")) {
+//                Snackbar.make(findViewById(R.id.email_sign_in_button), "환영합니다. 계정"+email+"으로 가입하셨습니다.", Snackbar.LENGTH_LONG).show();
+
+
+                LauncherActivity.LoginToken = true;
+                Toast.makeText(LoginActivity.this, "계정 " + email + " (으)로 로그인하셨습니다.", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+
+                finish();
+            }
+
+
+            //아이디 중복으로 가입이 실패하였다.
+            //에러메시지를 확인하고, 해당 에러를 텍스트뷰에 세팅한다.
+            else {
+
+                Toast toast = Toast.makeText(LoginActivity.this, "등록되지 않은 계정이거나, 아이디 혹은 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT);
+                int offsetX = 0;
+                int offsetY = 0;
+                toast.setGravity(Gravity.CENTER, offsetX, offsetY);
+                toast.show();
+
+            }
+
+
+        }
+
+    }
+
+
+    public class CheckDB extends AsyncTask<Void, Integer, Boolean> {
         String json_result = "";
         String passwordEnc = "";
+
         @Override
         protected Boolean doInBackground(Void... unused) {
 
@@ -644,7 +717,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             try {
 /* 서버연결 */
                 URL url = new URL(
-                        "http://115.68.231.13/project/android/login2.php");
+                        "http://115.68.231.13/project/android/login.php");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                 conn.setRequestMethod("POST");
@@ -666,8 +739,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 in = new BufferedReader(new InputStreamReader(is), 8 * 1024);
                 String line = null;
                 StringBuffer buff = new StringBuffer();
-                while ( ( line = in.readLine() ) != null )
-                {
+                while ((line = in.readLine()) != null) {
                     buff.append(line + "\n");
                 }
                 json_result = buff.toString().trim();
@@ -693,16 +765,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     e.printStackTrace();
                 }
 
-                Log.e("parsed DATA", login_msg+json_cookie.toString());
-
-
+                Log.e("parsed DATA", login_msg + json_cookie.toString());
 
 
                 // RECV 데이터에 php에서 뱉은 echo가 들어간다!
                 Log.e("RECV DATA", json_result);
 
                 //json을 성공적으로 서버에서 수신했다. 쿠키를 저장시키자
-                if(json_result.contains("success")){
+                if (json_result.contains("success")) {
 
                     success = true;
                     // 추출한 쿠키를 쉐어드에 저장시킨다.
@@ -714,8 +784,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         String cookie_birthday = json_cookie.getString("birthday");
 
                         editor.putString(getString(R.string.cookie_email), cookie_email);
-                        editor.putString(getString(R.string.cookie_name),cookie_name);
-                        editor.putString(getString(R.string.cookie_birthday),cookie_birthday);
+                        editor.putString(getString(R.string.cookie_name), cookie_name);
+                        editor.putString(getString(R.string.cookie_birthday), cookie_birthday);
 
                         editor.apply();
                     } catch (JSONException e) {
@@ -740,14 +810,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected void onPostExecute(Boolean success) {
             super.onPostExecute(success);
 
-            if(success){
+            if (success) {
 //                Snackbar.make(findViewById(R.id.email_sign_in_button), "환영합니다. 계정"+email+"으로 가입하셨습니다.", Snackbar.LENGTH_LONG).show();
 
 
                 LauncherActivity.LoginToken = true;
-                Toast.makeText(LoginActivity.this, "환영합니다. 계정"+email+"으로 로그인하셨습니다.", Toast.LENGTH_SHORT).show();
-
-
+                Toast.makeText(LoginActivity.this, "환영합니다. 계정" + email + "으로 로그인하셨습니다.", Toast.LENGTH_SHORT).show();
 
 
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -757,7 +825,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
             //로그인이 실패하였다.
             //에러메시지를 확인하고, 해당 에러를 텍스트뷰에 세팅한다.
-            else{
+            else {
 
                 Toast toast = Toast.makeText(LoginActivity.this, "등록되지 않은 계정이거나, 아이디 혹은 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT);
                 int offsetX = 0;
