@@ -191,6 +191,7 @@ public class NewsFeedFragment extends Fragment {
         Intent intent = new Intent(getContext(), WriteActivity.class);
         startActivity(intent);
 
+
     }
 
 

@@ -39,6 +39,7 @@ import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,9 +58,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import nova.typoapp.retrofit.AddCookiesInterceptor;
 import nova.typoapp.retrofit.ApiService;
 import nova.typoapp.retrofit.LoginInfo;
 import nova.typoapp.retrofit.LoginResult;
+import nova.typoapp.retrofit.ReceivedCookiesInterceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -607,21 +612,34 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
 
-    //todo 회원가입 레트로핏으로 구현하기ㅇ
 
     String json_result = "";
 
     public class LoginRetrofitTask extends AsyncTask<Void, String, String> {
 
 
+        private static final String TAG = "myTag";
+
         @Override
         protected String doInBackground(Void... voids) {
+
+            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .addInterceptor(new ReceivedCookiesInterceptor(LoginActivity.this))
+                    .addInterceptor(new AddCookiesInterceptor(LoginActivity.this))
+                    .addInterceptor(interceptor)
+                    .addNetworkInterceptor(new StethoInterceptor())
+                    .build();
+
 
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(ApiService.API_URL)
                     .addConverterFactory(GsonConverterFactory.create())
+                    .client(client)
                     .build();
-
+            Log.e(TAG, "shared-before call: "+getSharedPreferences("pref_login" , MODE_PRIVATE ).getAll()  ) ;
 
             ApiService apiService = retrofit.create(ApiService.class);
 
@@ -633,6 +651,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                 LoginResult loginResult = call.execute().body();
 
+                Log.e(TAG, "shared-after call: "+getSharedPreferences("pref_login" , MODE_PRIVATE ).getAll()  ) ;
+//                String cookie = call.clone().execute().headers().values("Set-Cookie").toString();
+
+                //cookie가 계속해서 바뀐다. 쿠키를 낚아채서 바꾸어주어야 한다.
+
+//                Log.e(TAG, "doInBackground:"+cookie );
                 Log.e("info", loginResult.toString() );
                 json_result = loginResult.getLogin_msg();
 
@@ -651,7 +675,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 editor.putString(getString(R.string.cookie_birthday), cookie_birthday);
 
                 editor.apply();
-
+                Log.e(TAG, "shared: "+getSharedPreferences("pref_login" , MODE_PRIVATE ).getAll()  ) ;
                 return json_result;
             } catch (IOException e) {
                 e.printStackTrace();

@@ -55,6 +55,9 @@ public interface ApiService {
     @POST("login.php")
     Call<LoginResult> loginMember (@Field("u_email") String email, @Field("u_pw") String pw);
 
+    //회원 정보 확인(세션 정보 가져오기)
+    @POST("looksess.php")
+    Call<LoginInfo> lookSession();
 
 
 }

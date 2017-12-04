@@ -38,7 +38,9 @@ public class LauncherActivity extends AppCompatActivity {
             finish();
 
         }
-        //일반 로그인이 된 상태에서 앱을 켰다. 메인으로
+        //일반 로그인이 된 상태에서 앱을 켰다.
+        // 세션 정보를 확인하고 로그인 처리해주자.
+
         else if(LoginToken!=null && LoginToken){
 
             intent = new Intent(LauncherActivity.this, MainActivity.class);

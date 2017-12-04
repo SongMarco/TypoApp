@@ -109,6 +109,7 @@ public class WriteActivity extends AppCompatActivity {
 
                 NewsFeedContent.called = false;
 
+
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
 

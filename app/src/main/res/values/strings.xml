@@ -76,4 +76,5 @@
     <bool name="called">true</bool>
     <bool name="not_called">false</bool>
     <string name="title_activity_write">WriteActivity</string>
+    <string name="cookie_sessID">cookie_sessID</string>
 </resources>

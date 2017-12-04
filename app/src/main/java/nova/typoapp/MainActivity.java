@@ -183,6 +183,7 @@ public class MainActivity extends AppCompatActivity
 //                    LoginToken = false;
                     SharedPreferences prefLogin = getSharedPreferences( getString(R.string.key_pref_Login) , Activity.MODE_PRIVATE);
                     SharedPreferences.Editor editor = prefLogin.edit();
+
                     editor.clear();
                     editor.apply();
 
