@@ -49,7 +49,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        LookProfileTask profileTask = new LookProfileTask();
+        LookupSessionTask profileTask = new LookupSessionTask();
         profileTask.execute();
 
 
@@ -68,7 +68,7 @@ public class ProfileActivity extends AppCompatActivity {
     String json_result = "";
 
     String email, name, birthday;
-    public class LookProfileTask extends AsyncTask<Void, String, Void> {
+    public class LookupSessionTask extends AsyncTask<Void, String, Void> {
 
 
         private static final String TAG = "myTag";
@@ -141,7 +141,7 @@ public class ProfileActivity extends AppCompatActivity {
             //에러메시지를 확인하고, 해당 에러를 텍스트뷰에 세팅한다.
             else {
 
-                Toast toast = Toast.makeText(ProfileActivity.this, "세션 정보를 가져오는데 실패했습니다.", Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(ProfileActivity.this, "로그인 정보를 가져오는데 실패했습니다.", Toast.LENGTH_SHORT);
                 int offsetX = 0;
                 int offsetY = 0;
                 toast.setGravity(Gravity.CENTER, offsetX, offsetY);

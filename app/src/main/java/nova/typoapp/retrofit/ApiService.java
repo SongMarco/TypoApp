@@ -56,6 +56,7 @@ public interface ApiService {
     Call<LoginResult> loginMember (@Field("u_email") String email, @Field("u_pw") String pw);
 
     //회원 정보 확인(세션 정보 가져오기)
+    //아무것도 날리지 않는다. 인터셉터 객체가 콜 날릴 때 세션ID를 추가해준다.
     @POST("looksess.php")
     Call<LoginInfo> lookSession();
 

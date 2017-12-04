@@ -877,7 +877,7 @@ public class JoinActivity extends AppCompatActivity implements LoaderCallbacks<C
 //                Snackbar.make(findViewById(R.id.email_sign_in_button), "환영합니다. 계정"+email+"으로 가입하셨습니다.", Snackbar.LENGTH_LONG).show();
 
 
-                LauncherActivity.LoginToken = true;
+
                 Toast.makeText(JoinActivity.this, "이메일 계정 "+email+" (으)로 회원 가입이 완료되었습니다.", Toast.LENGTH_SHORT).show();
 
                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);

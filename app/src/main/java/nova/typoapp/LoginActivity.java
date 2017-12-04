@@ -695,7 +695,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 //                Snackbar.make(findViewById(R.id.email_sign_in_button), "환영합니다. 계정"+email+"으로 가입하셨습니다.", Snackbar.LENGTH_LONG).show();
 
 
-                LauncherActivity.LoginToken = true;
+
                 Toast.makeText(LoginActivity.this, "계정 " + email + " (으)로 로그인하셨습니다.", Toast.LENGTH_SHORT).show();
 
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -838,7 +838,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 //                Snackbar.make(findViewById(R.id.email_sign_in_button), "환영합니다. 계정"+email+"으로 가입하셨습니다.", Snackbar.LENGTH_LONG).show();
 
 
-                LauncherActivity.LoginToken = true;
                 Toast.makeText(LoginActivity.this, "환영합니다. 계정" + email + "으로 로그인하셨습니다.", Toast.LENGTH_SHORT).show();
 
 

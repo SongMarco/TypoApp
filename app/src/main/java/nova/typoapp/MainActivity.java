@@ -13,7 +13,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,11 +23,14 @@ import android.widget.Toast;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import butterknife.ButterKnife;
 import nova.typoapp.dummy.NewsFeedContent;
 
 import static android.view.View.GONE;
-import static nova.typoapp.LauncherActivity.LoginToken;
+
 
 
 
@@ -160,7 +162,8 @@ public class MainActivity extends AppCompatActivity
 
 
             case R.id.action_logout:
-
+                SharedPreferences prefLogin = getSharedPreferences( getString(R.string.key_pref_Login) , Activity.MODE_PRIVATE);
+                Set<String> preferences = prefLogin.getStringSet("Cookie" , new HashSet<String>() );
                 //페이스북 로그아웃처리하기.
                 if (AccessToken.getCurrentAccessToken() != null) {
 
@@ -176,17 +179,16 @@ public class MainActivity extends AppCompatActivity
                     finish();
 
                 }
-                else if(LoginToken){
+                else if( !preferences.isEmpty() ){
 
                     Toast.makeText(MainActivity.this, "로그아웃되었습니다.", Toast.LENGTH_SHORT).show();
 
 //                    LoginToken = false;
-                    SharedPreferences prefLogin = getSharedPreferences( getString(R.string.key_pref_Login) , Activity.MODE_PRIVATE);
+
                     SharedPreferences.Editor editor = prefLogin.edit();
 
                     editor.clear();
                     editor.apply();
-
 
 
                     intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -311,22 +313,12 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public void saveLogin(){
-
-        SharedPreferences prefLogin = getSharedPreferences( getString(R.string.key_pref_Login) , Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefLogin.edit();
-
-        editor.putBoolean(getString(R.string.LoginToken), LauncherActivity.LoginToken);
-        Log.i("tokenSaved", String.valueOf(LoginToken));
-        editor.apply();
-    }
 
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        saveLogin();
 
 
     }

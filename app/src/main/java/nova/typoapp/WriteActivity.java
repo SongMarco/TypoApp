@@ -103,7 +103,7 @@ public class WriteActivity extends AppCompatActivity {
 //                Snackbar.make(findViewById(R.id.email_sign_in_button), "환영합니다. 계정"+email+"으로 가입하셨습니다.", Snackbar.LENGTH_LONG).show();
 
 
-                LauncherActivity.LoginToken = true;
+//                LauncherActivity.LoginToken = true;
                 Toast.makeText(WriteActivity.this, "글을 작성하였습니다.", Toast.LENGTH_SHORT).show();
 
 
