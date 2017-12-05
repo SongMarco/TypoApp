@@ -618,7 +618,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     public class LoginRetrofitTask extends AsyncTask<Void, String, String> {
 
 
-        private static final String TAG = "myTag";
+        final String TAG = "myTag";
 
         @Override
         protected String doInBackground(Void... voids) {

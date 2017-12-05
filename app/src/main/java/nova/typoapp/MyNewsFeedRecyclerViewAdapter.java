@@ -40,8 +40,8 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
         holder.mItem = mValues.get(position);
 
         holder.mWriterView.setText( "작성자 : "+ mValues.get(position).writer);
-        holder.mIdView.setText("제목 : "+mValues.get(position).title);
-        holder.mContentView.setText("내용 : "+ mValues.get(position).content);
+        holder.mIdView.setText("단어 : "+mValues.get(position).title);
+        holder.mContentView.setText("뜻 : "+ mValues.get(position).content);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
