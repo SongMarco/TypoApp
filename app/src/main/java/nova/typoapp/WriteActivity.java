@@ -3,10 +3,12 @@ package nova.typoapp;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -232,10 +234,13 @@ public class WriteActivity extends AppCompatActivity {
                         String imagePath = mCurrentPhotoPath;
 
                         // 비트맵의 사이즈를 줄여서 디코딩하기! -> 인 1/샘플사이즈 만큼 축소시켜서 디코딩한다!
+                        // 아웃오브메모리 해결!
+                        // @@@@@ 황금 코드~
                         BitmapFactory.Options options = new BitmapFactory.Options();
                         options.inSampleSize = 4;
                         Bitmap src = BitmapFactory.decodeFile(mCurrentPhotoPath, options);
 
+                        Log.e("img", "onActivityResult: "+mCurrentPhotoPath );
                         Bitmap image = Bitmap.createScaledBitmap(src, src.getWidth(), src.getHeight(), true);
 
                         // 이미지를 상황에 맞게 회전시킨다
@@ -244,17 +249,7 @@ public class WriteActivity extends AppCompatActivity {
                                 ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
                         int exifDegree = exifOrientationToDegrees(exifOrientation);
                         image = rotate(image, exifDegree);
-//
-//
-//                        Matrix matrix = new Matrix();
-//
-//                        matrix.postRotate(90);
-//
-//                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap,bitmap.getWidth(),bitmap.getHeight(),true);
-//
-//                        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap , 0, 0, scaledBitmap .getWidth(), scaledBitmap .getHeight(), matrix, true);
 
-//                        iv_view.setImageBitmap(rotatedBitmap);
 
                         imageViewAdd.setImageBitmap(image);
 
@@ -278,8 +273,44 @@ public class WriteActivity extends AppCompatActivity {
                             albumFile = createImageFile();
                             photoURI = data.getData();
                             albumURI = Uri.fromFile(albumFile);
-                            cropImage();
+
+                            //todo 수정할 때 cropimage를 호출하도록 수정할 예정이다.
+//                            cropImage();
+
+
+                            //그냥 getPath하면 작동하지 않으나 해당 함수를 사용 하면 작동한다@@@
+                            String realPhotoPath = getRealPathFromURI(this, photoURI);
+
+//                            galleryAddPic();
+//                            imageViewAdd.setImageURI(photoURI);
+
+                            // 비트맵의 사이즈를 줄여서 디코딩하기! -> 인 1/샘플사이즈 만큼 축소시켜서 디코딩한다!
+                            // 아웃오브메모리 해결!
+                            // @@@@@ 황금 코드~
+                            BitmapFactory.Options options = new BitmapFactory.Options();
+                            options.inSampleSize = 4;
+//                            Bitmap src = BitmapFactory.decodeFile(imagePath , options);
+
+                            Bitmap src = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
+
+                            Bitmap resized = Bitmap.createScaledBitmap(src, src.getWidth()/4, src.getHeight()/4, true);
+
+                            // 이미지를 상황에 맞게 회전시킨다
+                            ExifInterface exif = new ExifInterface(realPhotoPath );
+                            int exifOrientation = exif.getAttributeInt(
+                                    ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                            int exifDegree = exifOrientationToDegrees(exifOrientation);
+                            resized = rotate(resized, exifDegree);
+
+
+                            imageViewAdd.setImageBitmap(resized);
+
+
+                            Log.e("img", "real photo path: "+realPhotoPath );
+
+
                         }catch (Exception e){
+
                             Log.e("TAKE_ALBUM_SINGLE ERROR", e.toString());
                         }
                     }
@@ -290,14 +321,31 @@ public class WriteActivity extends AppCompatActivity {
                 if (resultCode == Activity.RESULT_OK) {
 
                     galleryAddPic();
-                    imageViewAdd.setImageURI(albumURI);
 
+                    imageViewAdd.setImageURI(albumURI);
+                    Log.e("img", "onActivityResult: "+albumURI.toString() );
 
 
 
 
                 }
                 break;
+        }
+    }
+
+    //
+    public String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = { MediaStore.Images.Media.DATA };
+            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
     }
     /**
