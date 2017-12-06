@@ -1,4 +1,4 @@
-package nova.typoapp.dummy;
+package nova.typoapp.newsfeed;
 
 import java.util.ArrayList;
 import java.util.HashMap;

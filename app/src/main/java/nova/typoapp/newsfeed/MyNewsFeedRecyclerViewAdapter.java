@@ -1,4 +1,4 @@
-package nova.typoapp;
+package nova.typoapp.newsfeed;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,7 +9,8 @@ import android.widget.TextView;
 import java.util.List;
 
 import nova.typoapp.NewsFeedFragment.OnListFragmentInteractionListener;
-import nova.typoapp.dummy.NewsFeedContent.FeedItem;
+import nova.typoapp.R;
+import nova.typoapp.newsfeed.NewsFeedContent.FeedItem;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link FeedItem} and makes a call to the

@@ -5,12 +5,15 @@ package nova.typoapp.retrofit;
  */
 
 
+import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 
 
 //Api를 제공해주는 메소드를 정의해놓은 인터페이스다
@@ -59,6 +62,12 @@ public interface ApiService {
     //아무것도 날리지 않는다. 인터셉터 객체가 콜 날릴 때 세션ID를 추가해준다.
     @POST("looksess.php")
     Call<LoginInfo> lookSession();
+
+
+    //이미지 업로드하기
+    @Multipart
+    @POST("imageUpload.php")
+    Call<ImageUploadResult> uploadImage(@Part MultipartBody.Part image);
 
 
 }

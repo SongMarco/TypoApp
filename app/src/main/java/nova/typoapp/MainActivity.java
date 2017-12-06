@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import butterknife.ButterKnife;
-import nova.typoapp.dummy.NewsFeedContent;
+import nova.typoapp.newsfeed.NewsFeedContent;
 
 import static android.view.View.GONE;
 

@@ -3,6 +3,7 @@ package nova.typoapp;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,6 +21,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -28,6 +30,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -42,11 +45,22 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import nova.typoapp.dummy.NewsFeedContent;
+import nova.typoapp.newsfeed.NewsFeedContent;
+import nova.typoapp.permission.PermissionsActivity;
+import nova.typoapp.permission.PermissionsChecker;
 import nova.typoapp.retrofit.ApiService;
+import nova.typoapp.retrofit.ImageUploadResult;
+import nova.typoapp.retrofit.RetroClient;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
+
+import static nova.typoapp.retrofit.ApiService.API_URL;
 
 public class WriteActivity extends AppCompatActivity {
     private static final int MY_PERMISSION_CAMERA = 1111;
@@ -54,6 +68,10 @@ public class WriteActivity extends AppCompatActivity {
     private static final int REQUEST_TAKE_ALBUM = 3333;
     private static final int REQUEST_IMAGE_CROP = 4444;
 
+    /**
+     * Permission List
+     */
+    private static final String[] PERMISSIONS_READ_STORAGE = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
 
     @BindView(R.id.editTitle)
     EditText editTitle;
@@ -67,20 +85,30 @@ public class WriteActivity extends AppCompatActivity {
     @BindView(R.id.textViewAddRequire)
     TextView textViewAdd;
 
-
+    File albumFile;
     Uri imageUri;
     Uri photoURI, albumURI;
-    String mCurrentPhotoPath;
-
+    String cameraPhotoPath;
+    String pickPhotoPath;
     private String absolutePath;
-
+    ProgressDialog progressDialog;
     String writer;
+
+    PermissionsChecker checker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write);
         ButterKnife.bind(this);
+
+
+        /**
+         * Permission Checker Initialized
+         */
+        checker = new PermissionsChecker(this);
+
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -177,7 +205,7 @@ public class WriteActivity extends AppCompatActivity {
         }
 
         imageFile = new File(storageDir, imageFileName);
-        mCurrentPhotoPath = imageFile.getAbsolutePath();
+        cameraPhotoPath = imageFile.getAbsolutePath();
 
         return imageFile;
     }
@@ -195,7 +223,7 @@ public class WriteActivity extends AppCompatActivity {
         Log.i("galleryAddPic", "Call");
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         // 해당 경로에 있는 파일을 객체화(새로 파일을 만든다는 것으로 이해하면 안 됨)
-        File f = new File(mCurrentPhotoPath);
+        File f = new File(cameraPhotoPath);
         Uri contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
         sendBroadcast(mediaScanIntent);
@@ -231,28 +259,39 @@ public class WriteActivity extends AppCompatActivity {
                         Log.i("REQUEST_TAKE_PHOTO", "OK");
                         galleryAddPic();
 
-                        String imagePath = mCurrentPhotoPath;
+                        String imagePath = cameraPhotoPath;
 
                         // 비트맵의 사이즈를 줄여서 디코딩하기! -> 인 1/샘플사이즈 만큼 축소시켜서 디코딩한다!
-                        // 아웃오브메모리 해결!
+                        // 아웃오브메모리 해결!, 사진은 어차피 용량이 클테니까 반드시 4분의1로 축소시켰다. -> 사실은 try/catch로 OOM을 캐치해서 고칠 수도 있어야 하겠다.
                         // @@@@@ 황금 코드~
                         BitmapFactory.Options options = new BitmapFactory.Options();
                         options.inSampleSize = 4;
-                        Bitmap src = BitmapFactory.decodeFile(mCurrentPhotoPath, options);
+                        Bitmap src = BitmapFactory.decodeFile(cameraPhotoPath, options);
 
-                        Log.e("img", "onActivityResult: "+mCurrentPhotoPath );
+                        Log.e("img", "onActivityResult: "+ cameraPhotoPath);
                         Bitmap image = Bitmap.createScaledBitmap(src, src.getWidth(), src.getHeight(), true);
 
                         // 이미지를 상황에 맞게 회전시킨다
                         ExifInterface exif = new ExifInterface(imagePath);
                         int exifOrientation = exif.getAttributeInt(
                                 ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+
                         int exifDegree = exifOrientationToDegrees(exifOrientation);
+
+
                         image = rotate(image, exifDegree);
 
 
+
+//                        Log.e("myimg", "onActivityResult-default drawable:: "+imageViewAdd.getDrawable().toString() );
                         imageViewAdd.setImageBitmap(image);
 
+                        if(imageViewAdd.getDrawable() != null){
+                            findViewById(R.id.imageViewSample).setVisibility(View.GONE);
+                        }
+
+                        Log.e("myimg", "onActivityResult: "+imageViewAdd.getDrawable().toString() );
 
 //                        iv_view.setImageURI(imageUri);
 
@@ -269,7 +308,7 @@ public class WriteActivity extends AppCompatActivity {
 
                     if(data.getData() != null){
                         try {
-                            File albumFile = null;
+                            albumFile = null;
                             albumFile = createImageFile();
                             photoURI = data.getData();
                             albumURI = Uri.fromFile(albumFile);
@@ -280,7 +319,7 @@ public class WriteActivity extends AppCompatActivity {
 
 
                             //그냥 getPath하면 작동하지 않으나 해당 함수를 사용 하면 작동한다@@@
-                            String realPhotoPath = getRealPathFromURI(this, photoURI);
+                            pickPhotoPath = getRealPathFromURI(this, photoURI);
 
 //                            galleryAddPic();
 //                            imageViewAdd.setImageURI(photoURI);
@@ -288,26 +327,41 @@ public class WriteActivity extends AppCompatActivity {
                             // 비트맵의 사이즈를 줄여서 디코딩하기! -> 인 1/샘플사이즈 만큼 축소시켜서 디코딩한다!
                             // 아웃오브메모리 해결!
                             // @@@@@ 황금 코드~
-                            BitmapFactory.Options options = new BitmapFactory.Options();
-                            options.inSampleSize = 4;
+                            Bitmap resized;
+                            try{
+
+                                BitmapFactory.Options options = new BitmapFactory.Options();
+                                Bitmap src = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
+                                 resized = Bitmap.createBitmap(src);
+                            }
+
+                            catch(OutOfMemoryError e){
+
+                                Toast.makeText(this, "메모리가 부족하여 이미지를 축소하였습니다.", Toast.LENGTH_SHORT).show();
+                                BitmapFactory.Options options = new BitmapFactory.Options();
+                                options.inSampleSize = 4;
+                                Bitmap src = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
+                                 resized = Bitmap.createScaledBitmap(src, src.getWidth()/4, src.getHeight()/4, true);
+                            }
+
 //                            Bitmap src = BitmapFactory.decodeFile(imagePath , options);
 
-                            Bitmap src = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
-
-                            Bitmap resized = Bitmap.createScaledBitmap(src, src.getWidth()/4, src.getHeight()/4, true);
 
                             // 이미지를 상황에 맞게 회전시킨다
-                            ExifInterface exif = new ExifInterface(realPhotoPath );
+                            ExifInterface exif = new ExifInterface(pickPhotoPath);
                             int exifOrientation = exif.getAttributeInt(
                                     ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
                             int exifDegree = exifOrientationToDegrees(exifOrientation);
+
                             resized = rotate(resized, exifDegree);
 
 
                             imageViewAdd.setImageBitmap(resized);
+                            if(imageViewAdd.getDrawable() != null){
+                                findViewById(R.id.imageViewSample).setVisibility(View.GONE);
+                            }
 
-
-                            Log.e("img", "real photo path: "+realPhotoPath );
+                            Log.e("img", "real photo path: "+ pickPhotoPath);
 
 
                         }catch (Exception e){
@@ -334,7 +388,7 @@ public class WriteActivity extends AppCompatActivity {
         }
     }
 
-    //
+    //getPath로 얻어지지 않는 진짜 파일의 패스를 얻어오는 메소드
     public String getRealPathFromURI(Context context, Uri contentUri) {
         Cursor cursor = null;
         try {
@@ -356,6 +410,7 @@ public class WriteActivity extends AppCompatActivity {
      * @param degrees 회전 각도
      * @return 회전된 이미지
      */
+    //사진을 회전각도에따라 회전시켜 비트맵을 세팅하는 메소드
     public Bitmap rotate(Bitmap bitmap, int degrees)
     {
         if(degrees != 0 && bitmap != null)
@@ -376,13 +431,19 @@ public class WriteActivity extends AppCompatActivity {
             }
             catch(OutOfMemoryError ex)
             {
+                //OOM에 걸릴 경우, 비트맵을 축소하여 재생성하고, 함수에 다시 넣어준다.
+//                Toast.makeText(this, "메모리 부족으로 리사이징함", Toast.LENGTH_SHORT).show();
                 Log.e("img", "err: mem 부족" );
+                bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/4, bitmap.getHeight()/4, true);
+                return rotate(bitmap, degrees);
+
                 // 메모리가 부족하여 회전을 시키지 못할 경우 그냥 원본을 반환합니다.
             }
         }
         return bitmap;
     }
 
+    //회전 각도를 얻는 메소드
     public int exifOrientationToDegrees(int exifOrientation)
     {
         if(exifOrientation == ExifInterface.ORIENTATION_ROTATE_90)
@@ -400,6 +461,7 @@ public class WriteActivity extends AppCompatActivity {
         return 0;
     }
 
+    //권한을 체크하는 메소드
     private void checkPermission(){
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             // 처음 호출시엔 if()안의 부분은 false로 리턴 됨 -> else{..}의 요청으로 넘어감
@@ -452,10 +514,17 @@ public class WriteActivity extends AppCompatActivity {
     @OnClick(R.id.buttonWrite)
     void onWrite() {
 
+        if (checker.lacksPermissions(PERMISSIONS_READ_STORAGE)) {
+            startPermissionsActivity(PERMISSIONS_READ_STORAGE);
+        }
         WriteTask writeTask = new WriteTask();
         writeTask.execute();
 
     }
+    private void startPermissionsActivity(String[] permission) {
+        PermissionsActivity.startActivityForResult(this, 0, permission);
+    }
+
     String json_result = "";
     public class WriteTask extends AsyncTask<Void, String, String> {
 
@@ -463,9 +532,23 @@ public class WriteActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(Void... voids) {
 
+
+            //이미지가 세팅된채로 글을 쓴다면, 이미지 업로드를 위한 어싱크를 돌린다.
+            if(imageViewAdd.getDrawable() != null){
+
+//                Bitmap bitmap = ((BitmapDrawable)imageViewAdd.getDrawable()).getBitmap();
+
+
+
+                uploadImage();
+
+                
+                //taskResult 로 경로가 설정되었을것임.
+            }
+
             //region//글쓰기
 
-            Retrofit retrofit = new Retrofit.Builder().baseUrl(ApiService.API_URL).build();
+            Retrofit retrofit = new Retrofit.Builder().baseUrl(API_URL).build();
             ApiService apiService = retrofit.create(ApiService.class);
 
             Call<ResponseBody> comment = apiService.write(writer, editTitle.getText().toString(), editContent.getText().toString());
@@ -525,6 +608,71 @@ public class WriteActivity extends AppCompatActivity {
 
         }
 
+    }
+
+    private void uploadImage() {
+
+        /**
+         * Progressbar to Display if you need
+         */
+
+
+        //Create Upload Server Client
+        ApiService service = RetroClient.getApiService();
+
+
+        //File creating from selected URL
+        File file;
+        if(cameraPhotoPath != null){
+            file = new File( cameraPhotoPath  );
+        }
+        else{
+            file = new File( pickPhotoPath  );
+        }
+
+        Log.e("myimg", "uploadImage: "+pickPhotoPath );
+
+        // create RequestBody instance from file
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+
+        // MultipartBody.Part is used to send also the actual file name
+        MultipartBody.Part body =
+                MultipartBody.Part.createFormData("uploaded_file", file.getName(), requestFile);
+
+        Call<ImageUploadResult> resultCall = service.uploadImage(body);
+
+        // finally, execute the request
+        resultCall.enqueue(new Callback<ImageUploadResult>() {
+            @Override
+            public void onResponse(Call<ImageUploadResult> call, Response<ImageUploadResult> response) {
+
+//                progressDialog.dismiss();
+
+                // Response Success or Fail
+                if (response.isSuccessful()) {
+                    if (response.body().getResult().equals("success"))
+                        Snackbar.make(editContent, R.string.string_upload_success, Snackbar.LENGTH_LONG).show();
+                    else
+                        Snackbar.make(editContent, R.string.string_upload_fail, Snackbar.LENGTH_LONG).show();
+
+                } else {
+                    Snackbar.make(editContent, R.string.string_upload_fail, Snackbar.LENGTH_LONG).show();
+                }
+
+                /**
+                 * Update Views
+                 */
+//                imagePath = "";
+//                textView.setVisibility(View.VISIBLE);
+//                imageView.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onFailure(Call<ImageUploadResult> call, Throwable t) {
+                Snackbar.make(editContent, R.string.string_upload_fail, Snackbar.LENGTH_LONG).show();
+            }
+
+        });
     }
 
     @Override
