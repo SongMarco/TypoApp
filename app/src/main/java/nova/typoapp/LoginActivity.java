@@ -623,13 +623,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected String doInBackground(Void... voids) {
 
-            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-            OkHttpClient client = new OkHttpClient.Builder()
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
                     .addInterceptor(new ReceivedCookiesInterceptor(LoginActivity.this))
                     .addInterceptor(new AddCookiesInterceptor(LoginActivity.this))
-                    .addInterceptor(interceptor)
+                    .addInterceptor(httpLoggingInterceptor)
                     .addNetworkInterceptor(new StethoInterceptor())
                     .build();
 
@@ -637,7 +637,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(ApiService.API_URL)
                     .addConverterFactory(GsonConverterFactory.create())
-                    .client(client)
+                    .client(okHttpClient)
                     .build();
             Log.e(TAG, "shared-before call: "+getSharedPreferences("pref_login" , MODE_PRIVATE ).getAll()  ) ;
 
