@@ -623,15 +623,17 @@ public class WriteActivity extends AppCompatActivity {
 
         //File creating from selected URL
         File file;
-        if(cameraPhotoPath != null){
-            file = new File( cameraPhotoPath  );
+        if(pickPhotoPath != null){
+            file = new File( pickPhotoPath  );
+
         }
         else{
-            file = new File( pickPhotoPath  );
+            file = new File( cameraPhotoPath  );
         }
 
-        Log.e("myimg", "uploadImage: "+pickPhotoPath );
+        Log.e("myimg", "uploadImage-> pick"+pickPhotoPath+" ="+file.getAbsolutePath() +"is it same?");
 
+        Log.e("myimg", "uploadImage-> camera"+cameraPhotoPath+" ="+file.getAbsolutePath() +"is it same?");
         // create RequestBody instance from file
         RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
 
