@@ -47,7 +47,9 @@ public class NewsFeedContent {
     public static FeedItem createFeed3(String writer, String title, String content) {
         return new FeedItem(writer, title, content);
     }
-
+    public static FeedItem createFeed4(String writer, String title, String content, String imgUrl) {
+        return new FeedItem(writer, title, content, imgUrl);
+    }
 
 
     private static String makeDetails(int position) {
@@ -66,6 +68,9 @@ public class NewsFeedContent {
         public String writer;
         public final String title;
         public final String content;
+        public String imgUrl;
+
+
         public String details = "aa";
 
         public FeedItem(String writer, String title, String content) {
@@ -73,11 +78,11 @@ public class NewsFeedContent {
             this.title = title;
             this.content = content;
         }
-        public FeedItem(String writer, String title, String content, String details) {
+        public FeedItem(String writer, String title, String content, String imgUrl) {
             this.writer = writer;
             this.title = title;
             this.content = content;
-            this.details = details;
+            this.imgUrl = imgUrl;
         }
 
         @Override

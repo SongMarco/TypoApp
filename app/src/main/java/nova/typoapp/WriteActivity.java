@@ -21,7 +21,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -56,8 +55,6 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 
 import static nova.typoapp.retrofit.ApiService.API_URL;
@@ -90,6 +87,7 @@ public class WriteActivity extends AppCompatActivity {
     Uri photoURI, albumURI;
     String cameraPhotoPath;
     String pickPhotoPath;
+    String uploadImagePath;
     private String absolutePath;
     ProgressDialog progressDialog;
     String writer;
@@ -517,8 +515,16 @@ public class WriteActivity extends AppCompatActivity {
         if (checker.lacksPermissions(PERMISSIONS_READ_STORAGE)) {
             startPermissionsActivity(PERMISSIONS_READ_STORAGE);
         }
-        WriteTask writeTask = new WriteTask();
-        writeTask.execute();
+
+        if(cameraPhotoPath != null || pickPhotoPath != null){
+            UploadTask uploadTask = new UploadTask();
+            uploadTask.execute();
+        }
+        else{
+            WriteTask writeTask = new WriteTask();
+            writeTask.execute();
+        }
+
 
     }
     private void startPermissionsActivity(String[] permission) {
@@ -533,25 +539,13 @@ public class WriteActivity extends AppCompatActivity {
         protected String doInBackground(Void... voids) {
 
 
-            //이미지가 세팅된채로 글을 쓴다면, 이미지 업로드를 위한 어싱크를 돌린다.
-            if(imageViewAdd.getDrawable() != null){
-
-//                Bitmap bitmap = ((BitmapDrawable)imageViewAdd.getDrawable()).getBitmap();
-
-
-
-                uploadImage();
-
-                
-                //taskResult 로 경로가 설정되었을것임.
-            }
-
             //region//글쓰기
 
             Retrofit retrofit = new Retrofit.Builder().baseUrl(API_URL).build();
             ApiService apiService = retrofit.create(ApiService.class);
 
-            Call<ResponseBody> comment = apiService.write(writer, editTitle.getText().toString(), editContent.getText().toString());
+            Log.e("myimg", "doInBackground: "+uploadImagePath );
+            Call<ResponseBody> comment = apiService.write(writer, editTitle.getText().toString(), editContent.getText().toString(), uploadImagePath );
 
 
             try {
@@ -610,7 +604,44 @@ public class WriteActivity extends AppCompatActivity {
 
     }
 
-    private void uploadImage() {
+
+
+    public class UploadTask extends AsyncTask<Void, String, String> {
+
+
+
+        @Override
+        protected String doInBackground(Void... voids) {
+
+
+            return uploadImage();
+        }
+
+
+        @Override
+
+        //이미지 업로드가 종료됨. 글쓰기 태스크 시작
+        protected void onPostExecute(String imgUrl){
+
+            super.onPostExecute(imgUrl);
+
+            Log.e("myimg", "imgurl="+imgUrl);
+
+
+            WriteTask writeTask = new WriteTask();
+            writeTask.execute();
+
+
+
+        }
+
+    }
+    //이미지를 업로드하는 메소드다.
+    // @@@@@주의할 점 : php에서 json만 반환하게 하라. 그렇지 않으면 오류메시지가 뜨게될 때, gsonConverter가 오류를 일으킨다! -> onFailure진입!
+    // 왜? 컨버팅 하려는데 json자료형이 아니니까!
+
+
+    public String uploadImage() {
 
         /**
          * Progressbar to Display if you need
@@ -630,10 +661,10 @@ public class WriteActivity extends AppCompatActivity {
         else{
             file = new File( cameraPhotoPath  );
         }
-
-        Log.e("myimg", "uploadImage-> pick"+pickPhotoPath+" ="+file.getAbsolutePath() +"is it same?");
-
-        Log.e("myimg", "uploadImage-> camera"+cameraPhotoPath+" ="+file.getAbsolutePath() +"is it same?");
+//
+//        Log.e("myimg", "uploadImage-> pick"+pickPhotoPath+" ="+file.getAbsolutePath() +"is it same?");
+//
+//        Log.e("myimg", "uploadImage-> camera"+cameraPhotoPath+" ="+file.getAbsolutePath() +"is it same?");
         // create RequestBody instance from file
         RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
 
@@ -643,38 +674,21 @@ public class WriteActivity extends AppCompatActivity {
 
         Call<ImageUploadResult> resultCall = service.uploadImage(body);
 
-        // finally, execute the request
-        resultCall.enqueue(new Callback<ImageUploadResult>() {
-            @Override
-            public void onResponse(Call<ImageUploadResult> call, Response<ImageUploadResult> response) {
+        try {
+            ImageUploadResult imageUploadResult = resultCall.execute().body();
 
-//                progressDialog.dismiss();
+            uploadImagePath = imageUploadResult.getPath();
 
-                // Response Success or Fail
-                if (response.isSuccessful()) {
-                    if (response.body().getResult().equals("success"))
-                        Snackbar.make(editContent, R.string.string_upload_success, Snackbar.LENGTH_LONG).show();
-                    else
-                        Snackbar.make(editContent, R.string.string_upload_fail, Snackbar.LENGTH_LONG).show();
 
-                } else {
-                    Snackbar.make(editContent, R.string.string_upload_fail, Snackbar.LENGTH_LONG).show();
-                }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-                /**
-                 * Update Views
-                 */
-//                imagePath = "";
-//                textView.setVisibility(View.VISIBLE);
-//                imageView.setVisibility(View.INVISIBLE);
-            }
 
-            @Override
-            public void onFailure(Call<ImageUploadResult> call, Throwable t) {
-                Snackbar.make(editContent, R.string.string_upload_fail, Snackbar.LENGTH_LONG).show();
-            }
+        Log.e("myimg1234", "onResponse: "+uploadImagePath );
+        return uploadImagePath;
 
-        });
+
     }
 
     @Override

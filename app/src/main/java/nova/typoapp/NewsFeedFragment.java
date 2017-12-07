@@ -126,10 +126,15 @@ public class NewsFeedFragment extends Fragment {
                             String writer = jObject.getString("writer");
                             String title = jObject.getString("title");
                             String content = jObject.getString("text_content");
+                            String imgUrl = "";
+                            if(jObject.getString("imgUrl") != null){
+                                imgUrl = jObject.getString("imgUrl");
+                            }
+
 
 //                            Log.v("hey", writer+title+content);
 
-                            FeedItem productFeed = NewsFeedContent.createFeed3(writer, title, content);
+                            FeedItem productFeed = NewsFeedContent.createFeed4(writer, title, content, imgUrl);
                             NewsFeedContent.addItem(productFeed);
 
 

@@ -9,6 +9,11 @@ public class ImageUploadResult {
     @Expose
     private String result;
 
+
+    @SerializedName("path")
+    private String path;
+
+
     /**
      * @return The result
      */
@@ -22,5 +27,14 @@ public class ImageUploadResult {
     public void setResult(String result) {
         this.result = result;
     }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
 
 }

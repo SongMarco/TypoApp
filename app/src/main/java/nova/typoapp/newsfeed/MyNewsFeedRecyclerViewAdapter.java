@@ -4,7 +4,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -44,6 +47,12 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
         holder.mIdView.setText("단어 : "+mValues.get(position).title);
         holder.mContentView.setText("뜻 : "+ mValues.get(position).content);
 
+        if( mValues.get(position).imgUrl != null){
+            Glide.with(holder.mView).load(mValues.get(position).imgUrl ).into(holder.mImageView);
+        }
+
+
+
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,6 +76,9 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
         public final TextView mIdView;
         public final TextView mContentView;
         public FeedItem mItem;
+        public ImageView mImageView;
+
+
 
         public ViewHolder(View view) {
             super(view);
@@ -74,6 +86,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
             mWriterView = (TextView)view.findViewById(R.id.feedWriter);
             mIdView = (TextView) view.findViewById(R.id.id);
             mContentView = (TextView) view.findViewById(R.id.content);
+            mImageView = (ImageView) view.findViewById(R.id.imageViewItem);
         }
 
         @Override
