@@ -630,6 +630,20 @@ public class WriteActivity extends AppCompatActivity {
     public class UploadTask extends AsyncTask<Void, String, String> {
 
 
+        ProgressDialog asyncDialog = new ProgressDialog(
+                WriteActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            asyncDialog.setMessage("이미지 업로드 중입니다...");
+
+            // show dialog
+            asyncDialog.show();
+
+
+            super.onPreExecute();
+        }
 
         @Override
         protected String doInBackground(Void... voids) {
@@ -648,6 +662,7 @@ public class WriteActivity extends AppCompatActivity {
 
             Log.e("myimg", "imgurl="+imgUrl);
 
+            asyncDialog.dismiss();
 
             WriteTask writeTask = new WriteTask();
             writeTask.execute();

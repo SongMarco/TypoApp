@@ -2,6 +2,7 @@ package nova.typoapp;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -273,7 +274,7 @@ public class ProfileActivity extends AppCompatActivity {
                     UploadTask uploadTask = new UploadTask();
                     uploadTask.execute();
 
-                        Glide.with(ProfileActivity.this).load(imageUri).into(imageViewProfile);
+//                        Glide.with(ProfileActivity.this).load(imageUri).into(imageViewProfile);
 
 
 
@@ -311,7 +312,7 @@ public class ProfileActivity extends AppCompatActivity {
                             UploadTask uploadTask = new UploadTask();
                             uploadTask.execute();
 
-                            Glide.with(ProfileActivity.this).load(photoURI).into(imageViewProfile);
+//                            Glide.with(ProfileActivity.this).load(photoURI).into(imageViewProfile);
 
 
 
@@ -406,9 +407,19 @@ public class ProfileActivity extends AppCompatActivity {
     public class UploadTask extends AsyncTask<Void, String, String> {
 
 
+        ProgressDialog asyncDialog = new ProgressDialog(
+                ProfileActivity.this);
+
 
         @Override
         protected String doInBackground(Void... voids) {
+
+            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            asyncDialog.setMessage("로딩중입니다..");
+
+            // show dialog
+            asyncDialog.show();
+
 
 
             return uploadImageProfile();
@@ -421,6 +432,11 @@ public class ProfileActivity extends AppCompatActivity {
         protected void onPostExecute(String imgUrl){
 
             super.onPostExecute(imgUrl);
+
+            LookupSessionTask profileTask = new LookupSessionTask();
+            profileTask.execute();
+
+            asyncDialog.dismiss();
 
             Log.e("myimg", "imgurl="+imgUrl);
         }
@@ -437,7 +453,7 @@ public class ProfileActivity extends AppCompatActivity {
 
 
         //Create Upload Server Client
-        ApiService service = RetroClient.getApiService();
+        ApiService service = RetroClient.getApiService2(ProfileActivity.this);
 
 
         //File creating from selected URL

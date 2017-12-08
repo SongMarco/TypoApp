@@ -1,5 +1,7 @@
 package nova.typoapp.retrofit;
 
+import android.content.Context;
+
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import okhttp3.OkHttpClient;
@@ -48,8 +50,30 @@ public class RetroClient {
                 .build();
     }
 
+    private static Retrofit getRetroClient2(Context context) {
+
+        HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+        httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addNetworkInterceptor(new StethoInterceptor())
+                .addInterceptor(new AddCookiesInterceptor(context))
+                .addInterceptor(httpLoggingInterceptor)
+                .build();
+
+        return new Retrofit.Builder()
+                .baseUrl(ApiService.API_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
+                .build();
+    }
+
     public static ApiService getApiService() {
         return getRetroClient().create(ApiService.class);
+    }
+
+    public static ApiService getApiService2(Context context) {
+        return getRetroClient2(context).create(ApiService.class);
     }
 }
 
