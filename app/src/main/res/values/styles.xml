@@ -22,4 +22,10 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="border_margin">
+
+        <item name="android:layout_marginStart">@dimen/margin_border</item>
+        <item name="android:layout_marginEnd">@dimen/margin_border</item>
+
+    </style>
 </resources>

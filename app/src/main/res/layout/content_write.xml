@@ -32,6 +32,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+                <ImageView
+                    android:id="@+id/imageViewAdd"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp" />
+
                 <LinearLayout
                     android:id="@+id/layoutAddImage"
                     android:layout_width="match_parent"
@@ -41,24 +46,20 @@
                     >
 
                     <ImageView
-                        android:id="@+id/imageViewAdd"
+                        android:id="@+id/imageViewSample"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp" />
+                        android:layout_height="200dp"
+                        android:visibility="visible"
+                        app:srcCompat="@android:drawable/ic_menu_report_image" />
 
                     <TextView
                         android:id="@+id/textViewAddRequire"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="이미지를 추가해주세요"
+                        android:text="터치하여 이미지를 추가해주세요"
                         android:textAlignment="center" />
-                </LinearLayout>
 
-                <ImageView
-                    android:id="@+id/imageViewSample"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="visible"
-                    app:srcCompat="@android:drawable/ic_menu_report_image" />
+                </LinearLayout>
 
             </FrameLayout>
 

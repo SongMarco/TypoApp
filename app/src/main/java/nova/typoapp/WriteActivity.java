@@ -146,11 +146,32 @@ public class WriteActivity extends AppCompatActivity {
 
         new AlertDialog.Builder(this)
 
-                .setTitle("업로드할 이미지 선택")
-                .setPositiveButton("사진촬영", cameraListener)
-                .setNeutralButton("앨범선택", albumListener)
-                .setNegativeButton("취소", cancelListener)
+//                .setTitle("업로드 방식 선택")
+                .setItems(R.array.image_way, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // The 'which' argument contains the index position
+                                // of the selected item
+
+                                switch(which){
+                                    case 0:
+                                        getAlbum();
+
+                                        break;
+                                    case 1:
+                                        captureCamera();
+
+                                        break;
+
+                                }
+                            }
+                        })
                 .show();
+
+//        .   show();
+//                .setPositiveButton("사진촬영", cameraListener)
+//                .setNeutralButton("앨범선택", albumListener)
+//                .setNegativeButton("취소", cancelListener)
+
 
 
 
@@ -286,7 +307,7 @@ public class WriteActivity extends AppCompatActivity {
                         imageViewAdd.setImageBitmap(image);
 
                         if(imageViewAdd.getDrawable() != null){
-                            findViewById(R.id.imageViewSample).setVisibility(View.GONE);
+                            findViewById(R.id.layoutAddImage).setVisibility(View.GONE);
                         }
 
                         Log.e("myimg", "onActivityResult: "+imageViewAdd.getDrawable().toString() );
@@ -356,7 +377,7 @@ public class WriteActivity extends AppCompatActivity {
 
                             imageViewAdd.setImageBitmap(resized);
                             if(imageViewAdd.getDrawable() != null){
-                                findViewById(R.id.imageViewSample).setVisibility(View.GONE);
+                                findViewById(R.id.layoutAddImage).setVisibility(View.GONE);
                             }
 
                             Log.e("img", "real photo path: "+ pickPhotoPath);

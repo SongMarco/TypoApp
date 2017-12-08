@@ -6,4 +6,6 @@
     <color name="facebookBlue">#3b5998</color>
 
     <color name="ivory">#EFECCA</color>
+    <color name="borderGrey">#e1e2e3</color>
+    <color name="transGrey">#BBe1e2e3</color>
 </resources>

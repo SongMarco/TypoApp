@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
 
-    android:layout_marginStart="10dp"
-    android:layout_marginEnd="10dp"
+
     android:layout_marginBottom="10dp"
     android:id="@+id/cv">
 
@@ -25,6 +24,14 @@
             android:layout_margin="@dimen/text_margin"
             android:text="글쓴이"
             android:textAppearance="?attr/textAppearanceListItem" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/borderGrey"
+            style="@style/border_margin"
+            android:layout_marginStart="5dp"
+
+            />
 
         <TextView
             android:id="@+id/id"
@@ -34,14 +41,33 @@
             android:text="글 제목"
             android:textAppearance="?attr/textAppearanceListItem" />
 
+        <View
+            android:id="@+id/view5"
+            style="@style/border_margin"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="5dp"
+
+            android:background="@color/borderGrey" />
+
         <ImageView
             android:id="@+id/imageViewItem"
-            android:layout_width="200dp"
-            android:layout_height="100dp"
-            android:layout_margin="@dimen/text_margin"
-            android:background="@color/cardview_light_background"
+            android:layout_width="match_parent"
+
+
+            android:layout_height="wrap_content"
+
             android:scaleType="fitCenter"
             app:srcCompat="@android:drawable/ic_menu_report_image" />
+
+        <View
+            android:id="@+id/view6"
+            style="@style/border_margin"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="5dp"
+
+            android:background="@color/borderGrey" />
 
         <TextView
             android:id="@+id/content"

@@ -64,10 +64,15 @@ public interface ApiService {
     Call<LoginInfo> lookSession();
 
 
-    //이미지 업로드하기
+    //뉴스피드 이미지 업로드하기
     @Multipart
-    @POST("imageUpload.php")
+    @POST("uploadImage.php")
     Call<ImageUploadResult> uploadImage(@Part MultipartBody.Part image);
+
+    //프로필 이미지 업로드하기
+    @Multipart
+    @POST("uploadImageProfile.php")
+    Call<ImageUploadResult> uploadImageProfile(@Part MultipartBody.Part image);
 
 
 }

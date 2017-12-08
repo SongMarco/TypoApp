@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="image_way">
+        <item>내 사진 가져오기</item>
+        <item>사진 찍기</item>
+
+
+
+    </string-array>
+
+</resources>
