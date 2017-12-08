@@ -17,13 +17,42 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/feedWriter"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:text="글쓴이"
-            android:textAppearance="?attr/textAppearanceListItem" />
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_margin="@dimen/margin_border"
+                android:id="@+id/imageProf"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+
+                card_view:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
+
+            <TextView
+                android:id="@+id/feedWriter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/text_margin"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:text="글쓴이"
+                android:textAppearance="?attr/textAppearanceListItem" />
+
+            <ImageView
+                android:id="@+id/imageViewMore"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+
+                android:tint="@color/transGrey"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/margin_border"
+
+                card_view:srcCompat="@drawable/ic_more_vert_black_48dp" />
+
+        </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -52,7 +81,7 @@
 
         <ImageView
             android:id="@+id/imageViewItem"
-            android:layout_width="match_parent"
+            android:layout_width="250dp"
 
 
             android:layout_height="wrap_content"

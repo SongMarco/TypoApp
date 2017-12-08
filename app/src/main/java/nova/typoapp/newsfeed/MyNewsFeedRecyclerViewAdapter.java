@@ -1,6 +1,7 @@
 package nova.typoapp.newsfeed;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
+import java.util.Objects;
 
 import nova.typoapp.NewsFeedFragment.OnListFragmentInteractionListener;
 import nova.typoapp.R;
@@ -43,12 +45,18 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
 
-        holder.mWriterView.setText( "작성자 : "+ mValues.get(position).writer);
+        holder.mWriterView.setText( ""+mValues.get(position).writer);
         holder.mIdView.setText("단어 : "+mValues.get(position).title);
         holder.mContentView.setText("뜻 : "+ mValues.get(position).content);
 
-        if( mValues.get(position).imgUrl != null){
+        if(!Objects.equals(mValues.get(position).imgUrl, "")){
+
+            Log.e("imgUrl", "onBindViewHolder: "+mValues.get(position).imgUrl );
+
             Glide.with(holder.mView).load(mValues.get(position).imgUrl ).into(holder.mImageView);
+        }
+        else{
+            Glide.with(holder.mView).load(R.drawable.ic_launcher_round).into(holder.mImageView);
         }
 
 
@@ -76,8 +84,13 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
         public final TextView mIdView;
         public final TextView mContentView;
         public FeedItem mItem;
+
+
         public ImageView mImageView;
 
+        public ImageView mProfileView;
+
+        public ImageView mMoreView;
 
 
         public ViewHolder(View view) {
@@ -86,7 +99,10 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
             mWriterView = (TextView)view.findViewById(R.id.feedWriter);
             mIdView = (TextView) view.findViewById(R.id.id);
             mContentView = (TextView) view.findViewById(R.id.content);
+
             mImageView = (ImageView) view.findViewById(R.id.imageViewItem);
+            mProfileView = (ImageView) view.findViewById(R.id.imageProf);
+            mMoreView = (ImageView)view.findViewById(R.id.imageViewMore);
         }
 
         @Override

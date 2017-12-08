@@ -50,6 +50,9 @@ public class NewsFeedContent {
     public static FeedItem createFeed4(String writer, String title, String content, String imgUrl) {
         return new FeedItem(writer, title, content, imgUrl);
     }
+    public static FeedItem createFeed5(String writer, String title, String content, String imgUrl, String imgProfileUrl) {
+        return new FeedItem(writer, title, content, imgUrl, imgProfileUrl);
+    }
 
 
     private static String makeDetails(int position) {
@@ -68,7 +71,11 @@ public class NewsFeedContent {
         public String writer;
         public final String title;
         public final String content;
+
+
         public String imgUrl;
+
+        public String imgProfileUrl;
 
 
         public String details = "aa";
@@ -84,6 +91,14 @@ public class NewsFeedContent {
             this.content = content;
             this.imgUrl = imgUrl;
         }
+        public FeedItem(String writer, String title, String content, String imgUrl, String imgProfileUrl) {
+            this.writer = writer;
+            this.title = title;
+            this.content = content;
+            this.imgUrl = imgUrl;
+            this.imgProfileUrl = imgProfileUrl;
+        }
+
 
         @Override
         public String toString() {

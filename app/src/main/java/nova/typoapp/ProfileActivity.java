@@ -404,24 +404,25 @@ public class ProfileActivity extends AppCompatActivity {
 
 
 
-    public class UploadTask extends AsyncTask<Void, String, String> {
 
+    public class UploadTask extends AsyncTask<Void, String, String> {
 
         ProgressDialog asyncDialog = new ProgressDialog(
                 ProfileActivity.this);
 
-
         @Override
-        protected String doInBackground(Void... voids) {
+        protected void onPreExecute() {
+            super.onPreExecute();
 
             asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            asyncDialog.setMessage("로딩중입니다..");
+            asyncDialog.setMessage("이미지 업로드 중입니다...");
 
             // show dialog
             asyncDialog.show();
+        }
 
-
-
+        @Override
+        protected String doInBackground(Void... voids) {
             return uploadImageProfile();
         }
 
@@ -438,12 +439,40 @@ public class ProfileActivity extends AppCompatActivity {
 
             asyncDialog.dismiss();
 
+
             Log.e("myimg", "imgurl="+imgUrl);
         }
 
     }
 
 
+    public class ProgressTask extends AsyncTask<String, Void, Void> {
+        ProgressDialog asyncDialog = new ProgressDialog(
+                ProfileActivity.this);
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(String... strings) {
+            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            asyncDialog.setMessage(strings[0]);
+
+            // show dialog
+            asyncDialog.show();
+
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            asyncDialog.dismiss();
+        }
+
+    }
 
     public String uploadImageProfile() {
 
