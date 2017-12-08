@@ -23,6 +23,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.signature.ObjectKey;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import java.io.File;
@@ -171,8 +173,15 @@ public class ProfileActivity extends AppCompatActivity {
 
             if ( email!=null ) {
 
+                RequestOptions requestOptions = new RequestOptions()
+                        .signature(new ObjectKey(String.valueOf(System.currentTimeMillis())));
 
-                Glide.with(ProfileActivity.this).load(profileImageUrl).into(imageViewProfile);
+                Glide.with(ProfileActivity.this)
+                        .load(profileImageUrl)
+                        .apply(requestOptions)
+                        .into(imageViewProfile);
+
+                Log.e("myimg", "onPostExecute: "+profileImageUrl );
                 profileEmail.setText(email);
                 profileName.setText(name);
                 profileBirthday.setText(birthday);
@@ -423,7 +432,13 @@ public class ProfileActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(Void... voids) {
-            return uploadImageProfile();
+
+            try {
+                return uploadImageProfile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
 
 
@@ -434,8 +449,13 @@ public class ProfileActivity extends AppCompatActivity {
 
             super.onPostExecute(imgUrl);
 
-            LookupSessionTask profileTask = new LookupSessionTask();
-            profileTask.execute();
+            RequestOptions requestOptions = new RequestOptions()
+                    .signature(new ObjectKey(String.valueOf(System.currentTimeMillis())));
+
+            Glide.with(ProfileActivity.this)
+                    .load(profileImageUrl)
+                    .apply(requestOptions)
+                    .into(imageViewProfile);
 
             asyncDialog.dismiss();
 
@@ -474,7 +494,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 
-    public String uploadImageProfile() {
+    public String uploadImageProfile() throws IOException {
 
         /**
          * Progressbar to Display if you need
@@ -494,31 +514,28 @@ public class ProfileActivity extends AppCompatActivity {
             file = new File( cameraPhotoPath  );
         }
 //
-        Log.e("myimg", "uploadImage-> pick"+pickPhotoPath+" ="+file.getAbsolutePath() +"is it same?");
-
-        Log.e("myimg", "uploadImage-> camera"+cameraPhotoPath+" ="+file.getAbsolutePath() +"is it same?");
+//        Log.e("myimg", "uploadImage-> pick"+pickPhotoPath+" ="+file.getAbsolutePath() +"is it same?");
+//
+//        Log.e("myimg", "uploadImage-> camera"+cameraPhotoPath+" ="+file.getAbsolutePath() +"is it same?");
         // create RequestBody instance from file
         RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
 
         // MultipartBody.Part is used to send also the actual file name
         MultipartBody.Part body =
-                MultipartBody.Part.createFormData("uploaded_file", file.getName(), requestFile);
+                MultipartBody.Part.createFormData("uploaded_file", "profile_"+email+".png", requestFile);
 
         Call<ImageUploadResult> resultCall = service.uploadImageProfile(body);
 
-        try {
+
             ImageUploadResult imageUploadResult = resultCall.execute().body();
 
             uploadImagePath = imageUploadResult.getPath();
 
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            return uploadImagePath;
 
 
-        Log.e("myimg1234", "onResponse: "+uploadImagePath );
-        return uploadImagePath;
+
+
 
 
     }

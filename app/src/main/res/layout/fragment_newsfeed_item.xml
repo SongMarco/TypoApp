@@ -28,6 +28,7 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
 
+                android:scaleType="centerCrop"
                 card_view:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
 
             <TextView

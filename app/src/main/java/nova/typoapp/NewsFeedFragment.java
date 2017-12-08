@@ -1,5 +1,6 @@
 package nova.typoapp;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,12 +12,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -81,6 +84,10 @@ public class NewsFeedFragment extends Fragment {
 
     String json_result;
 
+
+
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -106,7 +113,18 @@ public class NewsFeedFragment extends Fragment {
         NewsFeedContent.ITEMS.clear();
 
         Call<ResponseBody> comment = apiService.getList();
+
+
+        final ProgressDialog asyncDialog = new ProgressDialog(
+                getActivity());
+        asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        asyncDialog.setMessage("글을 불러오는 중입니다...");
+        // show dialog
+        asyncDialog.show();
+
         comment.enqueue(new Callback<ResponseBody>() {
+
+
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
@@ -114,6 +132,7 @@ public class NewsFeedFragment extends Fragment {
 
                     json_result = response.body().string();
 //                    Log.v("RECV DATA", json_result);
+
 
 
                     JSONArray jsonRes = null;
@@ -127,14 +146,20 @@ public class NewsFeedFragment extends Fragment {
                             String title = jObject.getString("title");
                             String content = jObject.getString("text_content");
                             String imgUrl = "";
-                            if(jObject.getString("imgUrl") != null){
+                            String profileUrl = "";
+                            if(!Objects.equals(jObject.getString("imgUrl"), "")){
                                 imgUrl = jObject.getString("imgUrl");
+                            }
+                            if(! jObject.getString("writer_profile").equals("") ){
+
+                                profileUrl = jObject.getString("writer_profile");
                             }
 
 
 //                            Log.v("hey", writer+title+content);
 
-                            FeedItem productFeed = NewsFeedContent.createFeed4(writer, title, content, imgUrl);
+//                            FeedItem productFeed = NewsFeedContent.createFeed4(writer, title, content, imgUrl);
+                            FeedItem productFeed = NewsFeedContent.createFeed5(writer, title, content, imgUrl, profileUrl);
                             NewsFeedContent.addItem(productFeed);
 
 
@@ -142,6 +167,14 @@ public class NewsFeedFragment extends Fragment {
 
 // Set the adapter
                         if (recyclerView != null) {
+                            recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                                @Override
+                                public void onGlobalLayout() {
+                                    asyncDialog.dismiss();
+                                    //At this point the layout is complete and the
+                                    //dimensions of recyclerView and any child views are known.
+                                }
+                            });
                             Context context = view.getContext();
 
                             if (mColumnCount <= 1) {
@@ -180,7 +213,6 @@ public class NewsFeedFragment extends Fragment {
             }
         });
         //endregion
-
 
 
 

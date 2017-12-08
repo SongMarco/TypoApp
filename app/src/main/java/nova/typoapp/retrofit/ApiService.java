@@ -46,7 +46,7 @@ public interface ApiService {
     //포스트 방식으로 글쓰기 해주기. formurlEncoded 와 필드 골뱅이를 주목할 것.
     @FormUrlEncoded
     @POST("writeFeed.php")
-    Call<ResponseBody>write (@Field("writer") String writer, @Field("title") String title, @Field("content") String content, @Field("imgUrl") String imgUrl );
+    Call<ResponseBody>write (@Field("writer") String writer, @Field("email") String email,  @Field("title") String title, @Field("content") String content, @Field("imgUrl") String imgUrl );
 
     //회원가입
     @FormUrlEncoded

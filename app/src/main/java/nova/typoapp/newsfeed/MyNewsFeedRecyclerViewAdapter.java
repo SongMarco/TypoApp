@@ -1,5 +1,7 @@
 package nova.typoapp.newsfeed;
 
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +11,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.signature.ObjectKey;
 
 import java.util.List;
 import java.util.Objects;
@@ -59,6 +63,13 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
             Glide.with(holder.mView).load(R.drawable.ic_launcher_round).into(holder.mImageView);
         }
 
+        if( !mValues.get(position).imgProfileUrl.equals("") ){
+            RequestOptions requestOptions = new RequestOptions()
+                    .signature(new ObjectKey(String.valueOf(System.currentTimeMillis())));
+
+            Glide.with(holder.mView).load(mValues.get(position).imgProfileUrl).into(holder.mProfileView);
+        }
+
 
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -103,6 +114,10 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
             mImageView = (ImageView) view.findViewById(R.id.imageViewItem);
             mProfileView = (ImageView) view.findViewById(R.id.imageProf);
             mMoreView = (ImageView)view.findViewById(R.id.imageViewMore);
+
+            mProfileView.setBackground(new ShapeDrawable(new OvalShape()));
+            mProfileView.setClipToOutline(true);
+
         }
 
         @Override

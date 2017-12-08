@@ -90,7 +90,7 @@ public class WriteActivity extends AppCompatActivity {
     String uploadImagePath;
     private String absolutePath;
     ProgressDialog progressDialog;
-    String writer;
+    String writer, email;
 
     PermissionsChecker checker;
 
@@ -117,6 +117,7 @@ public class WriteActivity extends AppCompatActivity {
         SharedPreferences pref_login = getSharedPreferences(getString(R.string.key_pref_Login), Activity.MODE_PRIVATE);
 
         writer = pref_login.getString(getString(R.string.cookie_name), "");
+        email = pref_login.getString("cookie_email", "");
 
     }
 
@@ -566,7 +567,7 @@ public class WriteActivity extends AppCompatActivity {
             ApiService apiService = retrofit.create(ApiService.class);
 
             Log.e("myimg", "doInBackground: "+uploadImagePath );
-            Call<ResponseBody> comment = apiService.write(writer, editTitle.getText().toString(), editContent.getText().toString(), uploadImagePath );
+            Call<ResponseBody> comment = apiService.write(writer, email, editTitle.getText().toString(), editContent.getText().toString(), uploadImagePath );
 
 
             try {
