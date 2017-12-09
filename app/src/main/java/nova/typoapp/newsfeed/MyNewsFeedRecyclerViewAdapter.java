@@ -3,7 +3,6 @@ package nova.typoapp.newsfeed;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +42,10 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
         return new ViewHolder(view);
     }
 
+    public interface OnRecyclerItemClickListener {
 
+        void onRecyclerItemClick(String data);
+    }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
@@ -55,7 +57,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
 
         if(!Objects.equals(mValues.get(position).imgUrl, "")){
 
-            Log.e("imgUrl", "onBindViewHolder: "+mValues.get(position).imgUrl );
+//            Log.e("imgUrl", "onBindViewHolder: "+mValues.get(position).imgUrl );
 
             Glide.with(holder.mView).load(mValues.get(position).imgUrl ).into(holder.mImageView);
         }
@@ -67,8 +69,11 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
             RequestOptions requestOptions = new RequestOptions()
                     .signature(new ObjectKey(String.valueOf(System.currentTimeMillis())));
 
-            Glide.with(holder.mView).load(mValues.get(position).imgProfileUrl).into(holder.mProfileView);
+            Glide.with(holder.mView).load(mValues.get(position).imgProfileUrl)
+                    .apply(requestOptions)
+                    .into(holder.mProfileView);
         }
+
 
 
 
@@ -104,6 +109,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
         public ImageView mMoreView;
 
 
+
         public ViewHolder(View view) {
             super(view);
             mView = view;
@@ -117,6 +123,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
 
             mProfileView.setBackground(new ShapeDrawable(new OvalShape()));
             mProfileView.setClipToOutline(true);
+
 
         }
 
