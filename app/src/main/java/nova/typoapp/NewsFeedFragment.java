@@ -142,6 +142,7 @@ public class NewsFeedFragment extends Fragment {
                         for (int i = 0; i < jsonRes.length(); i++) {
                             JSONObject jObject = jsonRes.getJSONObject(i);  // JSONObject 추출
 
+                            int feedNum = jObject.getInt("feedNum");
                             String writer = jObject.getString("writer");
                             String title = jObject.getString("title");
                             String content = jObject.getString("text_content");
@@ -159,7 +160,7 @@ public class NewsFeedFragment extends Fragment {
 //                            Log.v("hey", writer+title+content);
 
 //                            FeedItem productFeed = NewsFeedContent.createFeed4(writer, title, content, imgUrl);
-                            FeedItem productFeed = NewsFeedContent.createFeed5(writer, title, content, imgUrl, profileUrl);
+                            FeedItem productFeed = NewsFeedContent.createFeed6(feedNum, writer, title, content, imgUrl, profileUrl);
                             NewsFeedContent.addItem(productFeed);
 
 
@@ -182,7 +183,18 @@ public class NewsFeedFragment extends Fragment {
                             } else {
                                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
                             }
-                            recyclerView.setAdapter(new MyNewsFeedRecyclerViewAdapter(NewsFeedContent.ITEMS, mListener));
+                            recyclerView.setAdapter(new MyNewsFeedRecyclerViewAdapter(NewsFeedContent.ITEMS, new MyNewsFeedRecyclerViewAdapter.ClickListener() {
+                                @Override
+                                public void onPositionClicked(int position) {
+
+                                }
+
+                                @Override
+                                public void onLongClicked(int position) {
+
+                                }
+                            }
+                            ));
                             recyclerView.setNestedScrollingEnabled(false);
                         }
 

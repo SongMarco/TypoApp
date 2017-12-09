@@ -48,6 +48,18 @@ public interface ApiService {
     @POST("writeFeed.php")
     Call<ResponseBody>write (@Field("writer") String writer, @Field("email") String email,  @Field("title") String title, @Field("content") String content, @Field("imgUrl") String imgUrl );
 
+    //포스트 방식으로 글 수정
+    @FormUrlEncoded
+    @POST("editFeed.php")
+    Call<ResponseBody>editFeed (@Field("feedID") int FeedID ,
+                                @Field("writer") String writer,
+                                @Field("email") String email,
+                                @Field("title") String title,
+                                @Field("content") String content,
+                                @Field("imgUrl") String imgUrl );
+
+
+
     //회원가입
     @FormUrlEncoded
     @POST("join.php")
@@ -74,5 +86,9 @@ public interface ApiService {
     @POST("uploadImageProfile.php")
     Call<ImageUploadResult> uploadImageProfile(@Part MultipartBody.Part image);
 
+    //게시글 삭제하기
+    @FormUrlEncoded
+    @POST("deleteFeed.php")
+    Call<ResponseBody> deleteFeed(@Field("feedID") int feedID);
 
 }

@@ -36,10 +36,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -94,18 +97,39 @@ public class WriteActivity extends AppCompatActivity {
 
     PermissionsChecker checker;
 
+    Intent intent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write);
         ButterKnife.bind(this);
 
+        intent = getIntent();
+
+        if (intent.getStringExtra("title") != null) {
+
+
+
+            editTitle.setText(intent.getStringExtra("title"));
+            editContent.setText(intent.getStringExtra("content"));
+
+
+
+            if(!Objects.equals(intent.getStringExtra("imgUrl"), "")){
+                Glide.with(WriteActivity.this)
+                        .load(intent.getStringExtra("imgUrl"))
+                        .into(imageViewAdd);
+                findViewById(R.id.layoutAddImage).setVisibility(View.INVISIBLE);
+            }
+
+
+        }
 
         /**
          * Permission Checker Initialized
          */
         checker = new PermissionsChecker(this);
-
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -122,8 +146,8 @@ public class WriteActivity extends AppCompatActivity {
     }
 
 
-    @OnClick(R.id.layoutAddImage)
-    void onAddImage(){
+    @OnClick(R.id.frameAdd)
+    void onAddImage() {
         DialogInterface.OnClickListener cameraListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -149,23 +173,23 @@ public class WriteActivity extends AppCompatActivity {
 
 //                .setTitle("업로드 방식 선택")
                 .setItems(R.array.image_way, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // The 'which' argument contains the index position
-                                // of the selected item
+                    public void onClick(DialogInterface dialog, int which) {
+                        // The 'which' argument contains the index position
+                        // of the selected item
 
-                                switch(which){
-                                    case 0:
-                                        getAlbum();
+                        switch (which) {
+                            case 0:
+                                getAlbum();
 
-                                        break;
-                                    case 1:
-                                        captureCamera();
+                                break;
+                            case 1:
+                                captureCamera();
 
-                                        break;
+                                break;
 
-                                }
-                            }
-                        })
+                        }
+                    }
+                })
                 .show();
 
 //        .   show();
@@ -174,14 +198,10 @@ public class WriteActivity extends AppCompatActivity {
 //                .setNegativeButton("취소", cancelListener)
 
 
-
-
-
     }
 
 
-
-    private void captureCamera(){
+    private void captureCamera() {
         String state = Environment.getExternalStorageState();
         // 외장 메모리 검사
         if (Environment.MEDIA_MOUNTED.equals(state)) {
@@ -231,7 +251,7 @@ public class WriteActivity extends AppCompatActivity {
     }
 
 
-    private void getAlbum(){
+    private void getAlbum() {
         Log.i("getAlbum", "Call");
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
@@ -239,7 +259,7 @@ public class WriteActivity extends AppCompatActivity {
         startActivityForResult(intent, REQUEST_TAKE_ALBUM);
     }
 
-    private void galleryAddPic(){
+    private void galleryAddPic() {
         Log.i("galleryAddPic", "Call");
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         // 해당 경로에 있는 파일을 객체화(새로 파일을 만든다는 것으로 이해하면 안 됨)
@@ -251,7 +271,7 @@ public class WriteActivity extends AppCompatActivity {
     }
 
     // 카메라 전용 크랍
-    public void cropImage(){
+    public void cropImage() {
         Log.i("cropImage", "Call");
         Log.i("cropImage", "photoURI : " + photoURI + " / albumURI : " + albumURI);
 
@@ -288,7 +308,7 @@ public class WriteActivity extends AppCompatActivity {
                         options.inSampleSize = 4;
                         Bitmap src = BitmapFactory.decodeFile(cameraPhotoPath, options);
 
-                        Log.e("img", "onActivityResult: "+ cameraPhotoPath);
+                        Log.e("img", "onActivityResult: " + cameraPhotoPath);
                         Bitmap image = Bitmap.createScaledBitmap(src, src.getWidth(), src.getHeight(), true);
 
                         // 이미지를 상황에 맞게 회전시킨다
@@ -303,15 +323,14 @@ public class WriteActivity extends AppCompatActivity {
                         image = rotate(image, exifDegree);
 
 
-
 //                        Log.e("myimg", "onActivityResult-default drawable:: "+imageViewAdd.getDrawable().toString() );
                         imageViewAdd.setImageBitmap(image);
 
-                        if(imageViewAdd.getDrawable() != null){
+                        if (imageViewAdd.getDrawable() != null) {
                             findViewById(R.id.layoutAddImage).setVisibility(View.GONE);
                         }
 
-                        Log.e("myimg", "onActivityResult: "+imageViewAdd.getDrawable().toString() );
+                        Log.e("myimg", "onActivityResult: " + imageViewAdd.getDrawable().toString());
 
 //                        iv_view.setImageURI(imageUri);
 
@@ -326,7 +345,7 @@ public class WriteActivity extends AppCompatActivity {
             case REQUEST_TAKE_ALBUM:
                 if (resultCode == Activity.RESULT_OK) {
 
-                    if(data.getData() != null){
+                    if (data.getData() != null) {
                         try {
                             albumFile = null;
                             albumFile = createImageFile();
@@ -348,20 +367,18 @@ public class WriteActivity extends AppCompatActivity {
                             // 아웃오브메모리 해결!
                             // @@@@@ 황금 코드~
                             Bitmap resized;
-                            try{
+                            try {
 
                                 BitmapFactory.Options options = new BitmapFactory.Options();
                                 Bitmap src = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
-                                 resized = Bitmap.createBitmap(src);
-                            }
-
-                            catch(OutOfMemoryError e){
+                                resized = Bitmap.createBitmap(src);
+                            } catch (OutOfMemoryError e) {
 
                                 Toast.makeText(this, "메모리가 부족하여 이미지를 축소하였습니다.", Toast.LENGTH_SHORT).show();
                                 BitmapFactory.Options options = new BitmapFactory.Options();
                                 options.inSampleSize = 4;
                                 Bitmap src = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
-                                 resized = Bitmap.createScaledBitmap(src, src.getWidth()/4, src.getHeight()/4, true);
+                                resized = Bitmap.createScaledBitmap(src, src.getWidth() / 4, src.getHeight() / 4, true);
                             }
 
 //                            Bitmap src = BitmapFactory.decodeFile(imagePath , options);
@@ -377,14 +394,14 @@ public class WriteActivity extends AppCompatActivity {
 
 
                             imageViewAdd.setImageBitmap(resized);
-                            if(imageViewAdd.getDrawable() != null){
+                            if (imageViewAdd.getDrawable() != null) {
                                 findViewById(R.id.layoutAddImage).setVisibility(View.GONE);
                             }
 
-                            Log.e("img", "real photo path: "+ pickPhotoPath);
+                            Log.e("img", "real photo path: " + pickPhotoPath);
 
 
-                        }catch (Exception e){
+                        } catch (Exception e) {
 
                             Log.e("TAKE_ALBUM_SINGLE ERROR", e.toString());
                         }
@@ -398,9 +415,7 @@ public class WriteActivity extends AppCompatActivity {
                     galleryAddPic();
 
                     imageViewAdd.setImageURI(albumURI);
-                    Log.e("img", "onActivityResult: "+albumURI.toString() );
-
-
+                    Log.e("img", "onActivityResult: " + albumURI.toString());
 
 
                 }
@@ -412,8 +427,8 @@ public class WriteActivity extends AppCompatActivity {
     public String getRealPathFromURI(Context context, Uri contentUri) {
         Cursor cursor = null;
         try {
-            String[] proj = { MediaStore.Images.Media.DATA };
-            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+            String[] proj = {MediaStore.Images.Media.DATA};
+            cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             cursor.moveToFirst();
             return cursor.getString(column_index);
@@ -423,38 +438,33 @@ public class WriteActivity extends AppCompatActivity {
             }
         }
     }
+
     /**
      * 이미지를 회전시킵니다.
      *
-     * @param bitmap 비트맵 이미지
+     * @param bitmap  비트맵 이미지
      * @param degrees 회전 각도
      * @return 회전된 이미지
      */
     //사진을 회전각도에따라 회전시켜 비트맵을 세팅하는 메소드
-    public Bitmap rotate(Bitmap bitmap, int degrees)
-    {
-        if(degrees != 0 && bitmap != null)
-        {
+    public Bitmap rotate(Bitmap bitmap, int degrees) {
+        if (degrees != 0 && bitmap != null) {
             Matrix m = new Matrix();
             m.setRotate(degrees, (float) bitmap.getWidth() / 2,
                     (float) bitmap.getHeight() / 2);
 
-            try
-            {
+            try {
                 Bitmap converted = Bitmap.createBitmap(bitmap, 0, 0,
                         bitmap.getWidth(), bitmap.getHeight(), m, true);
-                if(bitmap != converted)
-                {
+                if (bitmap != converted) {
                     bitmap.recycle();
                     bitmap = converted;
                 }
-            }
-            catch(OutOfMemoryError ex)
-            {
+            } catch (OutOfMemoryError ex) {
                 //OOM에 걸릴 경우, 비트맵을 축소하여 재생성하고, 함수에 다시 넣어준다.
 //                Toast.makeText(this, "메모리 부족으로 리사이징함", Toast.LENGTH_SHORT).show();
-                Log.e("img", "err: mem 부족" );
-                bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/4, bitmap.getHeight()/4, true);
+                Log.e("img", "err: mem 부족");
+                bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth() / 4, bitmap.getHeight() / 4, true);
                 return rotate(bitmap, degrees);
 
                 // 메모리가 부족하여 회전을 시키지 못할 경우 그냥 원본을 반환합니다.
@@ -464,25 +474,19 @@ public class WriteActivity extends AppCompatActivity {
     }
 
     //회전 각도를 얻는 메소드
-    public int exifOrientationToDegrees(int exifOrientation)
-    {
-        if(exifOrientation == ExifInterface.ORIENTATION_ROTATE_90)
-        {
+    public int exifOrientationToDegrees(int exifOrientation) {
+        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
             return 90;
-        }
-        else if(exifOrientation == ExifInterface.ORIENTATION_ROTATE_180)
-        {
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
             return 180;
-        }
-        else if(exifOrientation == ExifInterface.ORIENTATION_ROTATE_270)
-        {
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
             return 270;
         }
         return 0;
     }
 
     //권한을 체크하는 메소드
-    private void checkPermission(){
+    private void checkPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             // 처음 호출시엔 if()안의 부분은 false로 리턴 됨 -> else{..}의 요청으로 넘어감
             if ((ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) ||
@@ -538,22 +542,27 @@ public class WriteActivity extends AppCompatActivity {
             startPermissionsActivity(PERMISSIONS_READ_STORAGE);
         }
 
-        if(cameraPhotoPath != null || pickPhotoPath != null){
+
+        // 작성 / 수정시 작업이 다르다.
+        //WriteTask를 수정에 맞게 수정해야 한다.
+        if (cameraPhotoPath != null || pickPhotoPath != null) {
+
             UploadTask uploadTask = new UploadTask();
             uploadTask.execute();
-        }
-        else{
+        } else {
             WriteTask writeTask = new WriteTask();
             writeTask.execute();
         }
 
 
     }
+
     private void startPermissionsActivity(String[] permission) {
         PermissionsActivity.startActivityForResult(this, 0, permission);
     }
 
     String json_result = "";
+
     public class WriteTask extends AsyncTask<Void, String, String> {
 
 
@@ -566,8 +575,32 @@ public class WriteActivity extends AppCompatActivity {
             Retrofit retrofit = new Retrofit.Builder().baseUrl(API_URL).build();
             ApiService apiService = retrofit.create(ApiService.class);
 
-            Log.e("myimg", "doInBackground: "+uploadImagePath );
-            Call<ResponseBody> comment = apiService.write(writer, email, editTitle.getText().toString(), editContent.getText().toString(), uploadImagePath );
+            Log.e("myimg", "doInBackground: " + uploadImagePath);
+
+
+
+            Call<ResponseBody> comment;
+            //수정이라면
+            if(getIntent().getStringExtra("title")!= null){
+
+                int feedID = getIntent().getIntExtra("feedID",0 );
+
+                //수정인데, 이미지를 수정했는지에 따라 분기가 갈린다.
+                if(uploadImagePath !=null){
+                    comment = apiService.editFeed(feedID, writer, email, editTitle.getText().toString(), editContent.getText().toString(), uploadImagePath);
+
+                }
+                else{
+                    comment = apiService.editFeed(feedID, writer, email, editTitle.getText().toString(), editContent.getText().toString(), getIntent().getStringExtra("imgUrl"));
+                }
+
+                //수정작업
+            }
+            //신규 작성이다
+            else{
+               comment = apiService.write(writer, email, editTitle.getText().toString(), editContent.getText().toString(), uploadImagePath);
+            }
+
 
 
             try {
@@ -587,14 +620,14 @@ public class WriteActivity extends AppCompatActivity {
 
         @Override
 
-        protected void onPostExecute(String result){
+        protected void onPostExecute(String result) {
 
             super.onPostExecute(result);
 
             Log.e("wow", result);
 
 
-            if ( result.contains("success") ) {
+            if (result.contains("success")) {
 //                Snackbar.make(findViewById(R.id.email_sign_in_button), "환영합니다. 계정"+email+"으로 가입하셨습니다.", Snackbar.LENGTH_LONG).show();
 
 
@@ -627,7 +660,6 @@ public class WriteActivity extends AppCompatActivity {
     }
 
 
-
     public class UploadTask extends AsyncTask<Void, String, String> {
 
 
@@ -657,17 +689,16 @@ public class WriteActivity extends AppCompatActivity {
         @Override
 
         //이미지 업로드가 종료됨. 글쓰기 태스크 시작
-        protected void onPostExecute(String imgUrl){
+        protected void onPostExecute(String imgUrl) {
 
             super.onPostExecute(imgUrl);
 
-            Log.e("myimg", "imgurl="+imgUrl);
+            Log.e("myimg", "imgurl=" + imgUrl);
 
             asyncDialog.dismiss();
 
             WriteTask writeTask = new WriteTask();
             writeTask.execute();
-
 
 
         }
@@ -691,12 +722,11 @@ public class WriteActivity extends AppCompatActivity {
 
         //File creating from selected URL
         File file;
-        if(pickPhotoPath != null){
-            file = new File( pickPhotoPath  );
+        if (pickPhotoPath != null) {
+            file = new File(pickPhotoPath);
 
-        }
-        else{
-            file = new File( cameraPhotoPath  );
+        } else {
+            file = new File(cameraPhotoPath);
         }
 //
 //        Log.e("myimg", "uploadImage-> pick"+pickPhotoPath+" ="+file.getAbsolutePath() +"is it same?");
@@ -722,7 +752,7 @@ public class WriteActivity extends AppCompatActivity {
         }
 
 
-        Log.e("myimg1234", "onResponse: "+uploadImagePath );
+        Log.e("myimg1234", "onResponse: " + uploadImagePath);
         return uploadImagePath;
 
 

@@ -174,6 +174,7 @@ public class ProfileActivity extends AppCompatActivity {
             if ( email!=null ) {
 
                 RequestOptions requestOptions = new RequestOptions()
+                       
                         .signature(new ObjectKey(String.valueOf(System.currentTimeMillis())));
 
                 Glide.with(ProfileActivity.this)

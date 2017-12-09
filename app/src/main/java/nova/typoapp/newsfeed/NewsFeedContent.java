@@ -53,7 +53,9 @@ public class NewsFeedContent {
     public static FeedItem createFeed5(String writer, String title, String content, String imgUrl, String imgProfileUrl) {
         return new FeedItem(writer, title, content, imgUrl, imgProfileUrl);
     }
-
+    public static FeedItem createFeed6(int feedID, String writer, String title, String content, String imgUrl, String imgProfileUrl) {
+        return new FeedItem(feedID, writer, title, content, imgUrl, imgProfileUrl);
+    }
 
     private static String makeDetails(int position) {
         StringBuilder builder = new StringBuilder();
@@ -69,13 +71,21 @@ public class NewsFeedContent {
      */
     public static class FeedItem {
         public String writer;
+
+
         public final String title;
         public final String content;
+
+
 
 
         public String imgUrl;
 
         public String imgProfileUrl;
+
+
+
+        public int feedID;
 
 
         public String details = "aa";
@@ -99,6 +109,15 @@ public class NewsFeedContent {
             this.imgProfileUrl = imgProfileUrl;
         }
 
+        public FeedItem(int feedID, String writer, String title, String content, String imgUrl, String imgProfileUrl) {
+            this.feedID = feedID;
+            this.writer = writer;
+            this.title = title;
+            this.content = content;
+            this.imgUrl = imgUrl;
+            this.imgProfileUrl = imgProfileUrl;
+        }
+
 
         @Override
         public String toString() {
@@ -111,7 +130,28 @@ public class NewsFeedContent {
 
 
 
-            return this.writer+" "+this.title+" "+this.content;
+            return this.feedID+this.writer+" "+this.title+" "+this.content;
+        }
+
+        public int getFeedID() {
+            return feedID;
+        }
+
+
+        public String getImgUrl() {
+            return imgUrl;
+        }
+
+        public void setImgUrl(String imgUrl) {
+            this.imgUrl = imgUrl;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getContent() {
+            return content;
         }
 
     }
