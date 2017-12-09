@@ -459,6 +459,7 @@ public class ProfileActivity extends AppCompatActivity {
                     .into(imageViewProfile);
 
             asyncDialog.dismiss();
+            Toast.makeText(ProfileActivity.this, "프로필 사진이 수정되었습니다.", Toast.LENGTH_SHORT).show();
 
 
             Log.e("myimg", "imgurl="+imgUrl);
@@ -466,34 +467,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 
-
-    public class ProgressTask extends AsyncTask<String, Void, Void> {
-        ProgressDialog asyncDialog = new ProgressDialog(
-                ProfileActivity.this);
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected Void doInBackground(String... strings) {
-            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            asyncDialog.setMessage(strings[0]);
-
-            // show dialog
-            asyncDialog.show();
-
-            return null;
-        }
-
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            asyncDialog.dismiss();
-        }
-
-    }
 
     public String uploadImageProfile() throws IOException {
 
