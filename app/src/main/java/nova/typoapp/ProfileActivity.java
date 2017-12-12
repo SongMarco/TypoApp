@@ -108,7 +108,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     String json_result = "";
 
-    String email, name, birthday, profileImageUrl;
+    String email, name, birthday, profileImageUrl, profileImageName;
     public class LookupSessionTask extends AsyncTask<Void, String, Void> {
 
 
@@ -137,7 +137,7 @@ public class ProfileActivity extends AppCompatActivity {
                     .build();
 
 
-            Log.e(TAG, "shared-before call: "+getSharedPreferences("pref_login" , MODE_PRIVATE ).getAll()  ) ;
+//            Log.e(TAG, "shared-before call: "+getSharedPreferences("pref_login" , MODE_PRIVATE ).getAll()  ) ;
 
             ApiService apiService = retrofit.create(ApiService.class);
 
@@ -147,7 +147,7 @@ public class ProfileActivity extends AppCompatActivity {
 
                 LoginInfo loginInfo = call.execute().body();
 
-                Log.e(TAG, "shared-after call: "+getSharedPreferences("pref_login" , MODE_PRIVATE ).getAll()  ) ;
+//                Log.e(TAG, "shared-after call: "+getSharedPreferences("pref_login" , MODE_PRIVATE ).getAll()  ) ;
 //                String cookie = call.clone().execute().headers().values("Set-Cookie").toString();
 
 
@@ -156,6 +156,12 @@ public class ProfileActivity extends AppCompatActivity {
                 name = loginInfo.getName();
                 birthday = loginInfo.getBirthday();
                 profileImageUrl = loginInfo.getProfile_url();
+
+                String homeUrl = "http://115.68.231.13/project/android/profileimage/";
+                String[] piecesOfHomeUrl = profileImageUrl.split("/");
+//                Log.e(TAG, Arrays.toString(piecesOfHomeUrl)  );
+                profileImageName = piecesOfHomeUrl[6];
+//                Log.e(TAG, "doInBackground: name = "+profileImageName );
 
 
 
@@ -179,7 +185,7 @@ public class ProfileActivity extends AppCompatActivity {
 
                 Glide.with(ProfileActivity.this)
                         .load(profileImageUrl)
-                        .apply(requestOptions)
+//                        .apply(requestOptions)
                         .into(imageViewProfile);
 
                 Log.e("myimg", "onPostExecute: "+profileImageUrl );
@@ -453,10 +459,14 @@ public class ProfileActivity extends AppCompatActivity {
             RequestOptions requestOptions = new RequestOptions()
                     .signature(new ObjectKey(String.valueOf(System.currentTimeMillis())));
 
-            Glide.with(ProfileActivity.this)
-                    .load(profileImageUrl)
-                    .apply(requestOptions)
-                    .into(imageViewProfile);
+//            Glide.with(ProfileActivity.this)
+//                    .load(profileImageUrl)
+//                    .apply(requestOptions)
+//                    .into(imageViewProfile);
+
+            LookupSessionTask lookupSessionTask = new LookupSessionTask();
+            lookupSessionTask.execute();
+
 
             asyncDialog.dismiss();
             Toast.makeText(ProfileActivity.this, "프로필 사진이 수정되었습니다.", Toast.LENGTH_SHORT).show();
@@ -496,7 +506,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         // MultipartBody.Part is used to send also the actual file name
         MultipartBody.Part body =
-                MultipartBody.Part.createFormData("uploaded_file", "profile_"+email+".png", requestFile);
+                MultipartBody.Part.createFormData("uploaded_file", profileImageUrl, requestFile);
 
         Call<ImageUploadResult> resultCall = service.uploadImageProfile(body);
 

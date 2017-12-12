@@ -83,7 +83,7 @@ public interface ApiService {
 
     //프로필 이미지 업로드하기
     @Multipart
-    @POST("uploadImageProfile.php")
+    @POST("uploadImageProfile_new.php")
     Call<ImageUploadResult> uploadImageProfile(@Part MultipartBody.Part image);
 
     //게시글 삭제하기
