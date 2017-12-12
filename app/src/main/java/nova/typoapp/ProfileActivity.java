@@ -64,7 +64,6 @@ public class ProfileActivity extends AppCompatActivity {
     String uploadImagePath;
 
 
-
     @BindView(R.id.profileEmail)
     TextView profileEmail;
     @BindView(R.id.profileName)

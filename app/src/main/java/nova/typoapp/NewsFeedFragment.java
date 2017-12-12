@@ -194,6 +194,7 @@ public class NewsFeedFragment extends Fragment {
 
                                 }
                             }
+
                             ));
                             recyclerView.setNestedScrollingEnabled(false);
                         }

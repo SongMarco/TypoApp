@@ -90,7 +90,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
                     .signature(new ObjectKey(String.valueOf(System.currentTimeMillis())));
 
             Glide.with(holder.mView).load(mValues.get(position).imgProfileUrl)
-                    .apply(requestOptions)
+//                    .apply(requestOptions)
                     .into(holder.mProfileView);
         }
 
