@@ -146,6 +146,7 @@ public class NewsFeedFragment extends Fragment {
                             String writer = jObject.getString("writer");
                             String title = jObject.getString("title");
                             String content = jObject.getString("text_content");
+                            String writtenDate = jObject.getString("written_time");
                             String imgUrl = "";
                             String profileUrl = "";
                             if(!Objects.equals(jObject.getString("imgUrl"), "")){
@@ -160,7 +161,7 @@ public class NewsFeedFragment extends Fragment {
 //                            Log.v("hey", writer+title+content);
 
 //                            FeedItem productFeed = NewsFeedContent.createFeed4(writer, title, content, imgUrl);
-                            FeedItem productFeed = NewsFeedContent.createFeed6(feedNum, writer, title, content, imgUrl, profileUrl);
+                            FeedItem productFeed = NewsFeedContent.createFeed7(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate);
                             NewsFeedContent.addItem(productFeed);
 
 

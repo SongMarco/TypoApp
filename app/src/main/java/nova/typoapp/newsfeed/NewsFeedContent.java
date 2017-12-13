@@ -27,9 +27,6 @@ public class NewsFeedContent {
     private static final int COUNT = 25;
 
 
-
-
-
     public static void addItem(FeedItem item) {
         ITEMS.add(item);
         ITEM_MAP.put(item.title, item);
@@ -42,19 +39,27 @@ public class NewsFeedContent {
     //이곳에서 본격적으로 아이템의 뷰를 세팅한다.
     //여기서 아이템을 본격적으로 만들게 된다 @@@ 메소드를 고치던가 하자.
     private static FeedItem createFeed(int position) {
-        return new FeedItem("작성자 : SongYC123", "제목"+ String.valueOf(position), "내용 " + position);
+        return new FeedItem("작성자 : SongYC123", "제목" + String.valueOf(position), "내용 " + position);
     }
+
     public static FeedItem createFeed3(String writer, String title, String content) {
         return new FeedItem(writer, title, content);
     }
+
     public static FeedItem createFeed4(String writer, String title, String content, String imgUrl) {
         return new FeedItem(writer, title, content, imgUrl);
     }
+
     public static FeedItem createFeed5(String writer, String title, String content, String imgUrl, String imgProfileUrl) {
         return new FeedItem(writer, title, content, imgUrl, imgProfileUrl);
     }
+
     public static FeedItem createFeed6(int feedID, String writer, String title, String content, String imgUrl, String imgProfileUrl) {
         return new FeedItem(feedID, writer, title, content, imgUrl, imgProfileUrl);
+    }
+
+    public static FeedItem createFeed7(int feedID, String writer, String title, String content, String imgUrl, String imgProfileUrl, String writtenDate) {
+        return new FeedItem(feedID, writer, title, content, imgUrl, imgProfileUrl, writtenDate);
     }
 
     private static String makeDetails(int position) {
@@ -77,12 +82,11 @@ public class NewsFeedContent {
         public final String content;
 
 
-
-
         public String imgUrl;
 
         public String imgProfileUrl;
 
+        public String writtenDate;
 
 
         public int feedID;
@@ -95,12 +99,14 @@ public class NewsFeedContent {
             this.title = title;
             this.content = content;
         }
+
         public FeedItem(String writer, String title, String content, String imgUrl) {
             this.writer = writer;
             this.title = title;
             this.content = content;
             this.imgUrl = imgUrl;
         }
+
         public FeedItem(String writer, String title, String content, String imgUrl, String imgProfileUrl) {
             this.writer = writer;
             this.title = title;
@@ -119,18 +125,26 @@ public class NewsFeedContent {
         }
 
 
+        public FeedItem(int feedID, String writer, String title, String content, String imgUrl, String imgProfileUrl, String writtenDate) {
+            this.feedID = feedID;
+            this.writer = writer;
+            this.title = title;
+            this.content = content;
+            this.imgUrl = imgUrl;
+            this.imgProfileUrl = imgProfileUrl;
+            this.writtenDate = writtenDate;
+        }
+
         @Override
         public String toString() {
             return content;
         }
 
 
-
-        public String getInfo(){
-
+        public String getInfo() {
 
 
-            return this.feedID+this.writer+" "+this.title+" "+this.content;
+            return this.feedID + this.writer + " " + this.title + " " + this.content;
         }
 
         public int getFeedID() {
@@ -152,6 +166,10 @@ public class NewsFeedContent {
 
         public String getContent() {
             return content;
+        }
+
+        public String getWrittenDate() {
+            return writtenDate;
         }
 
     }

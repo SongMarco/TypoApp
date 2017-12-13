@@ -157,10 +157,19 @@ public class ProfileActivity extends AppCompatActivity {
                 profileImageUrl = loginInfo.getProfile_url();
 
                 String homeUrl = "http://115.68.231.13/project/android/profileimage/";
-                String[] piecesOfHomeUrl = profileImageUrl.split("/");
+
+                if(profileImageUrl != null && !profileImageUrl.equals("")){
+                    String[] piecesOfHomeUrl = profileImageUrl.split("/");
 //                Log.e(TAG, Arrays.toString(piecesOfHomeUrl)  );
-                profileImageName = piecesOfHomeUrl[6];
+                    profileImageName = piecesOfHomeUrl[6];
 //                Log.e(TAG, "doInBackground: name = "+profileImageName );
+                }
+                //신규 작성일 경우 프로필 이미지 url이 들어오지 않으므로, 내가 직접 url을 지정한다.
+                else{
+                    profileImageUrl = homeUrl+email+".png";
+                    Log.e(TAG, "doInBackground: default--- "+profileImageUrl );
+                }
+
 
 
 
@@ -179,12 +188,12 @@ public class ProfileActivity extends AppCompatActivity {
             if ( email!=null ) {
 
                 RequestOptions requestOptions = new RequestOptions()
-                       
-                        .signature(new ObjectKey(String.valueOf(System.currentTimeMillis())));
+                        .error(R.drawable.com_facebook_profile_picture_blank_square);
+
 
                 Glide.with(ProfileActivity.this)
                         .load(profileImageUrl)
-//                        .apply(requestOptions)
+                        .apply(requestOptions)
                         .into(imageViewProfile);
 
                 Log.e("myimg", "onPostExecute: "+profileImageUrl );
