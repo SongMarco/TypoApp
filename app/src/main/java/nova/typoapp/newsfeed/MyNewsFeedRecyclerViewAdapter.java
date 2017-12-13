@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -23,6 +22,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
+import nova.typoapp.CommentActivity;
 import nova.typoapp.NewsFeedFragment.OnListFragmentInteractionListener;
 import nova.typoapp.R;
 import nova.typoapp.WriteActivity;
@@ -264,7 +264,10 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
                         })
                         .show();
             } else {
-                Toast.makeText(v.getContext(), "ROW PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(v.getContext(), CommentActivity.class);
+                v.getContext().startActivity(intent);
+//                Toast.makeText(v.getContext(), "ROW PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
             }
 
 

@@ -67,7 +67,7 @@
             android:name=".WriteActivity"
             android:label="@string/title_activity_write"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".commentActivity"></activity>
+        <activity android:name=".CommentActivity"></activity>
     </application>
 
 </manifest>
