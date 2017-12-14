@@ -56,7 +56,7 @@ public class RetroClient {
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addNetworkInterceptor(new StethoInterceptor())
+//                .addNetworkInterceptor(new StethoInterceptor())
                 .addInterceptor(new AddCookiesInterceptor(context))
                 .addInterceptor(httpLoggingInterceptor)
                 .build();

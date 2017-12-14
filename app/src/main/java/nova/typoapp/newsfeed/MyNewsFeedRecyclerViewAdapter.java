@@ -245,17 +245,12 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
 
 
 
-
-
-
-
 //                                        ITEMS.remove(item);
 //
 
 
 
 //                                        Toast.makeText(context, "삭제 클릭 = " + String.valueOf(ITEMS.get(getAdapterPosition()).getInfo()), Toast.LENGTH_SHORT).show();
-
 
                                         break;
 
@@ -264,8 +259,17 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
                         })
                         .show();
             } else {
+                FeedItem item = ITEMS.get(getAdapterPosition());
+//                Intent intent = new Intent(context, WriteActivity.class);
+//                intent.putExtra("imgUrl", item.getImgUrl());
+//                intent.putExtra("title", item.getTitle());
+//                intent.putExtra("content", item.getContent());
+//                intent.putExtra("feedID", item.getFeedID());
+//                context.startActivity(intent);
+
 
                 Intent intent = new Intent(v.getContext(), CommentActivity.class);
+                intent.putExtra("feedID", item.getFeedID());
                 v.getContext().startActivity(intent);
 //                Toast.makeText(v.getContext(), "ROW PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
             }

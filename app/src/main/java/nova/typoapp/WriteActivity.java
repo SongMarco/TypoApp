@@ -50,13 +50,17 @@ import butterknife.OnClick;
 import nova.typoapp.newsfeed.NewsFeedContent;
 import nova.typoapp.permission.PermissionsActivity;
 import nova.typoapp.permission.PermissionsChecker;
+import nova.typoapp.retrofit.AddCookiesInterceptor;
 import nova.typoapp.retrofit.ApiService;
 import nova.typoapp.retrofit.ImageUploadResult;
+import nova.typoapp.retrofit.ReceivedCookiesInterceptor;
 import nova.typoapp.retrofit.RetroClient;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 
@@ -572,7 +576,20 @@ public class WriteActivity extends AppCompatActivity {
 
             //region//글쓰기
 
-            Retrofit retrofit = new Retrofit.Builder().baseUrl(API_URL).build();
+            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(new ReceivedCookiesInterceptor(WriteActivity.this))
+                    .addInterceptor(new AddCookiesInterceptor(WriteActivity.this))
+                    .addInterceptor(httpLoggingInterceptor)
+                    .build();
+
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(API_URL)
+                    .client(okHttpClient)
+                    .build();
             ApiService apiService = retrofit.create(ApiService.class);
 
             Log.e("myimg", "doInBackground: " + uploadImagePath);

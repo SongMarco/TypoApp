@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import nova.typoapp.comment.CommentContent;
-import nova.typoapp.comment.CommentContent.DummyItem;
+import nova.typoapp.comment.CommentContent.CommentItem;
 import nova.typoapp.comment.MyCommentRecyclerViewAdapter;
 
 /**
@@ -103,6 +103,6 @@ public class CommentFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        void onListFragmentInteraction(CommentItem item);
     }
 }

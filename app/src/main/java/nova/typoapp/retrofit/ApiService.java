@@ -41,34 +41,43 @@ public interface ApiService {
 
     //게시판 리스트를 불러오는 메소드. 파라미터 필요 없음
     @GET("callAllFeeds.php")
-    Call<ResponseBody>getList();
+    Call<ResponseBody> getList();
+
+
+    //댓글 리스트를 불러오는 메소드
+    @GET("getCommentList.php")
+    Call<ResponseBody> getCommentList();
 
     //포스트 방식으로 글쓰기 해주기. formurlEncoded 와 필드 골뱅이를 주목할 것.
     @FormUrlEncoded
     @POST("writeFeed.php")
-    Call<ResponseBody>write (@Field("writer") String writer, @Field("email") String email,  @Field("title") String title, @Field("content") String content, @Field("imgUrl") String imgUrl );
+    Call<ResponseBody> write(@Field("writer") String writer, @Field("email") String email, @Field("title") String title, @Field("content") String content, @Field("imgUrl") String imgUrl);
 
     //포스트 방식으로 글 수정
     @FormUrlEncoded
     @POST("editFeed.php")
-    Call<ResponseBody>editFeed (@Field("feedID") int FeedID ,
+    Call<ResponseBody> editFeed(@Field("feedID") int FeedID,
                                 @Field("writer") String writer,
                                 @Field("email") String email,
                                 @Field("title") String title,
                                 @Field("content") String content,
-                                @Field("imgUrl") String imgUrl );
+                                @Field("imgUrl") String imgUrl);
 
+    //포스트 방식으로 댓글 작성
+    @FormUrlEncoded
+    @POST("writeComment.php")
+    Call<ResponseBody> writeComment( @Field("feedID") int feedID, @Field("content") String content);
 
 
     //회원가입
     @FormUrlEncoded
     @POST("join.php")
-    Call<ResponseBody> joinMember (@Field("u_email") String email, @Field("u_pw") String pw, @Field("u_name") String name ,@Field("u_birthday") String birthday );
+    Call<ResponseBody> joinMember(@Field("u_email") String email, @Field("u_pw") String pw, @Field("u_name") String name, @Field("u_birthday") String birthday);
 
     //로그인
     @FormUrlEncoded
     @POST("login.php")
-    Call<LoginResult> loginMember (@Field("u_email") String email, @Field("u_pw") String pw);
+    Call<LoginResult> loginMember(@Field("u_email") String email, @Field("u_pw") String pw);
 
     //회원 정보 확인(세션 정보 가져오기)
     //아무것도 날리지 않는다. 인터셉터 객체가 콜 날릴 때 세션ID를 추가해준다.

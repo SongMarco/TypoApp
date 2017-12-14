@@ -4,25 +4,31 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import nova.typoapp.CommentFragment.OnListFragmentInteractionListener;
 import nova.typoapp.R;
-import nova.typoapp.comment.CommentContent.DummyItem;
+import nova.typoapp.comment.CommentContent.CommentItem;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link CommentItem} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
 public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyCommentRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
+    private final List<CommentItem> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public MyCommentRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
+    public MyCommentRecyclerViewAdapter(List<CommentItem> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -40,6 +46,26 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
         holder.mIdView.setText(mValues.get(position).id);
         holder.mContentView.setText(mValues.get(position).content);
 
+// 프로필 이미지의 유무에 따라 이미지뷰 세팅. 없으면 -> 기본 세팅
+        if (mValues.get(position).imgProfileUrl != null && !mValues.get(position).imgProfileUrl.equals("") ) {
+            RequestOptions requestOptions = new RequestOptions()
+                    .error(R.drawable.com_facebook_profile_picture_blank_square);
+
+
+
+            Glide.with(holder.mView).load(mValues.get(position).imgProfileUrl)
+                    .apply(requestOptions)
+
+                    .into(holder.commentProfileImage);
+
+
+
+
+        }
+        else{
+
+            Glide.with(holder.mView).load(R.drawable.com_facebook_profile_picture_blank_square).into(holder.commentProfileImage);
+        }
 //        holder.mView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -59,15 +85,30 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public DummyItem mItem;
+
+        @BindView(R.id.id)
+        public TextView mIdView;
+
+        @BindView(R.id.content)
+        TextView mContentView;
+        @BindView(R.id.commentWriter)
+        TextView commentWriter;
+        @BindView(R.id.commentContent)
+        TextView commentContent;
+        @BindView(R.id.commentDate)
+        TextView commentDate;
+        @BindView(R.id.commentProfileImage)
+        ImageView commentProfileImage;
+
+
+
+
+        public CommentItem mItem;
 
         public ViewHolder(View view) {
             super(view);
+            ButterKnife.bind(this, view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.id);
-            mContentView = (TextView) view.findViewById(R.id.content);
         }
 
         @Override

@@ -1,17 +1,22 @@
 package nova.typoapp;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -223,30 +228,36 @@ public class ProfileActivity extends AppCompatActivity {
     @OnClick(R.id.CardViewProfile)
     void onChangeProfileImage(){
 
-//        checkPermission();
+        checkPermission();
 
-        new AlertDialog.Builder(this)
+        //위의 checkPermisson 메소드를 통해 권한을 받아왔는지 확인하고, 권한 없으면 클릭해도 반응 X. 체크에서 다이얼로그 내보냄
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
+        {
+            new AlertDialog.Builder(this)
 
 //                .setTitle("업로드 방식 선택")
-                .setItems(R.array.image_way, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // The 'which' argument contains the index position
-                        // of the selected item
+                    .setItems(R.array.image_way, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // The 'which' argument contains the index position
+                            // of the selected item
 
-                        switch(which){
-                            case 0:
-                                getAlbum();
+                            switch(which){
+                                case 0:
+                                    getAlbum();
 
-                                break;
-                            case 1:
-                                captureCamera();
+                                    break;
+                                case 1:
+                                    captureCamera();
 
-                                break;
+                                    break;
 
+                            }
                         }
-                    }
-                })
-                .show();
+                    })
+                    .show();
+        }
+
     }
 
 
@@ -282,6 +293,54 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
+
+    //권한을 체크하는 메소드
+    private boolean checkPermission() {
+        //저장소 혹은 카메라 권한을 가지고 있는지 확인한다. 사실 갤러리 / 사진에 따라 구별해야 하므로 코드 개선이 필요한 상태이다.
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED                                ) {
+            // 처음 호출시엔 if()안의 부분은 false로 리턴 됨 -> else{..}의 요청으로 넘어감
+            if ((ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) ||
+                    (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA))) {
+                new AlertDialog.Builder(this)
+                        .setTitle("알림")
+                        .setMessage("저장소 혹은 카메라 권한이 거부되었습니다. 사용을 원하시면 설정에서 해당 권한을 직접 허용하셔야 합니다.")
+                        .setNeutralButton("설정", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                intent.setData(Uri.parse("package:" + getPackageName()));
+                                startActivity(intent);
+                            }
+                        })
+                        //권한이 없는 상태.
+                        //확인을 누르면 프로필 액티비티에 그대로 남아있게 된다.
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+
+//                                finish();
+                            }
+                        })
+                        .setCancelable(false)
+                        .create()
+                        .show();
+
+
+            } else {
+                //맨 처음에
+                //권한을 요청하는 부분이다. 권한 요청 다이얼로그가 뜨게 된다.
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, MY_PERMISSION_CAMERA);
+                //권한을 요청하고 한 번 더 권한을 확인 -> 허용 거부한 게 있을 경우 예외처리된다.
+
+                //다 허용했다면 또 그냥 넘어가겠지!
+
+
+            }
+        }
+        return true;
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -495,8 +554,6 @@ public class ProfileActivity extends AppCompatActivity {
 
         //Create Upload Server Client
         ApiService service = RetroClient.getApiService2(ProfileActivity.this);
-
-
         //File creating from selected URL
         File file;
         if(pickPhotoPath != null){
