@@ -89,7 +89,7 @@ public class CommentFragment extends Fragment {
 
 
         Toast.makeText(getContext(), "onCreateView Called", Toast.LENGTH_SHORT).show();
-
+//ㅁㄴㅇ
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
