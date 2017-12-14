@@ -40,13 +40,15 @@ public interface ApiService {
 
 
     //게시판 리스트를 불러오는 메소드. 파라미터 필요 없음
-    @GET("callAllFeeds.php")
-    Call<ResponseBody> getList();
+    @GET("getFeedList.php")
+    Call<ResponseBody> getFeedList();
 
 
     //댓글 리스트를 불러오는 메소드
-    @GET("getCommentList.php")
-    Call<ResponseBody> getCommentList();
+    @FormUrlEncoded
+    @POST("getCommentList.php")
+    Call<ResponseBody> getCommentList(@Field("feedID") int feedID);
+
 
     //포스트 방식으로 글쓰기 해주기. formurlEncoded 와 필드 골뱅이를 주목할 것.
     @FormUrlEncoded

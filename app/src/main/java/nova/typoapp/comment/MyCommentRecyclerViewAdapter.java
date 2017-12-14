@@ -1,6 +1,7 @@
 package nova.typoapp.comment;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
         mListener = listener;
     }
 
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -43,29 +45,33 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
+
+        CommentItem mItem = holder.mItem;
+
         holder.mIdView.setText(mValues.get(position).id);
         holder.mContentView.setText(mValues.get(position).content);
 
+        holder.mCommentContentView.setText(mItem.commentContent);
+
+        holder.mCommentWriterView.setText(mItem.commentWriter);
+        holder.mCommentDateView.setText(mItem.commentDate);
+
+        Log.e("onBindTag", "onBindViewHolder: writer= "+mItem.commentWriter+"content = "+mItem.commentContent);
+
+
+
 // 프로필 이미지의 유무에 따라 이미지뷰 세팅. 없으면 -> 기본 세팅
         if (mValues.get(position).imgProfileUrl != null && !mValues.get(position).imgProfileUrl.equals("") ) {
+
+            //리퀘스트 옵션에서 에러 발생시 예외처리문 추가. 에러 생김 -> 기본 프로필로 세팅해줌
             RequestOptions requestOptions = new RequestOptions()
                     .error(R.drawable.com_facebook_profile_picture_blank_square);
 
-
-
             Glide.with(holder.mView).load(mValues.get(position).imgProfileUrl)
                     .apply(requestOptions)
-
-                    .into(holder.commentProfileImage);
-
-
-
-
+                    .into(holder.mCommentProfileImage);
         }
-        else{
 
-            Glide.with(holder.mView).load(R.drawable.com_facebook_profile_picture_blank_square).into(holder.commentProfileImage);
-        }
 //        holder.mView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -92,13 +98,13 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
         @BindView(R.id.content)
         TextView mContentView;
         @BindView(R.id.commentWriter)
-        TextView commentWriter;
+        TextView mCommentWriterView;
         @BindView(R.id.commentContent)
-        TextView commentContent;
+        TextView mCommentContentView;
         @BindView(R.id.commentDate)
-        TextView commentDate;
+        TextView mCommentDateView;
         @BindView(R.id.commentProfileImage)
-        ImageView commentProfileImage;
+        ImageView mCommentProfileImage;
 
 
 
@@ -108,6 +114,7 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
         public ViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
+
             mView = view;
         }
 

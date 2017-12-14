@@ -112,7 +112,7 @@ public class NewsFeedFragment extends Fragment {
 
         NewsFeedContent.ITEMS.clear();
 
-        Call<ResponseBody> comment = apiService.getList();
+        Call<ResponseBody> comment = apiService.getFeedList();
 
 
         final ProgressDialog asyncDialog = new ProgressDialog(
@@ -124,7 +124,6 @@ public class NewsFeedFragment extends Fragment {
 
         comment.enqueue(new Callback<ResponseBody>() {
 
-
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
@@ -132,8 +131,6 @@ public class NewsFeedFragment extends Fragment {
 
                     json_result = response.body().string();
 //                    Log.v("RECV DATA", json_result);
-
-
 
                     JSONArray jsonRes = null;
                     try {

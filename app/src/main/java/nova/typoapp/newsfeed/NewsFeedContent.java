@@ -29,7 +29,7 @@ public class NewsFeedContent {
 
     public static void addItem(FeedItem item) {
         ITEMS.add(item);
-        ITEM_MAP.put(item.title, item);
+//        ITEM_MAP.put(item.title, item);
     }
 
 

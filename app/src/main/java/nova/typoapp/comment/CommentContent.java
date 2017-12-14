@@ -32,17 +32,26 @@ public class CommentContent {
 //        }
 //    }
 
-    private static void addItem(CommentItem item) {
+    public static void addItem(CommentItem item) {
         ITEMS.add(item);
-        ITEM_MAP.put(item.id, item);
+
+//        ITEM_MAP.put(item.id, item);
+    }
+
+    public static void clearList() {
+       ITEMS.clear();
+//        ITEM_MAP.put(item.id, item);
     }
 
     private static CommentItem createCommentItem(int position) {
         return new CommentItem(String.valueOf(position), "Item " + position, makeDetails(position));
     }
-    private static CommentItem createCommentItem2(int commentID, String commentWriter, String commentContent, String commentDate) {
+    public static CommentItem createCommentItem2(int commentID, String commentWriter, String commentContent, String commentDate) {
         return new CommentItem( commentID,  commentWriter,  commentContent,  commentDate);
     }
+//    public static CommentItem createCommentItem3(int int commentID, String mCommentWriterView, String commentContent, String commentDate, int depth, String profileUrl) {
+//        return new CommentItem( commentID,  mCommentWriterView,  commentContent,  commentDate);
+//    }
 
     private static String makeDetails(int position) {
         StringBuilder builder = new StringBuilder();
@@ -66,8 +75,10 @@ public class CommentContent {
         public String commentWriter;
         public String commentDate;
         public String commentContent;
+
         public int commentID;
         public int feedID;
+        int depth;
 
 
         public CommentItem(String id, String content, String details) {
@@ -86,13 +97,27 @@ public class CommentContent {
         }
 
 
-        public CommentItem(int feedID, int commentID, String commentWriter, String commentContent, String commentDate){
+        public CommentItem(int commentID, int feedID, int depth, String commentWriter, String commentContent, String commentDate, String imgProfileUrl){
 
+            this.commentID = commentID;
+            this.feedID = feedID;
+
+            this.depth = depth;
+
+            this.commentWriter = commentWriter;
+            this. commentContent = commentContent;
+            this. commentDate =commentDate;
+            this.imgProfileUrl = imgProfileUrl;
+
+        }
+
+        public CommentItem (int commentID,  String commentWriter, String commentContent, String commentDate, int depth, String profileUrl){
             this.feedID = feedID;
             this.commentID = commentID;
             this.commentWriter = commentWriter;
             this. commentContent = commentContent;
             this. commentDate =commentDate;
+
 
         }
 
