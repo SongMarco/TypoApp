@@ -20,6 +20,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import nova.typoapp.comment.CommentContent;
 import nova.typoapp.comment.CommentContent.CommentItem;
 import nova.typoapp.comment.MyCommentRecyclerViewAdapter;
@@ -69,19 +71,38 @@ public class CommentFragment extends Fragment {
         return fragment;
     }
 
+    //리사이클러뷰를 업데이트하라.
+    public void updateRecyclerView(){
+
+        recyclerViewList.setLayoutManager(new LinearLayoutManager(getContext() )  );
+        recyclerViewList.setAdapter(commentRecyclerViewAdapter);
+        commentRecyclerViewAdapter.notifyDataSetChanged();
+
+    }
+
+
+    @BindView(R.id.RecyclerViewList)
+    RecyclerView recyclerViewList;
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ;
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
     }
 
+    MyCommentRecyclerViewAdapter commentRecyclerViewAdapter = new MyCommentRecyclerViewAdapter(CommentContent.ITEMS, mListener);
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_comment_list, container, false);
+
+        ButterKnife.bind(this,view);
 
         //먼저 리사이클러뷰에 담을 댓글을 불러온다.
 //        CallCommentTask callCommentTask = new CallCommentTask();
@@ -89,6 +110,9 @@ public class CommentFragment extends Fragment {
 
 
         Toast.makeText(getContext(), "onCreateView Called", Toast.LENGTH_SHORT).show();
+
+
+
 //ㅁㄴㅇ
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -99,7 +123,7 @@ public class CommentFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyCommentRecyclerViewAdapter(CommentContent.ITEMS, mListener));
+            recyclerView.setAdapter(commentRecyclerViewAdapter);
 
         }
         return view;

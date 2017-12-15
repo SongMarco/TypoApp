@@ -4,13 +4,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -63,7 +62,11 @@ implements CommentFragment.OnListFragmentInteractionListener {
         ButterKnife.bind(this);
 
 
+        CommentFragment commentFragment = (CommentFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentCommentList);
 
+
+        RefreshCommentTask refreshCommentTask = new RefreshCommentTask();
+        refreshCommentTask.execute();
 
 
 
@@ -263,8 +266,8 @@ implements CommentFragment.OnListFragmentInteractionListener {
     public class RefreshCommentTask extends AsyncTask<Void, String, Void> {
 
         Context context = CommentActivity.this;
-        ProgressDialog asyncDialog = new ProgressDialog(
-                context);
+//        ProgressDialog asyncDialog = new ProgressDialog(
+//                context);
 
 
 
@@ -375,18 +378,23 @@ implements CommentFragment.OnListFragmentInteractionListener {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            asyncDialog.dismiss();
+//            asyncDialog.dismiss();
 
 
 //// Reload current fragment
-            Fragment frg = null;
-            frg = getSupportFragmentManager().findFragmentById(R.id.fragmentCommentList);
-            final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.detach(frg);
-            ft.attach(frg);
-            ft.commit();
-            Log.e(TAG, "onPostExecute:fragmentcomment done" );
-//
+
+            CommentFragment commentFragment = (CommentFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentCommentList);
+
+
+            if(commentFragment != null){
+
+
+                Toast.makeText(context, "update called", Toast.LENGTH_SHORT).show();
+                commentFragment.updateRecyclerView();
+
+            }
+
+
 //
 //            CommentFragment commentFrag = (CommentFragment)
 //                    getSupportFragmentManager().findFragmentById(R.id.fragmentCommentList);

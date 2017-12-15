@@ -68,6 +68,11 @@
             android:label="@string/title_activity_write"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".CommentActivity"></activity>
+
+        <activity android:name=".permission.PermissionsActivity"></activity>
+
     </application>
+
+
 
 </manifest>
