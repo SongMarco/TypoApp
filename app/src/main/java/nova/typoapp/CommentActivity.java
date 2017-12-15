@@ -9,7 +9,6 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -385,11 +384,9 @@ implements CommentFragment.OnListFragmentInteractionListener {
 
             CommentFragment commentFragment = (CommentFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentCommentList);
 
-
             if(commentFragment != null){
 
-
-                Toast.makeText(context, "update called", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "update called", Toast.LENGTH_SHORT).show();
                 commentFragment.updateRecyclerView();
 
             }
@@ -401,7 +398,7 @@ implements CommentFragment.OnListFragmentInteractionListener {
 //
 ////            //commentFrag를 불러와서 업데이트하게 하자
 ////            if(commentFrag != null){
-////                commentFrag.updateRecyclerView();
+////                commentFrag.updateRecyclerViewNewsFeed();
 ////            }
 
 
@@ -411,8 +408,6 @@ implements CommentFragment.OnListFragmentInteractionListener {
         }
 
     }
-
-
 
     @Override
     public void onListFragmentInteraction(CommentContent.CommentItem item) {

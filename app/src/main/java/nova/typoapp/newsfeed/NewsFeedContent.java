@@ -77,7 +77,6 @@ public class NewsFeedContent {
     public static class FeedItem {
         public String writer;
 
-
         public final String title;
         public final String content;
 

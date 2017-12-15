@@ -138,7 +138,7 @@ public class CommentFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnListFragmentInteractionListener) {
-            Toast.makeText(context, "onAttach called", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "onAttach called", Toast.LENGTH_SHORT).show();
             mListener = (OnListFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
@@ -150,14 +150,14 @@ public class CommentFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
 
-        Toast.makeText(getContext(), "on Detach called", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getContext(), "on Detach called", Toast.LENGTH_SHORT).show();
         mListener = null;
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Toast.makeText(getContext(), "on pause called", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getContext(), "on pause called", Toast.LENGTH_SHORT).show();
 
     }
 

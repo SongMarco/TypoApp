@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 import nova.typoapp.CommentActivity;
+import nova.typoapp.MainActivity;
 import nova.typoapp.NewsFeedFragment.OnListFragmentInteractionListener;
 import nova.typoapp.R;
 import nova.typoapp.WriteActivity;
@@ -194,6 +195,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
             final Context context = v.getContext();
 
 
+
             if (v.getId() == mMoreView.getId()) {
                 new AlertDialog.Builder(context)
 
@@ -218,18 +220,22 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
                                         break;
                                     case 1:
 
-
-
-
-
+                                        //현재 컨텍스트는 메인 액티비티이다. asynctask로 컨텍스트 전달 또한 가능하다.
                                         AlertDialog.Builder builder =  new AlertDialog.Builder(context)
                                                 .setMessage("정말 삭제하시겠습니까?")
                                                 .setPositiveButton("삭제", new DialogInterface.OnClickListener() {
                                                     @Override
                                                     public void onClick(DialogInterface dialog, int which) {
                                                         FeedItem item = ITEMS.get(getAdapterPosition());
-                                                        DeleteTask deleteTask = new DeleteTask();
+
+
+
+                                                        DeleteTask deleteTask = new DeleteTask(context);
                                                         deleteTask.execute(item.getFeedID());
+
+
+
+
                                                     }
                                                 })
                                                 .setNegativeButton("취소", new DialogInterface.OnClickListener() {
@@ -239,16 +245,11 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
                                                     }
                                                 });
 
-
                                         AlertDialog dialog2 = builder.create();
                                         dialog2.show();
 
-
-
 //                                        ITEMS.remove(item);
 //
-
-
 
 //                                        Toast.makeText(context, "삭제 클릭 = " + String.valueOf(ITEMS.get(getAdapterPosition()).getInfo()), Toast.LENGTH_SHORT).show();
 
@@ -282,11 +283,18 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
 
     public class DeleteTask extends AsyncTask<Integer, String, String> {
 
+        private Context mContext;
+
+        // context를 가져오는 생성자. 이를 통해 메인 액티비티의 함수에 접근할 수 있다.
+
+        public DeleteTask (Context context){
+            mContext = context;
+        }
 
         @Override
         protected String doInBackground(Integer... integers) {
 
-            //region//글 삭제하기
+            //region//글 삭제하기 - DB상에서 뉴스피드 글을 삭제한다.
 
             Retrofit retrofit = new Retrofit.Builder().baseUrl(API_URL).build();
             ApiService apiService = retrofit.create(ApiService.class);
@@ -313,6 +321,12 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
         protected void onPostExecute(String result) {
 
             super.onPostExecute(result);
+
+            //삭제가 완료되었다. 여기서 새로고침을 진행하자
+            MainActivity activity = (MainActivity)mContext;
+            activity.getPagerAdapter().notifyDataSetChanged();
+
+
 
             Log.e("wow", result);
 

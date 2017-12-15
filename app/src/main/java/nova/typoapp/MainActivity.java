@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity
      * may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -62,6 +62,14 @@ public class MainActivity extends AppCompatActivity
     public static FloatingActionButton fabAdd;
 
 
+    public void updateViewpager(){
+
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+        mSectionsPagerAdapter.notifyDataSetChanged();
+
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +81,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -278,6 +286,18 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
+        public int getItemPosition(Object object) {
+//            Toast.makeText(MainActivity.this, "getItemPosition called", Toast.LENGTH_SHORT).show();
+//
+//
+//            //position none -> 수정 삭제 글쓰기 이후 문제없이 새로고침되지만 onClick이 듣지않음
+//            //아마 position을 몰라서 클릭잡는데 시간이 걸리는듯
+//            //0으로할 경우 온클릭은 잘 되지만, 갱신이 되지 않음
+            return POSITION_NONE;
+
+        }
+
+        @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
@@ -314,13 +334,30 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    //@@@@@ 중요@@@@@ onResume에서 프로필 사진이 고쳐진지 유무를 체크해서, 프로필 사진을 변경하게 된다.
+    //이 때 getItemPosition이, mSectionPagerAdapter에서 notify할 때 사용된다.
+    //반환값을 NONE으로 주면 뷰페이저가 무조건 refresh된다.
+    @Override
+    public void onResume() {
+        super.onResume();
+
+//        Toast.makeText(this, "onResume called", Toast.LENGTH_SHORT).show();
+        mSectionsPagerAdapter.notifyDataSetChanged();
+    }
+
+    public SectionsPagerAdapter  getPagerAdapter(){
+
+        return mSectionsPagerAdapter;
+
+    }
+
+
 
 
     @Override
     protected void onPause() {
         super.onPause();
 
-
-
+//        Toast.makeText(this, "onPause Called", Toast.LENGTH_SHORT).show();
     }
 }

@@ -10,9 +10,11 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,7 +25,6 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import nova.typoapp.newsfeed.MyNewsFeedRecyclerViewAdapter;
 import nova.typoapp.newsfeed.NewsFeedContent;
 import nova.typoapp.newsfeed.NewsFeedContent.FeedItem;
@@ -65,6 +66,16 @@ public class NewsFeedFragment extends Fragment {
         return fragment;
     }
 
+
+    public void updateRecyclerViewNewsFeed(){
+
+        recyclerViewNewsFeed.setLayoutManager(new LinearLayoutManager(getContext() )  );
+        recyclerViewNewsFeed.setAdapter(myNewsFeedRecyclerViewAdapter);
+        myNewsFeedRecyclerViewAdapter.notifyDataSetChanged();
+
+    }
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,8 +86,8 @@ public class NewsFeedFragment extends Fragment {
     }
 
 
-    @BindView(R.id.list)
-    RecyclerView recyclerView;
+    @BindView(R.id.recyclerViewNewsFeed)
+    RecyclerView recyclerViewNewsFeed;
 
     @BindView(R.id.layoutAdd)
     CardView layoutAdd;
@@ -86,6 +97,19 @@ public class NewsFeedFragment extends Fragment {
 
 
 
+    MyNewsFeedRecyclerViewAdapter myNewsFeedRecyclerViewAdapter = new MyNewsFeedRecyclerViewAdapter(NewsFeedContent.ITEMS, new MyNewsFeedRecyclerViewAdapter.ClickListener() {
+        @Override
+        public void onPositionClicked(int position) {
+
+        }
+
+        @Override
+        public void onLongClicked(int position) {
+
+        }
+    }
+
+    );
 
 
     @Override
@@ -95,6 +119,25 @@ public class NewsFeedFragment extends Fragment {
 
         ButterKnife.bind(this, view);
 
+        Toast.makeText(getActivity(), "onCreateViewCalled", Toast.LENGTH_SHORT).show();
+        layoutAdd.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+//                        Toast.makeText(getContext(), "글을씁시다", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(getContext(), WriteActivity.class);
+                        startActivity(intent);
+                }
+
+
+                return false;
+            }
+
+
+
+        });
         //DB에서 회원 정보를 확인하고 로그인하라. 단, 두번은 안하게!
 
         //call이 되었다면 해당 어싱크를 수행하지 않는다.
@@ -165,8 +208,8 @@ public class NewsFeedFragment extends Fragment {
                         }
 
 // Set the adapter
-                        if (recyclerView != null) {
-                            recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                        if (recyclerViewNewsFeed != null) {
+                            recyclerViewNewsFeed.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                                 @Override
                                 public void onGlobalLayout() {
                                     asyncDialog.dismiss();
@@ -177,24 +220,12 @@ public class NewsFeedFragment extends Fragment {
                             Context context = view.getContext();
 
                             if (mColumnCount <= 1) {
-                                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                                recyclerViewNewsFeed.setLayoutManager(new LinearLayoutManager(context));
                             } else {
-                                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+                                recyclerViewNewsFeed.setLayoutManager(new GridLayoutManager(context, mColumnCount));
                             }
-                            recyclerView.setAdapter(new MyNewsFeedRecyclerViewAdapter(NewsFeedContent.ITEMS, new MyNewsFeedRecyclerViewAdapter.ClickListener() {
-                                @Override
-                                public void onPositionClicked(int position) {
-
-                                }
-
-                                @Override
-                                public void onLongClicked(int position) {
-
-                                }
-                            }
-
-                            ));
-                            recyclerView.setNestedScrollingEnabled(false);
+                            recyclerViewNewsFeed.setAdapter(myNewsFeedRecyclerViewAdapter);
+                            recyclerViewNewsFeed.setNestedScrollingEnabled(false);
                         }
 
 
@@ -228,26 +259,27 @@ public class NewsFeedFragment extends Fragment {
 
 
 
+
         return view;
     }
 
-
-    @OnClick(R.id.layoutAdd)
-    void onAddClick() {
-//        Toast.makeText(getContext(), "글을씁시다", Toast.LENGTH_SHORT).show();
-
-        Intent intent = new Intent(getContext(), WriteActivity.class);
-        startActivity(intent);
-
-
-    }
+//
+//    @OnClick(R.id.layoutAdd)
+//    void onAddClick() {
+////        Toast.makeText(getContext(), "글을씁시다", Toast.LENGTH_SHORT).show();
+//
+//        Intent intent = new Intent(getContext(), WriteActivity.class);
+//        startActivity(intent);
+//
+//
+//    }
 
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
-        if (context instanceof OnListFragmentInteractionListener) {
+        Toast.makeText(getActivity(), "onAttachCalled", Toast.LENGTH_SHORT).show();
+            if (context instanceof OnListFragmentInteractionListener) {
 
 
             mListener = (OnListFragmentInteractionListener) context;
@@ -262,7 +294,16 @@ public class NewsFeedFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
 
-        mListener = null;
+//        mListener = null;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ButterKnife.bind(this,getActivity());
+        Toast.makeText(getActivity(), "onResumeFragCalled", Toast.LENGTH_SHORT).show();
+
+
     }
 
     /**
@@ -279,4 +320,6 @@ public class NewsFeedFragment extends Fragment {
         // TODO: Update argument type and name
         void onListFragmentInteraction(FeedItem item);
     }
+
+
 }

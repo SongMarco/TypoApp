@@ -535,6 +535,21 @@ public class ProfileActivity extends AppCompatActivity {
             lookupSessionTask.execute();
 
 
+            Toast.makeText(ProfileActivity.this, "newsFeed update called", Toast.LENGTH_SHORT).show();
+
+            NewsFeedFragment newsFeedFragment = (NewsFeedFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentNewsFeed);
+
+            if(newsFeedFragment != null){
+
+
+                Toast.makeText(ProfileActivity.this, "update called", Toast.LENGTH_SHORT).show();
+                newsFeedFragment.updateRecyclerViewNewsFeed();
+
+            }
+
+
+
+
             asyncDialog.dismiss();
             Toast.makeText(ProfileActivity.this, "프로필 사진이 수정되었습니다.", Toast.LENGTH_SHORT).show();
 
