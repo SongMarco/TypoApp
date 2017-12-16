@@ -4,9 +4,9 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -51,6 +51,8 @@ public class NewsFeedFragment extends Fragment {
     private OnListFragmentInteractionListener mListener;
 
 
+    private static Bundle mBundleRecyclerViewState;
+
     //덧글을 달러 갔는지 확인하는 변수이다. 덧글을 달러 갔었다면 -> onCreateView에서
     //리사이클러뷰를 초기화하지 않는다(스크롤이 초기화되면 안되기 때문)
     public static boolean isWentCommentActivity = false;
@@ -94,8 +96,11 @@ public class NewsFeedFragment extends Fragment {
     @BindView(R.id.recyclerViewNewsFeed)
     RecyclerView recyclerViewNewsFeed;
 
+    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+
     @BindView(R.id.layoutAdd)
     CardView layoutAdd;
+
 
 
     String json_result;
@@ -125,7 +130,7 @@ public class NewsFeedFragment extends Fragment {
 
         ButterKnife.bind(this, view);
 
-//        Toast.makeText(getActivity(), "onCreateViewCalled", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "onCreateViewCalled", Toast.LENGTH_SHORT).show();
 
 
 
@@ -238,14 +243,16 @@ public class NewsFeedFragment extends Fragment {
                                 });
                                 Context context = view.getContext();
 
-                                if (mColumnCount <= 1) {
-                                    recyclerViewNewsFeed.setLayoutManager(new LinearLayoutManager(context));
-                                } else {
-                                    recyclerViewNewsFeed.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+
+                                if(recyclerViewNewsFeed.getLayoutManager()==null){
+                                    recyclerViewNewsFeed.setLayoutManager(linearLayoutManager);
                                 }
+
                                 recyclerViewNewsFeed.setAdapter(myNewsFeedRecyclerViewAdapter);
                                 recyclerViewNewsFeed.setNestedScrollingEnabled(false);
                             }
+
+
 
 
 
@@ -276,8 +283,7 @@ public class NewsFeedFragment extends Fragment {
             //endregion
 
 
-        }
-        else{
+
 
 
         }
@@ -325,11 +331,29 @@ public class NewsFeedFragment extends Fragment {
     }
 
     @Override
+    public void onPause() {
+        Toast.makeText(getActivity(), "onPause", Toast.LENGTH_SHORT).show();
+        super.onPause();
+
+        // save RecyclerView state
+        mBundleRecyclerViewState = new Bundle();
+        Parcelable listState = recyclerViewNewsFeed.getLayoutManager().onSaveInstanceState();
+        mBundleRecyclerViewState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listState);
+    }
+
+
+
+    @Override
     public void onResume() {
         super.onResume();
-//        Toast.makeText(getActivity(), "onResumeFragCalled", Toast.LENGTH_SHORT).show();
 
 
+        // restore RecyclerView state
+        if (mBundleRecyclerViewState != null) {
+            Toast.makeText(getActivity(), "restoreView called", Toast.LENGTH_SHORT).show();
+            Parcelable listState = mBundleRecyclerViewState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
+            recyclerViewNewsFeed.getLayoutManager().onRestoreInstanceState(listState);
+        }
     }
 
     /**
@@ -347,5 +371,28 @@ public class NewsFeedFragment extends Fragment {
         void onListFragmentInteraction(FeedItem item);
     }
 
+    private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
+    /**
+     * This is a method for Fragment.
+     * You can do the same in onCreate or onRestoreInstanceState
+     */
+//    @Override
+//    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+//        super.onViewStateRestored(savedInstanceState);
+//        Toast.makeText(getActivity(), "reload state called", Toast.LENGTH_SHORT).show();
+//        if(savedInstanceState != null)
+//        {
+////            Toast.makeText(getActivity(), "reload state called", Toast.LENGTH_SHORT).show();
+//            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
+//            recyclerViewNewsFeed.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+//        }
+//    }
+
+//    @Override
+//    public void onSaveInstanceState(Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//        Toast.makeText(getActivity(), "save state called", Toast.LENGTH_SHORT).show();
+//        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerViewNewsFeed.getLayoutManager().onSaveInstanceState());
+//    }
 }
