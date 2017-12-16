@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -109,7 +108,7 @@ public class CommentFragment extends Fragment {
 //        callCommentTask.execute();
 
 
-        Toast.makeText(getContext(), "onCreateView Called", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getContext(), "onCreateView Called", Toast.LENGTH_SHORT).show();
 
 
 

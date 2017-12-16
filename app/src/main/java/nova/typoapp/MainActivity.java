@@ -287,13 +287,20 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         public int getItemPosition(Object object) {
-//            Toast.makeText(MainActivity.this, "getItemPosition called", Toast.LENGTH_SHORT).show();
-//
-//
-//            //position none -> 수정 삭제 글쓰기 이후 문제없이 새로고침되지만 onClick이 듣지않음
-//            //아마 position을 몰라서 클릭잡는데 시간이 걸리는듯
-//            //0으로할 경우 온클릭은 잘 되지만, 갱신이 되지 않음
-            return POSITION_NONE;
+
+//            Toast.makeText(MainActivity.this, "getItemPos Called", Toast.LENGTH_SHORT).show();
+            //댓글을 달러 왔으니까 리프레시 하지 말기
+            if(NewsFeedFragment.isWentCommentActivity || !ProfileActivity.isProfileEdited ){
+                NewsFeedFragment.isWentCommentActivity = false;
+                return super.getItemPosition(object);
+
+            }
+            //댓글을 안달았다면 || 프로필을 고치고 왔다면 리프레시하기
+            else{
+                ProfileActivity.isProfileEdited = false;
+                return POSITION_NONE;
+            }
+
 
         }
 

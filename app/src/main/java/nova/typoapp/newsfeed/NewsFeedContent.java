@@ -62,6 +62,8 @@ public class NewsFeedContent {
         return new FeedItem(feedID, writer, title, content, imgUrl, imgProfileUrl, writtenDate);
     }
 
+
+
     private static String makeDetails(int position) {
         StringBuilder builder = new StringBuilder();
         builder.append("Details about Item: ").append(position);
@@ -89,6 +91,14 @@ public class NewsFeedContent {
 
 
         public int feedID;
+
+
+        public int getCommentNum() {
+            return commentNum;
+        }
+
+        public int commentNum;
+
 
 
         public String details = "aa";
@@ -132,6 +142,17 @@ public class NewsFeedContent {
             this.imgUrl = imgUrl;
             this.imgProfileUrl = imgProfileUrl;
             this.writtenDate = writtenDate;
+        }
+
+        public FeedItem(int feedID, String writer, String title, String content, String imgUrl, String imgProfileUrl, String writtenDate, int commentNum) {
+            this.feedID = feedID;
+            this.writer = writer;
+            this.title = title;
+            this.content = content;
+            this.imgUrl = imgUrl;
+            this.imgProfileUrl = imgProfileUrl;
+            this.writtenDate = writtenDate;
+            this.commentNum = commentNum;
         }
 
         @Override

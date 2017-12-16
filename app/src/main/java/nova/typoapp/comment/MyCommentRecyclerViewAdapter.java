@@ -1,5 +1,7 @@
 package nova.typoapp.comment;
 
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -115,6 +117,8 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
             super(view);
             ButterKnife.bind(this, view);
 
+            mCommentProfileImage.setBackground(new ShapeDrawable(new OvalShape()));
+            mCommentProfileImage.setClipToOutline(true);
             mView = view;
         }
 

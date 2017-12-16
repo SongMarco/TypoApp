@@ -61,6 +61,9 @@ public class ProfileActivity extends AppCompatActivity {
     private static final int REQUEST_TAKE_ALBUM = 3333;
     private static final int REQUEST_IMAGE_CROP = 4444;
 
+
+    public static boolean isProfileEdited = false;
+
     File albumFile;
     Uri imageUri;
     Uri photoURI, albumURI;
@@ -77,6 +80,7 @@ public class ProfileActivity extends AppCompatActivity {
     TextView profileBirthday;
     @BindView(R.id.ImageViewProfile)
     ImageView imageViewProfile;
+
 
 
 
@@ -508,7 +512,10 @@ public class ProfileActivity extends AppCompatActivity {
         protected String doInBackground(Void... voids) {
 
             try {
+                isProfileEdited = true;
                 return uploadImageProfile();
+
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
