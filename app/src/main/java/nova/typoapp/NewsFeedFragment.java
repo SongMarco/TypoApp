@@ -2,20 +2,17 @@ package nova.typoapp;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.CardView;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,6 +53,11 @@ public class NewsFeedFragment extends Fragment {
     //덧글을 달러 갔는지 확인하는 변수이다. 덧글을 달러 갔었다면 -> onCreateView에서
     //리사이클러뷰를 초기화하지 않는다(스크롤이 초기화되면 안되기 때문)
     public static boolean isWentCommentActivity = false;
+
+    //아이템을 삭제했는지 확인하는 변수이다. 아이템을 삭제했다면 화면을 리프레시 해야 하므로,
+    //메인 액티비티에서 이를 체크하여 리프레시는 position_none반환(메인 액티비티의 getItemPosition 참조)
+    public static boolean isItemDeleted = false;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -64,7 +66,7 @@ public class NewsFeedFragment extends Fragment {
     }
 
     // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
+
     public static NewsFeedFragment newInstance(int columnCount) {
         NewsFeedFragment fragment = new NewsFeedFragment();
         Bundle args = new Bundle();
@@ -73,10 +75,10 @@ public class NewsFeedFragment extends Fragment {
         return fragment;
     }
 
+    //리사이클러뷰를 업데이트하라.
+    public void updateRecyclerView() {
 
-    public void updateRecyclerViewNewsFeed(){
-
-        recyclerViewNewsFeed.setLayoutManager(new LinearLayoutManager(getContext() )  );
+        recyclerViewNewsFeed.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewNewsFeed.setAdapter(myNewsFeedRecyclerViewAdapter);
         myNewsFeedRecyclerViewAdapter.notifyDataSetChanged();
 
@@ -96,15 +98,11 @@ public class NewsFeedFragment extends Fragment {
     @BindView(R.id.recyclerViewNewsFeed)
     RecyclerView recyclerViewNewsFeed;
 
-    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-
-    @BindView(R.id.layoutAdd)
-    CardView layoutAdd;
-
+    @BindView(R.id.swipeViewNewsFeed)
+    SwipeRefreshLayout mSwipeViewNewsFeed;
 
 
     String json_result;
-
 
 
     MyNewsFeedRecyclerViewAdapter myNewsFeedRecyclerViewAdapter = new MyNewsFeedRecyclerViewAdapter(NewsFeedContent.ITEMS, new MyNewsFeedRecyclerViewAdapter.ClickListener() {
@@ -117,10 +115,7 @@ public class NewsFeedFragment extends Fragment {
         public void onLongClicked(int position) {
 
         }
-    }
-
-    );
-
+    });
 
 
     @Override
@@ -130,131 +125,115 @@ public class NewsFeedFragment extends Fragment {
 
         ButterKnife.bind(this, view);
 
-        Toast.makeText(getActivity(), "onCreateViewCalled", Toast.LENGTH_SHORT).show();
 
-
-
-        layoutAdd.setOnTouchListener(new View.OnTouchListener() {
-
+        mSwipeViewNewsFeed.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-//                        Toast.makeText(getContext(), "글을씁시다", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(getContext(), WriteActivity.class);
-                        startActivity(intent);
-                }
+            public void onRefresh() {
 
 
-                return false;
+                RefreshTask refreshTask = new RefreshTask();
+                refreshTask.execute();
+
             }
-
-
-
         });
-        //DB에서 회원 정보를 확인하고 로그인하라. 단, 두번은 안하게!
 
-        //call이 되었다면 해당 어싱크를 수행하지 않는다.
-//        if(! NewsFeedContent.called ){
-//            NewsFeedContent.taskCallFeeds taskCallFeeds = new NewsFeedContent.taskCallFeeds();
-//            taskCallFeeds.execute();
+//        Toast.makeText(getActivity(), "onCreateViewCalled", Toast.LENGTH_SHORT).show();
+
 //
-//        }
+//
+//        });
+
 
         //region 게시물 리스트 불러오기. 주의사항 - 불러오기 이후 어댑터를 세팅해주어야, 제때 뷰를 반환해준다.
         // 게시물 리스트 불러오기
-
         //댓글을 달러 간 것이 아니라면 새로 불러와라.
-        if(!isWentCommentActivity){
 
-            Retrofit retrofit = new Retrofit.Builder().baseUrl(ApiService.API_URL).build();
-            ApiService apiService = retrofit.create(ApiService.class);
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(ApiService.API_URL).build();
+        ApiService apiService = retrofit.create(ApiService.class);
 
+        NewsFeedContent.ITEMS.clear();
 
-            NewsFeedContent.ITEMS.clear();
-
-            final Call<ResponseBody> comment = apiService.getFeedList();
+        final Call<ResponseBody> comment = apiService.getFeedList();
 
 
-            final ProgressDialog asyncDialog = new ProgressDialog(
-                    getActivity());
-            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            asyncDialog.setMessage("글을 불러오는 중입니다...");
-            // show dialog
-            asyncDialog.show();
+        final ProgressDialog asyncDialog = new ProgressDialog(
+                getActivity());
+        asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        asyncDialog.setMessage("글을 불러오는 중입니다...");
+        // show dialog
+        asyncDialog.show();
 
-            comment.enqueue(new Callback<ResponseBody>() {
+        comment.enqueue(new Callback<ResponseBody>() {
 
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    try {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
 //                                       Log.v("Test", response.body().string());
 
-                        json_result = response.body().string();
-                    Log.v("RECV DATA", json_result);
+                    json_result = response.body().string();
+//                    Log.v("RECV DATA", json_result);
 
-                        JSONArray jsonRes = null;
-                        try {
-                            jsonRes = new JSONArray(json_result);
+                    JSONArray jsonRes = null;
+                    try {
+                        jsonRes = new JSONArray(json_result);
 
-                            for (int i = 0; i < jsonRes.length(); i++) {
-                                JSONObject jObject = jsonRes.getJSONObject(i);  // JSONObject 추출
+                        for (int i = 0; i < jsonRes.length(); i++) {
+                            JSONObject jObject = jsonRes.getJSONObject(i);  // JSONObject 추출
 
-                                int feedNum = jObject.getInt("feedNum");
-                                String writer = jObject.getString("writer");
-                                String title = jObject.getString("title");
-                                String content = jObject.getString("text_content");
-                                String writtenDate = jObject.getString("written_time");
-                                String imgUrl = "";
-                                String profileUrl = "";
-                                int commentNum = jObject.getInt("comment_num");
-
-
-                                if(!Objects.equals(jObject.getString("imgUrl"), "")){
-                                    imgUrl = jObject.getString("imgUrl");
-                                }
-                                if(! jObject.getString("writer_profile").equals("") ){
-
-                                    profileUrl = jObject.getString("writer_profile");
-                                }
+                            int feedNum = jObject.getInt("feedNum");
+                            String writer = jObject.getString("writer");
+                            String title = jObject.getString("title");
+                            String content = jObject.getString("text_content");
+                            String writtenDate = jObject.getString("written_time");
+                            String imgUrl = "";
+                            String profileUrl = "";
+                            int commentNum = jObject.getInt("comment_num");
 
 
+                            if (!Objects.equals(jObject.getString("imgUrl"), "")) {
+                                imgUrl = jObject.getString("imgUrl");
+                            }
+                            if (!jObject.getString("writer_profile").equals("")) {
 
-                                Log.e("myCommentNum", "onResponse: "+commentNum);
+                                profileUrl = jObject.getString("writer_profile");
+                            }
+
+
+                            Log.e("myCommentNum", "onResponse: " + commentNum);
 //                            Log.v("hey", writer+title+content);
 
 //                            FeedItem productFeed = NewsFeedContent.createFeed4(writer, title, content, imgUrl);
 //                                FeedItem productFeed = NewsFeedContent.createFeed7(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate);
-                                FeedItem productFeed = new FeedItem(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate, commentNum);
-                                NewsFeedContent.addItem(productFeed);
+                            FeedItem productFeed = new FeedItem(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate, commentNum);
+                            NewsFeedContent.addItem(productFeed);
 
 
-                            }
+                        }
+                        for (int i = 0; i < 10; i++) {
+                            Log.v("hey", "" + NewsFeedContent.ITEMS.get(i).content);
+                        }
+
 
 // Set the adapter
-                            if (recyclerViewNewsFeed != null) {
-                                recyclerViewNewsFeed.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                                    @Override
-                                    public void onGlobalLayout() {
-                                        asyncDialog.dismiss();
-                                        //At this point the layout is complete and the
-                                        //dimensions of recyclerView and any child views are known.
-                                    }
-                                });
-                                Context context = view.getContext();
-
-
-                                if(recyclerViewNewsFeed.getLayoutManager()==null){
-                                    recyclerViewNewsFeed.setLayoutManager(linearLayoutManager);
+                        if (recyclerViewNewsFeed != null) {
+                            recyclerViewNewsFeed.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                                @Override
+                                public void onGlobalLayout() {
+                                    asyncDialog.dismiss();
+                                    //At this point the layout is complete and the
+                                    //dimensions of recyclerView and any child views are known.
                                 }
+                            });
+                            Context context = view.getContext();
 
-                                recyclerViewNewsFeed.setAdapter(myNewsFeedRecyclerViewAdapter);
-                                recyclerViewNewsFeed.setNestedScrollingEnabled(false);
+
+                            if (recyclerViewNewsFeed.getLayoutManager() == null) {
+                                recyclerViewNewsFeed.setLayoutManager(new LinearLayoutManager(getContext()));
                             }
 
+                            recyclerViewNewsFeed.setAdapter(myNewsFeedRecyclerViewAdapter);
 
-
-
+                        }
 
 
 //                        for (int i = 0; i < NewsFeedContent.ITEMS.size(); i++) {
@@ -266,53 +245,31 @@ public class NewsFeedFragment extends Fragment {
 //
 
 
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    } catch (IOException e) {
+                    } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+            }
 
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                }
-            });
-            //endregion
-
-
-
-
-
-        }
-
-
-
-
+            }
+        });
+        //endregion
 
 
         return view;
     }
 
-//
-//    @OnClick(R.id.layoutAdd)
-//    void onAddClick() {
-////        Toast.makeText(getContext(), "글을씁시다", Toast.LENGTH_SHORT).show();
-//
-//        Intent intent = new Intent(getContext(), WriteActivity.class);
-//        startActivity(intent);
-//
-//
-//    }
-
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Toast.makeText(getActivity(), "onAttachCalled", Toast.LENGTH_SHORT).show();
-            if (context instanceof OnListFragmentInteractionListener) {
+//        Toast.makeText(getActivity(), "onAttachCalled", Toast.LENGTH_SHORT).show();
+        if (context instanceof OnListFragmentInteractionListener) {
 
 
             mListener = (OnListFragmentInteractionListener) context;
@@ -332,30 +289,45 @@ public class NewsFeedFragment extends Fragment {
 
     @Override
     public void onPause() {
-        Toast.makeText(getActivity(), "onPause", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getActivity(), "onPause", Toast.LENGTH_SHORT).show();
         super.onPause();
 
-        // save RecyclerView state
-        mBundleRecyclerViewState = new Bundle();
-        Parcelable listState = recyclerViewNewsFeed.getLayoutManager().onSaveInstanceState();
-        mBundleRecyclerViewState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listState);
-    }
+//        // save RecyclerView state
+//        mBundleRecyclerViewState = new Bundle();
+//        Parcelable listState = recyclerViewNewsFeed.getLayoutManager().onSaveInstanceState();
+//        mBundleRecyclerViewState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listState);
 
+
+    }
 
 
     @Override
     public void onResume() {
         super.onResume();
 
+//        updateRecyclerView();
 
         // restore RecyclerView state
-        if (mBundleRecyclerViewState != null) {
-            Toast.makeText(getActivity(), "restoreView called", Toast.LENGTH_SHORT).show();
-            Parcelable listState = mBundleRecyclerViewState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
-            recyclerViewNewsFeed.getLayoutManager().onRestoreInstanceState(listState);
-        }
+//        if (mBundleRecyclerViewState != null) {
+//            Toast.makeText(getActivity(), "restoreView called", Toast.LENGTH_SHORT).show();
+//            Parcelable listState = mBundleRecyclerViewState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
+//            recyclerViewNewsFeed.getLayoutManager().onRestoreInstanceState(listState);
+////
+////            final int[] position = mBundleRecyclerViewState.getIntArray("ARTICLE_SCROLL_POSITION");
+////
+////            Log.e("omg", "onResume: "+position[0]+"opgg"+position[1] );
+//
+//
+//
+//        }
     }
 
+    public interface OnListFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onListFragmentInteraction(FeedItem item);
+    }
+
+    private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -366,18 +338,15 @@ public class NewsFeedFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(FeedItem item);
-    }
 
-    private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
 
     /**
      * This is a method for Fragment.
      * You can do the same in onCreate or onRestoreInstanceState
      */
-//    @Override
+
+
+    //    @Override
 //    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
 //        super.onViewStateRestored(savedInstanceState);
 //        Toast.makeText(getActivity(), "reload state called", Toast.LENGTH_SHORT).show();
@@ -395,4 +364,122 @@ public class NewsFeedFragment extends Fragment {
 //        Toast.makeText(getActivity(), "save state called", Toast.LENGTH_SHORT).show();
 //        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerViewNewsFeed.getLayoutManager().onSaveInstanceState());
 //    }
+
+
+
+    public class RefreshTask extends AsyncTask<Void, String, String> {
+
+
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            Retrofit retrofit = new Retrofit.Builder().baseUrl(ApiService.API_URL).build();
+            ApiService apiService = retrofit.create(ApiService.class);
+
+            NewsFeedContent.ITEMS.clear();
+
+            final Call<ResponseBody> comment = apiService.getFeedList();
+
+            // show dialog
+
+
+            try {
+                json_result = comment.execute().body().string();
+                JSONArray jsonRes = null;
+
+                jsonRes = new JSONArray(json_result);
+
+                for (int i = 0; i < jsonRes.length(); i++) {
+                    JSONObject jObject = jsonRes.getJSONObject(i);  // JSONObject 추출
+
+                    int feedNum = jObject.getInt("feedNum");
+                    String writer = jObject.getString("writer");
+                    String title = jObject.getString("title");
+                    String content = jObject.getString("text_content");
+                    String writtenDate = jObject.getString("written_time");
+                    String imgUrl = "";
+                    String profileUrl = "";
+                    int commentNum = jObject.getInt("comment_num");
+
+
+                    if (!Objects.equals(jObject.getString("imgUrl"), "")) {
+                        imgUrl = jObject.getString("imgUrl");
+                    }
+                    if (!jObject.getString("writer_profile").equals("")) {
+
+                        profileUrl = jObject.getString("writer_profile");
+                    }
+
+
+                    Log.e("myCommentNum", "onResponse: " + commentNum);
+//                            Log.v("hey", writer+title+content);
+
+//                            FeedItem productFeed = NewsFeedContent.createFeed4(writer, title, content, imgUrl);
+//                                FeedItem productFeed = NewsFeedContent.createFeed7(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate);
+                    FeedItem productFeed = new FeedItem(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate, commentNum);
+                    NewsFeedContent.addItem(productFeed);
+
+
+                }
+                for (int i = 0; i < 10; i++) {
+                    Log.v("hey", "" + NewsFeedContent.ITEMS.get(i).content);
+                }
+
+
+// Set the adapter
+                if (recyclerViewNewsFeed != null) {
+                    recyclerViewNewsFeed.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+
+                            //At this point the layout is complete and the
+                            //dimensions of recyclerView and any child views are known.
+                        }
+                    });
+
+                    if (recyclerViewNewsFeed.getLayoutManager() == null) {
+                        recyclerViewNewsFeed.setLayoutManager(new LinearLayoutManager(getContext()));
+                    }
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                           getActivity().runOnUiThread(new Runnable(){
+                                @Override
+                                public void run() {
+                                    updateRecyclerView();
+                                    // 해당 작업을 처리함
+                                }
+                            });
+                        }
+                    }).start();
+
+                }
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            //endregion
+
+            return null;
+        }
+
+
+        @Override
+
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+
+            mSwipeViewNewsFeed.setRefreshing(false);
+//            Log.e("wow", result);
+
+        }
+
+    }
+
 }
+

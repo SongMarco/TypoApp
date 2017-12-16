@@ -32,9 +32,6 @@ import nova.typoapp.newsfeed.NewsFeedContent;
 import static android.view.View.GONE;
 
 
-
-
-
 //본 액티비티는 프래그먼트 3개를 품은 액티비티이다.
 //프래그먼트를 getItem으로 호출한다.
 //이 때 액티비티에 인터페이스를 적용하는 것을 잊지말라.
@@ -289,17 +286,28 @@ public class MainActivity extends AppCompatActivity
         public int getItemPosition(Object object) {
 
 //            Toast.makeText(MainActivity.this, "getItemPos Called", Toast.LENGTH_SHORT).show();
-            //댓글을 달러 왔으니까 리프레시 하지 말기
-            if(NewsFeedFragment.isWentCommentActivity || !ProfileActivity.isProfileEdited ){
-                NewsFeedFragment.isWentCommentActivity = false;
-                return super.getItemPosition(object);
 
-            }
-            //댓글을 안달았다면 || 프로필을 고치고 왔다면 리프레시하기
-            else{
-                ProfileActivity.isProfileEdited = false;
-                return POSITION_NONE;
-            }
+            //리프레시 하는 경우 : 댓글 달고 올때, 프로필 고쳤을 때, 수정삭제했을때
+
+            return POSITION_NONE;
+
+//            //댓글을 달러 왔으니까 리프레시 하지 말기
+//            if(NewsFeedFragment.isWentCommentActivity ){
+//                NewsFeedFragment.isWentCommentActivity = false;
+//                return super.getItemPosition(object);
+//            }
+//            //그게 아니지만 프로필을 고치지 않았따면 리프레시 하지말기
+//            else if ( !ProfileActivity.isProfileEdited ){
+//
+//                return super.getItemPosition(object);
+//            }
+//            //아이템을 삭제하지 않았다면 리프레시 하지말기
+//
+//            else{
+//                ProfileActivity.isProfileEdited = false;
+//                isItemDeleted = false;
+//                return POSITION_NONE;
+//            }
 
 
         }

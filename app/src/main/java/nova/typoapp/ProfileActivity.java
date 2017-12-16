@@ -544,15 +544,6 @@ public class ProfileActivity extends AppCompatActivity {
 
             Toast.makeText(ProfileActivity.this, "newsFeed update called", Toast.LENGTH_SHORT).show();
 
-            NewsFeedFragment newsFeedFragment = (NewsFeedFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentNewsFeed);
-
-            if(newsFeedFragment != null){
-
-
-                Toast.makeText(ProfileActivity.this, "update called", Toast.LENGTH_SHORT).show();
-                newsFeedFragment.updateRecyclerViewNewsFeed();
-
-            }
 
 
 

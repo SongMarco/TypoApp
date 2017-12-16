@@ -7,9 +7,11 @@ import android.content.Intent;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.os.AsyncTask;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -52,9 +54,10 @@ import static nova.typoapp.retrofit.ApiService.API_URL;
  https://stackoverflow.com/questions/30284067/handle-button-click-inside-a-row-in-recyclerview
  */
 
-public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFeedRecyclerViewAdapter.ViewHolder> {
+public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_ITEM = 1;
 
     // 아이템들의 리스트를 만든다.
     private final List<FeedItem> mValues;
@@ -77,20 +80,33 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
     }
 
 
-    // 뷰홀더와 프래그먼트 아이템을 매칭시키는 함수
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_newsfeed_item, parent, false);
-        return new ViewHolder(view);
-    }
-
-
-
+    //왜 1을 더하지? 헤더가 있으니까!
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mValues.size() + 1;
     }
+
+    //헤더자리인지 검사 후 헤더자리면 헤더로 타입을 주고
+    // 아니라면 일반 아이템으로 타입을 준다.
+    @Override
+    public int getItemViewType(int position) {
+        if (isPositionHeader(position))
+            return TYPE_HEADER;
+
+        return TYPE_ITEM;
+    }
+
+    //헤더인지 검사하는 함수 - position == 0인지 검사
+    private boolean isPositionHeader(int position) {
+        return position == 0;
+    }
+
+    //아이템을 건져올 때는 1을 빼자 왜?? 헤더를 제외해야 하니까
+    // ex) 리사이클러뷰에서 5번째 아이템은 아이템어레이에선 4번째다.
+    private FeedItem getItem(int position) {
+        return ITEMS.get(position - 1);
+    }
+
 
     public interface ClickListener {
 
@@ -99,9 +115,126 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
         void onLongClicked(int position);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public final View mView;
+    // 뷰홀더와 프래그먼트 아이템을 매칭시키는 함수
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
+        if (viewType == TYPE_ITEM) {
+
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.fragment_newsfeed_item, parent, false);
+            //inflate your layout and pass it to view holder
+            return new VHItem(view);
+        } else if (viewType == TYPE_HEADER) {
+
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.fragment_newsfeed_layoutadd, parent, false);
+
+            //inflate your layout and pass it to view holder
+            return new VHHeader(view);
+        }
+
+        throw new RuntimeException("there is no type that matches the type " + viewType + " + make sure your using types correctly");
+
+
+    }
+
+    //뷰홀더가 아이템에 달라붙을 때 어떤 일을 할지 정의하는 함수
+    @Override
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof VHItem) {
+
+            // 리사이클러뷰 아이템에 각 뷰를 세팅한다(작가, 단어, 뜻, 날짜 등)
+
+            VHItem itemHolder = (VHItem) holder;
+
+            FeedItem item = getItem(position);
+
+            itemHolder.mWriterView.setText("" + item.writer);
+            itemHolder.mIdView.setText("단어 : " + item.title);
+            itemHolder.mContentView.setText("뜻 : " + item.content);
+            itemHolder.mDateView.setText(item.writtenDate);
+            itemHolder.mCommentNum.setText("댓글 " + item.commentNum + "개");
+
+            //cast holder to VHItem and set data
+
+
+            // 조건문이 나뉘는 경우 - 이미지 Url, 프로필Url은 없을 수도 있으니까.
+
+            //이미지 Url의 유무에 따라 이미지뷰를 세팅함. 이미지 없으면 -> 기본 이미지를 세팅함
+            if (!Objects.equals(item.imgUrl, "")) {
+
+//            Log.e("imgUrl", "onBindViewHolder: "+getItem(position).imgUrl );
+
+                Glide.with(itemHolder.mView).load(getItem(position).imgUrl).into(itemHolder.mImageView);
+            } else {
+                Glide.with(itemHolder.mView).load(R.drawable.ic_launcher_round).into(itemHolder.mImageView);
+            }
+
+            // 프로필 이미지의 유무에 따라 이미지뷰 세팅. 없으면 -> 기본 세팅
+            if (!getItem(position).imgProfileUrl.equals("") && getItem(position).imgProfileUrl != null) {
+                RequestOptions requestOptions = new RequestOptions()
+                        .error(R.drawable.com_facebook_profile_picture_blank_square);
+
+
+                Glide.with(itemHolder.mView).load(getItem(position).imgProfileUrl)
+                        .apply(requestOptions)
+
+                        .into(itemHolder.mProfileView);
+
+
+            } else {
+
+                Glide.with(itemHolder.mView).load(R.drawable.com_facebook_profile_picture_blank_square).into(itemHolder.mProfileView);
+            }
+
+
+        } else if (holder instanceof VHHeader) {
+            //cast holder to VHHeader and set data for header.
+        }
+
+
+    }
+
+
+    public class VHHeader extends RecyclerView.ViewHolder implements View.OnTouchListener {
+
+
+        @BindView(R.id.cardViewAdd)
+        CardView cardViewAdd;
+
+        public VHHeader(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+
+            cardViewAdd.setOnTouchListener(this);
+        }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            final Context context = v.getContext();
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+//                        Toast.makeText(getContext(), "글을씁시다", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(context, WriteActivity.class);
+                    context.startActivity(intent);
+            }
+            return false;
+        }
+//        @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//
+//
+//
+//                return false;
+//            }
+
+
+    }
+
+
+    public class VHItem extends RecyclerView.ViewHolder implements View.OnClickListener {
+        public final View mView;
 
         @BindView(R.id.feedWriter)
         TextView mWriterView;
@@ -133,13 +266,12 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
         public FeedItem mItem;
 
 
-        public ViewHolder(View view) {
+        public VHItem(View view) {
             super(view);
 
             ButterKnife.bind(this, view);
 
             mView = view;
-
 
             mProfileView.setBackground(new ShapeDrawable(new OvalShape()));
             mProfileView.setClipToOutline(true);
@@ -159,7 +291,6 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
             final Context context = v.getContext();
 
 
-
             if (v.getId() == mMoreView.getId()) {
                 new AlertDialog.Builder(context)
 
@@ -171,7 +302,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
 
                                 switch (which) {
                                     case 0:
-                                        FeedItem item = ITEMS.get(getAdapterPosition());
+                                        FeedItem item = ITEMS.get(getAdapterPosition() - 1);
 
                                         Intent intent = new Intent(context, WriteActivity.class);
                                         intent.putExtra("imgUrl", item.getImgUrl());
@@ -185,19 +316,16 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
                                     case 1:
 
                                         //현재 컨텍스트는 메인 액티비티이다. asynctask로 컨텍스트 전달 또한 가능하다.
-                                        AlertDialog.Builder builder =  new AlertDialog.Builder(context)
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(context)
                                                 .setMessage("정말 삭제하시겠습니까?")
                                                 .setPositiveButton("삭제", new DialogInterface.OnClickListener() {
                                                     @Override
                                                     public void onClick(DialogInterface dialog, int which) {
-                                                        FeedItem item = ITEMS.get(getAdapterPosition());
-
+                                                        FeedItem item = ITEMS.get(getAdapterPosition() - 1);
 
 
                                                         DeleteTask deleteTask = new DeleteTask(context);
                                                         deleteTask.execute(item.getFeedID());
-
-
 
 
                                                     }
@@ -224,7 +352,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
                         })
                         .show();
             } else {
-                FeedItem item = ITEMS.get(getAdapterPosition());
+                FeedItem item = ITEMS.get(getAdapterPosition() - 1);
 //                Intent intent = new Intent(context, WriteActivity.class);
 //                intent.putExtra("imgUrl", item.getImgUrl());
 //                intent.putExtra("title", item.getTitle());
@@ -235,7 +363,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
 
                 Intent intent = new Intent(v.getContext(), CommentActivity.class);
                 intent.putExtra("feedID", item.getFeedID());
-                NewsFeedFragment.isWentCommentActivity = true;
+//                NewsFeedFragment.isWentCommentActivity = true;
                 v.getContext().startActivity(intent);
 //                Toast.makeText(v.getContext(), "ROW PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
             }
@@ -245,61 +373,6 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
     }
 
 
-    //뷰홀더가 아이템에 달라붙을 때 어떤 일을 할지 정의하는 함수
-    @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-
-
-        FeedItem item = mValues.get(position);
-
-        // 리사이클러뷰 아이템에 각 뷰를 세팅한다(작가, 단어, 뜻, 날짜 등)
-        holder.mWriterView.setText("" + mValues.get(position).writer);
-        holder.mIdView.setText("단어 : " + mValues.get(position).title);
-        holder.mContentView.setText("뜻 : " + mValues.get(position).content);
-        holder.mDateView.setText(mValues.get(position).writtenDate );
-
-
-        holder.mCommentNum.setText("댓글 "+item.commentNum+"개");
-
-
-
-        // 조건문이 나뉘는 경우 - 이미지 Url, 프로필Url은 없을 수도 있으니까.
-
-        //이미지 Url의 유무에 따라 이미지뷰를 세팅함. 이미지 없으면 -> 기본 이미지를 세팅함
-        if (!Objects.equals(mValues.get(position).imgUrl, "")) {
-
-//            Log.e("imgUrl", "onBindViewHolder: "+mValues.get(position).imgUrl );
-
-            Glide.with(holder.mView).load(mValues.get(position).imgUrl).into(holder.mImageView);
-        } else {
-            Glide.with(holder.mView).load(R.drawable.ic_launcher_round).into(holder.mImageView);
-        }
-
-        // 프로필 이미지의 유무에 따라 이미지뷰 세팅. 없으면 -> 기본 세팅
-        if (!mValues.get(position).imgProfileUrl.equals("") && mValues.get(position).imgProfileUrl != null) {
-            RequestOptions requestOptions = new RequestOptions()
-                    .error(R.drawable.com_facebook_profile_picture_blank_square);
-
-
-
-            Glide.with(holder.mView).load(mValues.get(position).imgProfileUrl)
-                    .apply(requestOptions)
-
-                    .into(holder.mProfileView);
-
-
-
-
-        }
-        else{
-
-            Glide.with(holder.mView).load(R.drawable.com_facebook_profile_picture_blank_square).into(holder.mProfileView);
-        }
-
-
-    }
-
     String json_result = "";
 
     public class DeleteTask extends AsyncTask<Integer, String, String> {
@@ -308,7 +381,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
 
         // context를 가져오는 생성자. 이를 통해 메인 액티비티의 함수에 접근할 수 있다.
 
-        public DeleteTask (Context context){
+        public DeleteTask(Context context) {
             mContext = context;
         }
 
@@ -332,8 +405,6 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
             }
 
 
-
-
             return null;
         }
 
@@ -343,10 +414,10 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<MyNewsFe
 
             super.onPostExecute(result);
 
+            NewsFeedFragment.isItemDeleted = true;
             //삭제가 완료되었다. 여기서 새로고침을 진행하자
-            MainActivity activity = (MainActivity)mContext;
+            MainActivity activity = (MainActivity) mContext;
             activity.getPagerAdapter().notifyDataSetChanged();
-
 
 
             Log.e("wow", result);
