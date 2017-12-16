@@ -112,6 +112,7 @@ public class NewsFeedFragment extends Fragment {
     );
 
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -119,7 +120,10 @@ public class NewsFeedFragment extends Fragment {
 
         ButterKnife.bind(this, view);
 
-        Toast.makeText(getActivity(), "onCreateViewCalled", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getActivity(), "onCreateViewCalled", Toast.LENGTH_SHORT).show();
+
+
+
         layoutAdd.setOnTouchListener(new View.OnTouchListener() {
 
             @Override

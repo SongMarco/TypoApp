@@ -48,8 +48,8 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
 
         CommentItem mItem = holder.mItem;
 
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+//        holder.mIdView.setText(mValues.get(position).id);
+//        holder.mContentView.setText(mValues.get(position).content);
 
         holder.mCommentContentView.setText(mItem.commentContent);
 
@@ -92,11 +92,11 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
 
-        @BindView(R.id.id)
-        public TextView mIdView;
+//        @BindView(R.id.id)
+//        public TextView mIdView;
+//        @BindView(R.id.content)
+//        TextView mContentView;
 
-        @BindView(R.id.content)
-        TextView mContentView;
         @BindView(R.id.commentWriter)
         TextView mCommentWriterView;
         @BindView(R.id.commentContent)
@@ -118,9 +118,9 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
             mView = view;
         }
 
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
-        }
+//        @Override
+//        public String toString() {
+//            return super.toString() + " '" + mContentView.getText() + "'";
+//        }
     }
 }
