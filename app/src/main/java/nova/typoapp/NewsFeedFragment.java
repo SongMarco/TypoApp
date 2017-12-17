@@ -209,7 +209,7 @@ public class NewsFeedFragment extends Fragment {
 
 
                         }
-                        for (int i = 0; i < 10; i++) {
+                        for (int i = 0; i < NewsFeedContent.ITEMS.size(); i++) {
                             Log.v("hey", "" + NewsFeedContent.ITEMS.get(i).content);
                         }
 

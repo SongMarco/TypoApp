@@ -43,6 +43,8 @@ implements CommentFragment.OnListFragmentInteractionListener {
     @BindView(R.id.parentLayoutComment)
     LinearLayout layoutComment;
 
+
+
     String textCommentContent;
 
     public static int getFeedID() {
@@ -191,7 +193,7 @@ implements CommentFragment.OnListFragmentInteractionListener {
             super.onPreExecute();
 
             asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            asyncDialog.setMessage("덧글 작성중입니다...");
+            asyncDialog.setMessage("댓글 작성중입니다...");
 
             // show dialog
             asyncDialog.show();
@@ -381,6 +383,8 @@ implements CommentFragment.OnListFragmentInteractionListener {
 
 
 //// Reload current fragment
+
+            editTextComment.setText("");
 
             CommentFragment commentFragment = (CommentFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentCommentList);
 
