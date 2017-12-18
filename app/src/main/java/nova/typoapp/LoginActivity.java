@@ -75,20 +75,41 @@ import static android.Manifest.permission.READ_CONTACTS;
 /**
  * A login screen that offers login via email/password.
  */
+
+/*
+로그인 액티비티
+
+로그인 액티비티에서는 이메일과 비밀번호로 로그인을 할 수 있으며,
+가입하지 않은 사용자는 회원가입을 할 수 있다.
+
+ */
+
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     /**
      * Id to identity READ_CONTACTS permission request.
+     * 자동완성시 이메일 목록 확인이 필요하므로, 연락처 목록 읽기 권한 필요,
+     * 그러나 현재는 자동완성을 사용하고 있지 않으므로, 주석처리 하는 것을 권장
      */
     private static final int REQUEST_READ_CONTACTS = 0;
-
+    private List<String> permissionNeeds = Arrays.asList("email");
 
     /**
+     *
      * Keep track of the login task to ensure we can cancel it if requested.
+     *클래스 변수들 정의.
+     *
      */
+
+    /*
+    로그인 처리를 담당하는 스레드.
+    실제 사용처는 ctrl+B로 클래스를 참고하라
+      */
     private UserLoginTask mAuthTask = null;
 
-    // UI references.
+    /*
+    UI에 대한 정의
+     */
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
@@ -97,12 +118,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     TextInputLayout textLoginEmail, textLoginPassword;
 
 
+
+
     private CallbackManager callbackManager;
 
-    private List<String> permissionNeeds = Arrays.asList("email");
+
     Button buttonFacebook;
 
     String email, password;
+
+
+
+    /*
+    onCreate
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

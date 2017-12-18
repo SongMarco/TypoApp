@@ -29,8 +29,6 @@ import nova.typoapp.newsfeed.NewsFeedContent;
 /*
 메인 액티비티
 
-1. 액티비티 설명
-
 메인 액티비티는 뷰페이저로 구성되어, 한 액티비티에 여러 화면이 Fragment 형태로 담겨져 있다.
 
 각 페이지를 상단의 탭을 눌러 이동할 수 있다.
@@ -341,8 +339,8 @@ public class MainActivity extends AppCompatActivity
         겟아이템 메소드
 
         사용자가 페이지 탭을 누르면 프래그먼트를 가져다주는 메소드.
-
-
+        이 때 새로운 프레그먼트를 가져다 주기 때문에, 화면이 요소들이 갱신된다.
+        (화면 요소는 댓글 수, 프로필 이미지, 게시물 등이 있다.)
 
          */
         @Override
@@ -382,9 +380,10 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    //@@@@@ 중요@@@@@ onResume에서 프로필 사진이 고쳐진지 유무를 체크해서, 프로필 사진을 변경하게 된다.
-    //이 때 getItemPosition이, mSectionPagerAdapter에서 notify할 때 사용된다.
-    //반환값을 NONE으로 주면 뷰페이저가 무조건 refresh된다.
+    //@@@@@ 중요@@@@@ onResume에서 페이저 어댑터에 notifyDataSetChanged를 호출한다.
+    //이것으로 프로필 사진이 고쳐진지 유무를 체크해서, 프로필 사진을 변경하게 된다.
+    //이 때 getItemPosition이, mSectionPagerAdapter에서 notify 후에 콜된다.
+    //getItemPosition의 반환값을 NONE 으로 주면 뷰페이저가 새로고침된다. (getItemPosition 메소드 참조)
     @Override
     public void onResume() {
         super.onResume();
