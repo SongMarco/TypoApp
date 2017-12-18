@@ -63,6 +63,7 @@ import nova.typoapp.retrofit.ApiService;
 import nova.typoapp.retrofit.LoginInfo;
 import nova.typoapp.retrofit.LoginResult;
 import nova.typoapp.retrofit.ReceivedCookiesInterceptor;
+import nova.typoapp.retrofit.SharedPreferenceBase;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
@@ -639,7 +640,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(okHttpClient)
                     .build();
-            Log.e(TAG, "shared-before call: "+getSharedPreferences("pref_login" , MODE_PRIVATE ).getAll()  ) ;
+            Log.e(TAG, "shared-before call: "+getSharedPreferences(getString(R.string.key_pref_Login) , MODE_PRIVATE ).getAll()  ) ;
 
             ApiService apiService = retrofit.create(ApiService.class);
 
@@ -648,10 +649,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             Call<LoginResult> call = apiService.loginMember(email, passwordEnc);
 
             try {
-
+                SharedPreferenceBase.setContext(LoginActivity.this);
                 LoginResult loginResult = call.execute().body();
 
-                Log.e(TAG, "shared-after call: "+getSharedPreferences("pref_login" , MODE_PRIVATE ).getAll()  ) ;
+                Log.e(TAG, "shared-after call: "+getSharedPreferences(getString(R.string.key_pref_Login) , MODE_PRIVATE ).getAll()  ) ;
 //                String cookie = call.clone().execute().headers().values("Set-Cookie").toString();
 
                 //cookie가 계속해서 바뀐다. 쿠키를 낚아채서 바꾸어주어야 한다.
@@ -675,7 +676,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 editor.putString(getString(R.string.cookie_birthday), cookie_birthday);
 
                 editor.apply();
-                Log.e(TAG, "shared: "+getSharedPreferences("pref_login" , MODE_PRIVATE ).getAll()  ) ;
+                Log.e(TAG, "shared: "+getSharedPreferences(getString(R.string.key_pref_Login), MODE_PRIVATE ).getAll()  ) ;
                 return json_result;
             } catch (IOException e) {
                 e.printStackTrace();

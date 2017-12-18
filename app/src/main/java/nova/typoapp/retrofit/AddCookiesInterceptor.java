@@ -27,9 +27,11 @@ public class AddCookiesInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         Request.Builder builder = chain.request().newBuilder();
 
-        SharedPreferences pref_login = context.getSharedPreferences(context.getString(R.string.key_pref_Login) , 0);
 
         SharedPreferenceBase.setContext(context);
+
+        SharedPreferences pref_login = context.getSharedPreferences(context.getString(R.string.key_pref_Login) , 0);
+
         Set<String> preferences = pref_login.getStringSet("Cookie" , new HashSet<String>() );
 
         Log.e("my", "intercept: "+preferences.toString() );

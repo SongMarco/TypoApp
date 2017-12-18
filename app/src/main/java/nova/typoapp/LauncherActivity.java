@@ -20,6 +20,7 @@ import nova.typoapp.retrofit.AddCookiesInterceptor;
 import nova.typoapp.retrofit.ApiService;
 import nova.typoapp.retrofit.LoginInfo;
 import nova.typoapp.retrofit.ReceivedCookiesInterceptor;
+import nova.typoapp.retrofit.SharedPreferenceBase;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -116,7 +117,7 @@ public class LauncherActivity extends AppCompatActivity {
                     .build();
 
 
-            Log.e(TAG, "shared-before call: "+getSharedPreferences("pref_login" , MODE_PRIVATE ).getAll()  ) ;
+            Log.e(TAG, "shared-before call: "+getSharedPreferences(getString(R.string.key_pref_Login) , MODE_PRIVATE ).getAll()  ) ;
 
             ApiService apiService = retrofit.create(ApiService.class);
 
@@ -124,9 +125,11 @@ public class LauncherActivity extends AppCompatActivity {
 
             try {
 
+                //컨텍스트를 설정해주어야 베이스에서 리소스를 가져올 수 잇음
+                SharedPreferenceBase.setContext(LauncherActivity.this);
                 LoginInfo loginInfo = call.execute().body();
 
-                Log.e(TAG, "shared-after call: "+getSharedPreferences("pref_login" , MODE_PRIVATE ).getAll()  ) ;
+                Log.e(TAG, "shared-after call: "+getSharedPreferences(getString(R.string.key_pref_Login), MODE_PRIVATE ).getAll()  ) ;
 //                String cookie = call.clone().execute().headers().values("Set-Cookie").toString();
 
 
