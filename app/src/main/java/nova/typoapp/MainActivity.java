@@ -32,9 +32,35 @@ import nova.typoapp.newsfeed.NewsFeedContent;
 import static android.view.View.GONE;
 
 
-//본 액티비티는 프래그먼트 3개를 품은 액티비티이다.
-//프래그먼트를 getItem으로 호출한다.
-//이 때 액티비티에 인터페이스를 적용하는 것을 잊지말라.
+
+/*
+
+1. 앱 설명
+
+이 앱은 영단어를 SNS 처럼 공유할 수 있는 앱이다.
+기본 기능은 페이스북처럼 뉴스피드 형태로 단어를 이미지와 함께 게시하는 것이다.
+
+이 때 단어의 이미지는 타이포그래피로 이루어져 있다.
+타이포그래피는 단어의 철자 모양을 이용해 단어의 의미를 표현하는 방법이다.
+말로는 잘 와닿지 않는데, 아래 링크를 타고 이미지를 보면 타이포그래피가 무엇인지
+알 수 있다.
+https://goo.gl/PWL4q3
+
+
+
+
+
+2. 이 액티비티는 어떤 액티비티인가
+
+
+본 액티비티는 프래그먼트 3개를 품은 액티비티이다.
+프래그먼트를 getItem으로 호출한다.
+이 때 액티비티에 인터페이스를 적용하는 것을 잊지말라.
+
+
+
+
+*/
 public class MainActivity extends AppCompatActivity
         implements
         NewsFeedFragment.OnListFragmentInteractionListener,
