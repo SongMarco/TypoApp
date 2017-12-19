@@ -185,8 +185,14 @@ public class NewsFeedFragment extends Fragment {
                             String title = jObject.getString("title");
                             String content = jObject.getString("text_content");
                             String writtenDate = jObject.getString("written_time");
+
+                            String writerEmail = jObject.getString("writer_email");
+//                            Log.e("hoss", "onResponse: 작성자 email = "+writerEmail );
+
+
                             String imgUrl = "";
                             String profileUrl = "";
+
                             int commentNum = jObject.getInt("comment_num");
 
 
@@ -204,7 +210,7 @@ public class NewsFeedFragment extends Fragment {
 
 //                            FeedItem productFeed = NewsFeedContent.createFeed4(writer, title, content, imgUrl);
 //                                FeedItem productFeed = NewsFeedContent.createFeed7(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate);
-                            FeedItem productFeed = new FeedItem(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate, commentNum);
+                            FeedItem productFeed = new FeedItem(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate, commentNum, writerEmail);
                             NewsFeedContent.addItem(productFeed);
 
 
@@ -397,6 +403,9 @@ public class NewsFeedFragment extends Fragment {
                     String title = jObject.getString("title");
                     String content = jObject.getString("text_content");
                     String writtenDate = jObject.getString("written_time");
+
+                    String writerEmail = jObject.getString("writer_email");
+
                     String imgUrl = "";
                     String profileUrl = "";
                     int commentNum = jObject.getInt("comment_num");
@@ -410,13 +419,13 @@ public class NewsFeedFragment extends Fragment {
                         profileUrl = jObject.getString("writer_profile");
                     }
 
-
-                    Log.e("myCommentNum", "onResponse: " + commentNum);
+//                    Log.e("hoss", "onResponse: 작성자 email = "+writerEmail );
+//                    Log.e("myCommentNum", "onResponse: " + commentNum);
 //                            Log.v("hey", writer+title+content);
 
 //                            FeedItem productFeed = NewsFeedContent.createFeed4(writer, title, content, imgUrl);
 //                                FeedItem productFeed = NewsFeedContent.createFeed7(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate);
-                    FeedItem productFeed = new FeedItem(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate, commentNum);
+                    FeedItem productFeed = new FeedItem(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate, commentNum, writerEmail);
                     NewsFeedContent.addItem(productFeed);
 
 

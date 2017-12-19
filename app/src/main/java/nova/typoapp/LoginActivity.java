@@ -56,7 +56,6 @@ import nova.typoapp.retrofit.ApiService;
 import nova.typoapp.retrofit.LoginInfo;
 import nova.typoapp.retrofit.LoginResult;
 import nova.typoapp.retrofit.ReceivedCookiesInterceptor;
-import nova.typoapp.retrofit.SharedPreferenceBase;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
@@ -743,7 +742,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // http 통신을 수행한다.
 
             try {
-                SharedPreferenceBase.setContext(LoginActivity.this);
+//                SharedPreferenceBase.setContext(LoginActivity.this);
 
                 //loginResult는 http의 reponse 이며, json을 자바 객체로 만들었다.
                 //자세한 사항은 ctrl+B로 클래스를 확인해보라

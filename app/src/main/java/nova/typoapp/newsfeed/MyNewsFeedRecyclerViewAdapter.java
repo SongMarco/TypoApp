@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.os.AsyncTask;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -146,15 +148,23 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
             // 리사이클러뷰 아이템에 각 뷰를 세팅한다(작가, 단어, 뜻, 날짜 등)
 
-            VHItem itemHolder = (VHItem) holder;
 
-            FeedItem item = getItem(position);
+
+            final VHItem itemHolder = (VHItem) holder;
+
+            final FeedItem item = getItem(position);
+            Context context = itemHolder.mView.getContext();
 
             itemHolder.mWriterView.setText("" + item.writer);
             itemHolder.mIdView.setText("단어 : " + item.title);
             itemHolder.mContentView.setText("뜻 : " + item.content);
             itemHolder.mDateView.setText(item.writtenDate);
             itemHolder.mCommentNum.setText("댓글 " + item.commentNum + "개");
+
+            SharedPreferences pref_login =  context.getSharedPreferences(context.getString(R.string.key_pref_Login), Context.MODE_PRIVATE );
+            final String loginEmail = pref_login.getString("cookie_email","");
+
+            Log.e("hoxy", "onBindViewHolder: "+loginEmail );
 
             //cast holder to VHItem and set data
 
@@ -187,6 +197,105 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
                 Glide.with(itemHolder.mView).load(R.drawable.com_facebook_profile_picture_blank_square).into(itemHolder.mProfileView);
             }
+
+            itemHolder.mMoreView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final Context context = v.getContext();
+
+                    if (v.getId() == itemHolder.mMoreView.getId()) {
+
+                        AlertDialog.Builder builderItem = new AlertDialog.Builder(context);
+
+                                // 여기서 분기를 가른다.
+                                // 작성자 이메일 = 쉐어드에 담긴 로그인 이메일이면 수정삭제 가능
+                                // 아니면 수정 삭제 불가. else문에서 신고만 보이게 해라
+
+                        //로그인 이메일과 게시물의 작성자가 같음 -> 수정삭제 세팅
+                        if(loginEmail.equals(item.writerEmail)){
+
+                            builderItem.setItems(R.array.edit_del, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // The 'which' argument contains the index position
+                                    // of the selected item
+
+                                    switch (which) {
+                                        case 0:
+
+                                            Intent intent = new Intent(context, WriteActivity.class);
+                                            intent.putExtra("imgUrl", item.getImgUrl());
+                                            intent.putExtra("title", item.getTitle());
+                                            intent.putExtra("content", item.getContent());
+                                            intent.putExtra("feedID", item.getFeedID());
+                                            context.startActivity(intent);
+
+//                                        Toast.makeText(context, "수정 클릭 = " + String.valueOf(ITEMS.get(getAdapterPosition()).getInfo()), Toast.LENGTH_SHORT).show();
+                                            break;
+                                        case 1:
+
+                                            //현재 컨텍스트는 메인 액티비티이다. asynctask로 컨텍스트 전달 또한 가능하다.
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                                                    .setMessage("정말 삭제하시겠습니까?")
+                                                    .setPositiveButton("삭제", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+
+
+                                                            DeleteTask deleteTask = new DeleteTask(context);
+                                                            deleteTask.execute(item.getFeedID());
+
+
+                                                        }
+                                                    })
+                                                    .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            dialog.dismiss();
+                                                        }
+                                                    });
+
+                                            AlertDialog dialog2 = builder.create();
+                                            dialog2.show();
+
+//                                        ITEMS.remove(item);
+//
+
+//                                        Toast.makeText(context, "삭제 클릭 = " + String.valueOf(ITEMS.get(getAdapterPosition()).getInfo()), Toast.LENGTH_SHORT).show();
+
+                                            break;
+
+                                    }
+                                }
+                            })
+                                    .show();
+
+                        }
+                        //로그인한 사람과 게시물 작성자 다름 -> 신고 버튼만 세팅됨
+                        else{
+                            builderItem.setItems(R.array.edit_another, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // The 'which' argument contains the index position
+                                    // of the selected item
+
+                                    switch (which) {
+                                        case 0:
+
+                                        Toast.makeText(context, "신고를 클릭했습니다. " + String.valueOf(item.getInfo()), Toast.LENGTH_SHORT).show();
+                                            break;
+
+                                    }
+                                }
+                            })
+                                    .show();
+                        }
+
+
+                    }
+
+                }
+            });
+
+
 
 
         } else if (holder instanceof VHHeader) {
@@ -290,76 +399,9 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
         public void onClick(View v) {
             final Context context = v.getContext();
 
-
-            if (v.getId() == mMoreView.getId()) {
-                new AlertDialog.Builder(context)
-
-//                .setTitle("업로드 방식 선택")
-                        .setItems(R.array.edit_del, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // The 'which' argument contains the index position
-                                // of the selected item
-
-                                switch (which) {
-                                    case 0:
-                                        FeedItem item = ITEMS.get(getAdapterPosition() - 1);
-
-                                        Intent intent = new Intent(context, WriteActivity.class);
-                                        intent.putExtra("imgUrl", item.getImgUrl());
-                                        intent.putExtra("title", item.getTitle());
-                                        intent.putExtra("content", item.getContent());
-                                        intent.putExtra("feedID", item.getFeedID());
-                                        context.startActivity(intent);
-
-//                                        Toast.makeText(context, "수정 클릭 = " + String.valueOf(ITEMS.get(getAdapterPosition()).getInfo()), Toast.LENGTH_SHORT).show();
-                                        break;
-                                    case 1:
-
-                                        //현재 컨텍스트는 메인 액티비티이다. asynctask로 컨텍스트 전달 또한 가능하다.
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                                                .setMessage("정말 삭제하시겠습니까?")
-                                                .setPositiveButton("삭제", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        FeedItem item = ITEMS.get(getAdapterPosition() - 1);
-
-
-                                                        DeleteTask deleteTask = new DeleteTask(context);
-                                                        deleteTask.execute(item.getFeedID());
-
-
-                                                    }
-                                                })
-                                                .setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        dialog.dismiss();
-                                                    }
-                                                });
-
-                                        AlertDialog dialog2 = builder.create();
-                                        dialog2.show();
-
-//                                        ITEMS.remove(item);
-//
-
-//                                        Toast.makeText(context, "삭제 클릭 = " + String.valueOf(ITEMS.get(getAdapterPosition()).getInfo()), Toast.LENGTH_SHORT).show();
-
-                                        break;
-
-                                }
-                            }
-                        })
-                        .show();
-            } else {
+            // 더보기 버튼 이외의 클릭에 대해서는 댓글달기로 이동한다.
+            if(v.getId() != mMoreView.getId()){
                 FeedItem item = ITEMS.get(getAdapterPosition() - 1);
-//                Intent intent = new Intent(context, WriteActivity.class);
-//                intent.putExtra("imgUrl", item.getImgUrl());
-//                intent.putExtra("title", item.getTitle());
-//                intent.putExtra("content", item.getContent());
-//                intent.putExtra("feedID", item.getFeedID());
-//                context.startActivity(intent);
-
 
                 Intent intent = new Intent(v.getContext(), CommentActivity.class);
                 intent.putExtra("feedID", item.getFeedID());

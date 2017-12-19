@@ -79,6 +79,8 @@ public class NewsFeedContent {
     public static class FeedItem {
         public String writer;
 
+        String writerEmail;
+
         public final String title;
         public final String content;
 
@@ -154,6 +156,19 @@ public class NewsFeedContent {
             this.writtenDate = writtenDate;
             this.commentNum = commentNum;
         }
+
+        public FeedItem(int feedID, String writer, String title, String content, String imgUrl, String imgProfileUrl, String writtenDate, int commentNum, String writerEmail) {
+            this.feedID = feedID;
+            this.writer = writer;
+            this.title = title;
+            this.content = content;
+            this.imgUrl = imgUrl;
+            this.imgProfileUrl = imgProfileUrl;
+            this.writtenDate = writtenDate;
+            this.commentNum = commentNum;
+            this.writerEmail = writerEmail;
+        }
+
 
         @Override
         public String toString() {

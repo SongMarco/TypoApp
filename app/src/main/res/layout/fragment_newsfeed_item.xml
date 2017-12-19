@@ -183,6 +183,7 @@
                     android:background="@android:color/white"
                     android:drawableLeft="@drawable/likewhite"
 
+
                     android:drawablePadding="6dp"
 
                     android:duplicateParentState="true"
