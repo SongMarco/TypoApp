@@ -1,5 +1,7 @@
 package nova.typoapp.comment;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +19,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import nova.typoapp.CoCommentActivity;
 import nova.typoapp.CommentFragment.OnListFragmentInteractionListener;
 import nova.typoapp.R;
 import nova.typoapp.comment.CommentContent.CommentItem;
@@ -91,7 +94,7 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
         return mValues.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final View mView;
 
 //        @BindView(R.id.id)
@@ -99,6 +102,8 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
 //        @BindView(R.id.content)
 //        TextView mContentView;
 
+
+        // 덧글 리사이클러뷰의 내부 뷰들을 세팅한다
         @BindView(R.id.commentWriter)
         TextView mCommentWriterView;
         @BindView(R.id.commentContent)
@@ -109,6 +114,11 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
         ImageView mCommentProfileImage;
 
 
+        @BindView(R.id.textViewCoComment)
+        TextView mCoComment;
+
+        @BindView(R.id.textViewCoCommentNum)
+        TextView mCoCommentNum;
 
 
         public CommentItem mItem;
@@ -116,11 +126,40 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
         public ViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
+            mView = view;
 
+            //프로필 이미지를 동그랗게 하기 위한 코드.
             mCommentProfileImage.setBackground(new ShapeDrawable(new OvalShape()));
             mCommentProfileImage.setClipToOutline(true);
-            mView = view;
+
+
+            //답글 보기, 답글 수에 클릭 리스너를 세팅한다.
+            mCoComment.setOnClickListener(this);
+            mCoCommentNum.setOnClickListener(this);
+
         }
+
+        @Override
+        public void onClick(View v) {
+            final Context context = v.getContext();
+
+            // 답글보기 혹은 답글 갯수를 클릭하면 답글 액티비티로 이동시킨다.
+            if(v.getId() == mCoComment.getId() || v.getId() == mCoCommentNum.getId()   ){
+
+
+                CommentItem item = CommentContent.ITEMS.get(getAdapterPosition());
+
+                Intent intent = new Intent(v.getContext(), CoCommentActivity.class);
+//                intent.putExtra("feedID", item.getFeedID());
+//                NewsFeedFragment.isWentCommentActivity = true;
+                v.getContext().startActivity(intent);
+//                Toast.makeText(v.getContext(), "ROW PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
+            }
+            else{
+
+            }
+        }
+
 
 //        @Override
 //        public String toString() {

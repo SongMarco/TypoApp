@@ -87,6 +87,7 @@ public class CommentFragment extends Fragment {
     RecyclerView recyclerViewList;
 
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +99,12 @@ public class CommentFragment extends Fragment {
     }
 
     MyCommentRecyclerViewAdapter commentRecyclerViewAdapter = new MyCommentRecyclerViewAdapter(CommentContent.ITEMS, mListener);
+
+
+
+    /*
+    프래그먼트 초기화
+     */
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -118,14 +125,7 @@ public class CommentFragment extends Fragment {
 
 
         //먼저 리사이클러뷰에 담을 댓글을 불러온다.
-//        CallCommentTask callCommentTask = new CallCommentTask();
-//        callCommentTask.execute();
 
-
-//        Toast.makeText(getContext(), "onCreateView Called", Toast.LENGTH_SHORT).show();
-
-
-//ㅁㄴㅇ
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();

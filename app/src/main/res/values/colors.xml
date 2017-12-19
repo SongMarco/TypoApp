@@ -9,5 +9,6 @@
     <color name="borderGrey">#e1e2e3</color>
     <color name="transGrey">#BBe1e2e3</color>
 
+    <color name="black">#000000</color>
     <color name="fontGrey">#767676</color>
 </resources>
