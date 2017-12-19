@@ -44,14 +44,7 @@ import com.facebook.stetho.okhttp3.StethoInterceptor;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -105,32 +98,43 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     로그인 처리를 담당하는 스레드.
     실제 사용처는 ctrl+B로 클래스를 참고하라
       */
-    private UserLoginTask mAuthTask = null;
+    private LoginRetrofitTask mAuthTask = null;
 
     /*
     UI에 대한 정의
+    근데 왜 private 로 사용하는 것일까?
+    - 이 뷰들은 이 액티비티 안에서만 접근하길 원하기 때문.
+    즉, 액티비티 안에서 사용할 변수를 명확히 할 수 있다.
+
      */
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
 
-    TextInputLayout textLoginEmail, textLoginPassword;
-
+    private TextInputLayout textLoginEmail, textLoginPassword;
 
 
 
     private CallbackManager callbackManager;
 
 
-    Button buttonFacebook;
+    private Button buttonFacebook;
 
-    String email, password;
+    private String email, password;
 
 
 
     /*
-    onCreate
+    로그인 액티비티 초기화
+
+    주로 로그인 관련 뷰 - 입력창, 버튼 등 - 을 세팅하게 되는데,
+    페이스북 로그인 API 관련 세팅 코드가 긴 편이다.
+
+    페이스북 관련 기능을 세팅하고,
+    뷰를 세팅하고
+    리스너를 세팅하게 된다.
+
      */
 
     @Override
@@ -140,7 +144,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         setContentView(R.layout.activity_login);
 
         buttonFacebook = (Button) findViewById(R.id.buttonFacebookLogin);
-        setLoginButton();
+        setFacebookLoginButton();
 
         callbackManager = CallbackManager.Factory.create();
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<com.facebook.login.LoginResult>() {
@@ -196,22 +200,36 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         });
 
 
-        // Set up the login form.
+        /*
+        로그인 관련 뷰들을 inflate 한다.
+        이메일 및 비밀번호 입력란과 각종 버튼들이 세팅된다.
+         */
         mEmailView = (AutoCompleteTextView) findViewById(R.id.loginEmail);
         populateAutoComplete();
         mLoginFormView = findViewById(R.id.login_form);
         mPasswordView = (EditText) findViewById(R.id.loginPassword);
         Button mEmailSignInButton = (Button) findViewById(R.id.buttonLogin);
         mProgressView = findViewById(R.id.login_progress);
-
         textLoginEmail = (TextInputLayout) findViewById(R.id.textLoginEmail);
         textLoginPassword = (TextInputLayout) findViewById(R.id.textLoginPassword);
 
 
+        /*
+        이메일과 패스워드 입력 란에는
+        포커스 체인지 리스너를 세팅한다.
+
+        입력한 형식이 적절치 않거나, 입력을 하지 않았을 경우 예외처리를 적용한다.
+        자세한 사항은 focusChangeListener 참조
+         */
         mPasswordView.setOnFocusChangeListener(focusChangeListener);
         mEmailView.setOnFocusChangeListener(focusChangeListener);
 
 
+        /*
+        로그인 버튼 클릭리스너
+
+        로그인 버튼을 클릭시 로그인을 위한 스레드를 실행하게 된다.
+        */
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -229,7 +247,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     }
 
-    private void setLoginButton() {
+
+    /*
+    페이스북 로그인을 위한 버튼을 세팅한다.
+
+    로그인을 한 상태라면 로그아웃 텍스트와 해당 동작을,
+    로그인이 되지 않은 상태라면 페이스북으로 로그인 텍스트와 동작을 버튼에 세팅
+     */
+    private void setFacebookLoginButton() {
         if (AccessToken.getCurrentAccessToken() != null) {
             buttonFacebook.setText("로그아웃");
             buttonFacebook.setOnClickListener(new View.OnClickListener() {
@@ -241,7 +266,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     Toast.makeText(LoginActivity.this, "로그아웃 하셨습니다.", Toast.LENGTH_SHORT).show();
 
                     LoginManager.getInstance().logOut();
-                    setLoginButton();
+                    setFacebookLoginButton();
                 }
             });
         } else {
@@ -256,6 +281,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
+
+    /*
+    onActivityResult에서는 페이스북 로그인 이후 콜백을 받아 처리하게 된다.(분명하지 않음 - 확실히 할 것)
+
+    ex) 페이스북 로그인 버튼 -> 페이스북 계정 로그인 하기 -> 페이스북 로그인 됬는지 안됬는지 파악해서
+    onActivityResult에서 콜백메소드를 통해 적절히 세팅.
+
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -263,12 +296,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
 
+    //로그인 버튼과 회원가입 버튼에 대한 클릭 리스너
     Button.OnClickListener mClickListener = new View.OnClickListener() {
         public void onClick(View v) {
             Intent intent;
             switch (v.getId()) {
 
-//   buttonLogin은 위에서 이미 리스너가 지정되있다.
+                /*
+                로그인 버튼 클릭 -> 로그인 관련 메소드가 수행된다.
+
+                사용자가 정확히 ID/PW 정보를 입력하였는지 등을 체크하고 로그인 처리한다.
+
+                 */
                 case R.id.buttonLogin:
 //                    Toast.makeText(LoginActivity.this, "로그인 되었습니다.", Toast.LENGTH_SHORT).show();
 
@@ -276,6 +315,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
                     break;
+
+                    /*
+                    회원가입 버튼 클릭 -> 회원가입 액티비티를 띄운다.
+                     */
                 case R.id.buttonJoin:
                     intent = new Intent(getApplicationContext(), JoinActivity.class);
                     startActivity(intent);
@@ -285,6 +328,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     };
 
 
+    /*
+    자동 완성과 관련된 코드. 아직 제대로 동작하지 않는다.
+     */
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
             return;
@@ -329,30 +375,50 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
 
+    /*
+    OnFocusChangeListener
+
+    포커스가 바뀔 때 어떤 행동을 할지 지정하는 리스너다.
+
+    이메일 : 입력 X 혹은 적절치 않은 형식(정규식 처리)
+    비밀번호 : 입력 X
+    위와 같은 경우 빨간색의 에러메시지를 출력한다.
+
+    */
     View.OnFocusChangeListener focusChangeListener = new View.OnFocusChangeListener() {
         @Override
         public void onFocusChange(View v, boolean hasFocus) {
 
+
+            //사용자 포커스가 있다가 없어졌을 때 동작
             if (!hasFocus) {
+
                 switch (v.getId()) {
 
 
+                    //이메일 입력 칸에서 포커스가 있다가 없어질 때
+
                     case R.id.loginEmail:
+
 
                         textLoginEmail.setErrorEnabled(true);
                         email = mEmailView.getText().toString();
 
+                        //이메일 입력칸이 비었는지, 이메일 형식이 유효한지 검사
                         if (TextUtils.isEmpty(email) || !isEmailValid(email)) {
 
+                            //비었다면 이메일 입력이 필요하다고 에러 출력
                             if (TextUtils.isEmpty(email)) {
                                 textLoginEmail.setError(getString(R.string.error_field_required));
-                            } else {
+                            }
+                            //비지 않았다면 적절치 않은 형식으로 에러 출력
+                            else {
                                 textLoginEmail.setError(getString(R.string.error_invalid_email));
                             }
 
 
                         }
-                        //no Error
+                        //에러 없음. 정상 진행
                         else {
                             textLoginEmail.setError(null);
                             textLoginEmail.setErrorEnabled(false);
@@ -360,31 +426,35 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                         break;
 
-
+                    //비밀번호 입력칸
+                    //패스워드 입력 여부만 판단함. 맞고 / 틀리고는 로그인 시도할 때 판단하게 됨
                     case R.id.loginPassword:
                         textLoginPassword.setErrorEnabled(true);
                         password = mPasswordView.getText().toString();
 
-                        // 패스워드 빈 것만 확인. 형식 확인 필요없다
+                        // 패스워드가 입력되지 않았음을 확인함
                         if (TextUtils.isEmpty(password)) {
                             textLoginPassword.setError(getString(R.string.error_field_required));
 
                         }
-                        //에러가 없다
+                        //에러가 없음
                         else {
                             textLoginPassword.setError(null);
                             textLoginPassword.setErrorEnabled(false);
                         }
-
-
                         break;
                 }
-            } else {
+            }
+
+            //사용자 포커스가 없다가 있었을 때.
+            //특정 칸 입력 후 포커스를 옮겼을 때 에러가 있는 걸 보고,
+            //다시 해당 칸을 재입력할 때 이 케이스가 발생한다.
+            else {
 
 
                 switch (v.getId()) {
 
-                    // 주의 : 생년 월일은 다이얼로그에서 처리하였다. 입력 완료 -> 에러 널로!
+                    //이메일을 수정하려 시도할 때, 붉은 에러메시지를 없애줌
                     case R.id.loginEmail:
 
 
@@ -394,6 +464,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         break;
 
 
+                    //패스워드를 수정하려 시도할 때 에러메시지 없애줌
                     case R.id.loginPassword:
 
 
@@ -415,77 +486,78 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
+
+    /*
+    로그인을 시도하는 메소드.
+     */
     private void attemptLogin() {
         if (mAuthTask != null) {
             return;
         }
 
-        // Reset errors.
+        //에러 메시지 초기화
         mEmailView.setError(null);
         mPasswordView.setError(null);
         textLoginPassword.setError(null);
         textLoginPassword.setError(null);
 
         // Store values at the time of the login attempt.
+        // 사용자가 입력한 정보를 변수화
         email = mEmailView.getText().toString();
         password = mPasswordView.getText().toString();
 
         boolean cancel = false;
-        View focusView = null;
 
-
-        // Check for a valid email address.
 
         // 패스워드 형식 확인하기.
-        if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
-            if (TextUtils.isEmpty(password)) {
-                textLoginPassword.setError(getString(R.string.error_field_required));
-            } else {
-                textLoginPassword.setError(getString(R.string.error_invalid_password));
-            }
+        // 패스워드 입력칸이 빈 것을 확인한다.
+        // 원래는 패스워드 형식을 검사하는 isPasswordValid 조건이 있었지만,
+        // 패스워드가 비었는지 여부만 확인하도록 변경되었다.
+        if (TextUtils.isEmpty(password) ) {
 
-            focusView = textLoginPassword;
+            textLoginPassword.setError(getString(R.string.error_field_required));
+
             cancel = true;
         }
         //이메일 형식 확인하기
-
+        //이메일이 비었는지, 적절한 형식인지 검사(정규식)
         if (TextUtils.isEmpty(email)) {
 
             textLoginEmail.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
             cancel = true;
         } else if (!isEmailValid(email)) {
 
             textLoginEmail.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
             cancel = true;
         }
 
+        //각 예외처리를 통해 cancel bool변수가 true이면, 로그인 처리하지 않고
+        //에러메시지를 확인할 수 있다.
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
 //            focusView.requestFocus();
-        } else {
+        }
+        //cancel 변수가 false 이면, 오류 없이 정상적으로 로그인을 시도한 것이다.
+        //서버에서 로그인한 이메일과 패스워드를 확인하는 스레드(userLoginTask)를 실행한다.
+        else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            mAuthTask = new LoginRetrofitTask(email, password);
+            mAuthTask.execute();
         }
     }
 
+    //이메일 형식에 대한 정규식 검사
     private boolean isEmailValid(String email) {
 
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
-    private boolean isPasswordValid(String password) {
-        //굳이 확인할 필요 없음, 틀린 것만 보면 된다.
-        return true;
-    }
-
     /**
      * Shows the progress UI and hides the login form.
+     * 프로그레스 관련 UI를 세팅한다. 로그인할 때 동그랗게 돌아가는 로딩 모양이 보인다.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
@@ -520,6 +592,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
+    /*
+    자동 로딩 관련 파트. 접어둔다
+     */
+
+    //region 자동 로딩 관련 파트, 사용하지 않으므로 접어둠.(추후 정리할 때 삭제할 것)
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return new CursorLoader(this,
@@ -549,6 +626,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         addEmailsToAutoComplete(emails);
     }
 
+
+    /*
+    자동완성 관련 파트
+    */
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
 
@@ -573,50 +654,189 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         int ADDRESS = 0;
         int IS_PRIMARY = 1;
     }
+    //endregion
 
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+
+
+
+    /*
+     UserLoginTask
+
+     사용자가 형식에 맞는 이메일과 패스워드를 입력할 경우 동작
+     서버를 통해 사용자 정보를 검사하고 로그인처리한다.
+
+     사용자 패스워드는 암호화해서 전송한다.
+      */
+    String json_result = "";
+    public class LoginRetrofitTask extends AsyncTask<Void, String, String> {
 
         private final String mEmail;
         private final String mPassword;
 
-        UserLoginTask(String email, String password) {
+        LoginRetrofitTask(String email, String password) {
             mEmail = email;
             mPassword = password;
         }
 
+        final String TAG = "myTag";
+
+
+        /*
+        doInBackground 에서 레트로핏2와 okHttpClient 를 이용, 서버와 http 통신을 수행한다.
+
+        레트로핏2의 http 통신 과정은 okHttpClient 세팅, 레트로핏 객체 세팅, 레트로핏 call 의 실행으로 이루어진다.
+         */
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected String doInBackground(Void... voids) {
+
+            /*
 
 
-            //DB에서 회원 정보를 확인하고 로그인하라
-//            CheckDB cdb = new CheckDB();
-//            cdb.execute();
+            레트로핏의 okHttpClient 를 세팅한다.
+            해당 클라이언트에는 3가지의 인터셉터가 적용되었다.
 
-            LoginRetrofitTask rTask = new LoginRetrofitTask();
-            rTask.execute();
-            return true;
+            먼저 안드로이드에서 세션-쿠키를 전송하고 받아서 저장하기 위한 두 인터셉터가 있다.
+            서버에 전송하기 위한 쿠키값은 PHPSESSID 를 사용한다. 이것을 서버에 전송해야
+            서버에서 세션에 저장된 데이터를 이용할 수 있다.
+            1. AddCookiesInterceptor : http 통신할 때 클라이언트의 sharedPreference 에 저장된 쿠키를 서버로 전송할 때 사용
+            2. ReceivedCookiesInterceptor : http 통신 이후 서버에서 받은 쿠키를 sharedPreference 에 저장할 때 사용
+
+            3. httpLoggingInterceptor : 안드로이드 로그캣에서 http 통신 로그를 확인할 때 사용한다.
+            로그캣에서 http를 검색하면 http 통신을 확인할 수 있다.(리퀘스트, 리스폰스, 쿠키, 오가는 데이터 등을 확인 가능)
+
+            4. StethoInterceptor : 페이스북에서 제작한 라이브러리다. httpLoggingInterceptor 와 마찬가지로 로그를 확인할 때 사용하는데,
+            http 통신 뿐만 아니라 앱의 sharedPreference 에 어떤 값이 저장된지도 확인 가능하다. 자세한 사항은 Stetho 검색
+             */
+
+            //okhttp client 세팅
+            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(new AddCookiesInterceptor(LoginActivity.this))
+                    .addInterceptor(new ReceivedCookiesInterceptor(LoginActivity.this))
+                    .addInterceptor(httpLoggingInterceptor)
+                    .addNetworkInterceptor(new StethoInterceptor())
+                    .build();
 
 
+            //레트로핏 객체 세팅
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(ApiService.API_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(okHttpClient)
+                    .build();
+
+//            Log.e(TAG, "shared-before call: "+getSharedPreferences(getString(R.string.key_pref_Login) , MODE_PRIVATE ).getAll()  ) ;
+
+            ApiService apiService = retrofit.create(ApiService.class);
+
+            //패스워드를 암호화한다. 이 값을 http 통신에서 전송 후, 서버에서 DB에 저장된 패스워드값과 비교하게 된다.
+            String passwordEnc = LoginActivity.md5(password);
+
+
+            //레트로핏 call 객체를 만든다. 이 call이 execute 되면 http 통신이 이루어진다.
+
+            Call<LoginResult> call = apiService.loginMember(email, passwordEnc);
+
+
+            // http 통신을 수행한다.
+
+            try {
+                SharedPreferenceBase.setContext(LoginActivity.this);
+
+                //loginResult는 http의 reponse 이며, json을 자바 객체로 만들었다.
+                //자세한 사항은 ctrl+B로 클래스를 확인해보라
+                LoginResult loginResult = call.execute().body();
+
+
+
+                //통신 이후로 로그로 shared 에 필요한 변수들이 담겼는지 확인한다.
+                Log.e(TAG, "shared-after call: "+getSharedPreferences(getString(R.string.key_pref_Login) , MODE_PRIVATE ).getAll()  ) ;
+
+
+                Log.e("info", loginResult.toString() );
+
+                //로그인 성공 여부를 가져온다.
+                json_result = loginResult.getLogin_msg();
+
+                LoginInfo login_info = loginResult.getInfo();
+                Log.e("info", login_info.getEmail() );
+
+
+                //쉐어드 프리퍼런스에 로그인 정보를 저장한다. - 이메일, 이름, 생년월일
+                SharedPreferences pref_login = getSharedPreferences(getString(R.string.key_pref_Login), Activity.MODE_PRIVATE);
+                SharedPreferences.Editor editor = pref_login.edit();
+                String cookie_email = login_info.getEmail();
+                String cookie_name = login_info.getName();
+                String cookie_birthday = login_info.getBirthday();
+
+                editor.putString(getString(R.string.cookie_email), cookie_email);
+                editor.putString(getString(R.string.cookie_name), cookie_name);
+                editor.putString(getString(R.string.cookie_birthday), cookie_birthday);
+
+                editor.apply();
+                Log.e(TAG, "shared: "+getSharedPreferences(getString(R.string.key_pref_Login), MODE_PRIVATE ).getAll()  ) ;
+
+
+                //onPost 에 들어갈 결과값
+
+                return json_result;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+
+            Log.e("LogResult", result);
+
+            //로그인 결과가 성공이라면 로그인 성공 메시지를 띄우고,
+            //메인 액티비티로 이동한다.
+            if (result.contains("success")) {
+
+                Toast.makeText(LoginActivity.this, "계정 " + email + " (으)로 로그인하셨습니다.", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+
+                finish();
+            }
+
+
+            // ID/PW가 맞지 않아 로그인에 실패하였다.
+            // 에러 메시지를 띄운다.
+            else {
+
+                Toast toast = Toast.makeText(LoginActivity.this, "등록되지 않은 계정이거나, 아이디 혹은 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT);
+                int offsetX = 0;
+                int offsetY = 0;
+                toast.setGravity(Gravity.CENTER, offsetX, offsetY);
+                toast.show();
+
+            }
+
             mAuthTask = null;
             showProgress(false);
-
         }
+
 
         @Override
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
         }
+
     }
 
+
+
+    //패스워드를 서버에 전송하기 전에 암호화하는 메소드
+    //파라미터로 들어온 문자열을 XXX방식으로 암호화한다. (보안상 주석에서 밝히지 않음)
     public static final String md5(final String s) {
         try {
             // Create MD5 Hash
@@ -642,253 +862,148 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
 
-
-    String json_result = "";
-
-    public class LoginRetrofitTask extends AsyncTask<Void, String, String> {
-
-
-        final String TAG = "myTag";
-
-        @Override
-        protected String doInBackground(Void... voids) {
-
-            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
-            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-
-            OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                    .addInterceptor(new ReceivedCookiesInterceptor(LoginActivity.this))
-                    .addInterceptor(new AddCookiesInterceptor(LoginActivity.this))
-                    .addInterceptor(httpLoggingInterceptor)
-                    .addNetworkInterceptor(new StethoInterceptor())
-                    .build();
-
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(ApiService.API_URL)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .client(okHttpClient)
-                    .build();
-            Log.e(TAG, "shared-before call: "+getSharedPreferences(getString(R.string.key_pref_Login) , MODE_PRIVATE ).getAll()  ) ;
-
-            ApiService apiService = retrofit.create(ApiService.class);
-
-            String passwordEnc = LoginActivity.md5(password);
-
-            Call<LoginResult> call = apiService.loginMember(email, passwordEnc);
-
-            try {
-                SharedPreferenceBase.setContext(LoginActivity.this);
-                LoginResult loginResult = call.execute().body();
-
-                Log.e(TAG, "shared-after call: "+getSharedPreferences(getString(R.string.key_pref_Login) , MODE_PRIVATE ).getAll()  ) ;
-//                String cookie = call.clone().execute().headers().values("Set-Cookie").toString();
-
-                //cookie가 계속해서 바뀐다. 쿠키를 낚아채서 바꾸어주어야 한다.
-
-//                Log.e(TAG, "doInBackground:"+cookie );
-                Log.e("info", loginResult.toString() );
-                json_result = loginResult.getLogin_msg();
-
-                LoginInfo login_info = loginResult.getInfo();
-                Log.e("info", login_info.getEmail() );
-
-
-                SharedPreferences pref_login = getSharedPreferences(getString(R.string.key_pref_Login), Activity.MODE_PRIVATE);
-                SharedPreferences.Editor editor = pref_login.edit();
-                String cookie_email = login_info.getEmail();
-                String cookie_name = login_info.getName();
-                String cookie_birthday = login_info.getBirthday();
-
-                editor.putString(getString(R.string.cookie_email), cookie_email);
-                editor.putString(getString(R.string.cookie_name), cookie_name);
-                editor.putString(getString(R.string.cookie_birthday), cookie_birthday);
-
-                editor.apply();
-                Log.e(TAG, "shared: "+getSharedPreferences(getString(R.string.key_pref_Login), MODE_PRIVATE ).getAll()  ) ;
-                return json_result;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-
-            super.onPostExecute(result);
-
-            Log.e("LogResult", result);
-
-
-            if (result.contains("success")) {
-//                Snackbar.make(findViewById(R.id.email_sign_in_button), "환영합니다. 계정"+email+"으로 가입하셨습니다.", Snackbar.LENGTH_LONG).show();
-
-
-
-                Toast.makeText(LoginActivity.this, "계정 " + email + " (으)로 로그인하셨습니다.", Toast.LENGTH_SHORT).show();
-
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-
-                finish();
-            }
-
-
-            //아이디 중복으로 가입이 실패하였다.
-            //에러메시지를 확인하고, 해당 에러를 텍스트뷰에 세팅한다.
-            else {
-
-                Toast toast = Toast.makeText(LoginActivity.this, "등록되지 않은 계정이거나, 아이디 혹은 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT);
-                int offsetX = 0;
-                int offsetY = 0;
-                toast.setGravity(Gravity.CENTER, offsetX, offsetY);
-                toast.show();
-
-            }
-
-
-        }
-
-    }
-
-
-    public class CheckDB extends AsyncTask<Void, Integer, Boolean> {
-        String json_result = "";
-        String passwordEnc = "";
-
-        @Override
-        protected Boolean doInBackground(Void... unused) {
-
-/* 인풋 파라메터값 생성 */
-
-            passwordEnc = md5(password);
-
-            String param = "u_email=" + email + "&u_pw=" + passwordEnc;
-            Log.e("passEnc", passwordEnc);
-            boolean success = false;
-
-            try {
-/* 서버연결 */
-                URL url = new URL(
-                        "http://115.68.231.13/project/android/login.php");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                conn.setRequestMethod("POST");
-                conn.setDoInput(true);
-                conn.connect();
-
-/* 안드로이드 -> 서버 파라메터값 전달 */
-                OutputStream outs = conn.getOutputStream();
-                outs.write(param.getBytes("UTF-8"));
-                outs.flush();
-                outs.close();
-
-/* 서버 -> 안드로이드 파라메터값 전달 */
-                InputStream is = null;
-                BufferedReader in = null;
-
-
-                is = conn.getInputStream();
-                in = new BufferedReader(new InputStreamReader(is), 8 * 1024);
-                String line = null;
-                StringBuffer buff = new StringBuffer();
-                while ((line = in.readLine()) != null) {
-                    buff.append(line + "\n");
-                }
-                json_result = buff.toString().trim();
-
-                //<editor-fold desc="json 파싱 관련파트.">
-                // json_result는 결과값으로 가져온 json String이다. json오브젝트에 이 스트링을 담는다.
-
-
-                JSONObject jsonRes = null;
-                try {
-                    jsonRes = new JSONObject(json_result);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                // jsonRes오브젝트에서 로그인 메세지와, 로그인 정보가 담긴 쿠키를 추출한다.
-                JSONObject json_cookie = null;
-                String login_msg = null;
-                try {
-                    login_msg = jsonRes.getString("login_msg");
-                    json_cookie = jsonRes.getJSONObject("login_cookie");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                Log.e("parsed DATA", login_msg + json_cookie.toString());
-
-
-                // RECV 데이터에 php에서 뱉은 echo가 들어간다!
-                Log.e("RECV DATA", json_result);
-
-                //json을 성공적으로 서버에서 수신했다. 쿠키를 저장시키자
-                if (json_result.contains("success")) {
-
-                    success = true;
-                    // 추출한 쿠키를 쉐어드에 저장시킨다.
-                    SharedPreferences pref_login = getSharedPreferences(getString(R.string.key_pref_Login), Activity.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = pref_login.edit();
-                    try {
-                        String cookie_email = json_cookie.getString("email");
-                        String cookie_name = json_cookie.getString("name");
-                        String cookie_birthday = json_cookie.getString("birthday");
-
-                        editor.putString(getString(R.string.cookie_email), cookie_email);
-                        editor.putString(getString(R.string.cookie_name), cookie_name);
-                        editor.putString(getString(R.string.cookie_birthday), cookie_birthday);
-
-                        editor.apply();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                //</editor-fold>
-
-                Log.e("success", String.valueOf(success));
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-            return success;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean success) {
-            super.onPostExecute(success);
-
-            if (success) {
-//                Snackbar.make(findViewById(R.id.email_sign_in_button), "환영합니다. 계정"+email+"으로 가입하셨습니다.", Snackbar.LENGTH_LONG).show();
-
-
-                Toast.makeText(LoginActivity.this, "환영합니다. 계정" + email + "으로 로그인하셨습니다.", Toast.LENGTH_SHORT).show();
-
-
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-
-                finish();
-            }
-            //로그인이 실패하였다.
-            //에러메시지를 확인하고, 해당 에러를 텍스트뷰에 세팅한다.
-            else {
-
-                Toast toast = Toast.makeText(LoginActivity.this, "등록되지 않은 계정이거나, 아이디 혹은 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT);
-                int offsetX = 0;
-                int offsetY = 0;
-                toast.setGravity(Gravity.CENTER, offsetX, offsetY);
-                toast.show();
-
-            }
-
-        }
-    }
+    /*
+    httpUrlConnection 으로 서버와 통신하는 스레드다.
+    지금은 레트로핏으로 http 통신을 한다.
+    httpURLConnection 의 사용법을 기억하기 위해 주석처리하고 남겨둔다.
+     */
+
+//    public class CheckDB extends AsyncTask<Void, Integer, Boolean> {
+//        String json_result = "";
+//        String passwordEnc = "";
+//
+//        @Override
+//        protected Boolean doInBackground(Void... unused) {
+//
+///* 인풋 파라메터값 생성 */
+//
+//            passwordEnc = md5(password);
+//
+//            String param = "u_email=" + email + "&u_pw=" + passwordEnc;
+//            Log.e("passEnc", passwordEnc);
+//            boolean success = false;
+//
+//            try {
+///* 서버연결 */
+//                URL url = new URL(
+//                        "http://115.68.231.13/project/android/login.php");
+//                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+//                conn.setRequestMethod("POST");
+//                conn.setDoInput(true);
+//                conn.connect();
+//
+///* 안드로이드 -> 서버 파라메터값 전달 */
+//                OutputStream outs = conn.getOutputStream();
+//                outs.write(param.getBytes("UTF-8"));
+//                outs.flush();
+//                outs.close();
+//
+///* 서버 -> 안드로이드 파라메터값 전달 */
+//                InputStream is = null;
+//                BufferedReader in = null;
+//
+//
+//                is = conn.getInputStream();
+//                in = new BufferedReader(new InputStreamReader(is), 8 * 1024);
+//                String line = null;
+//                StringBuffer buff = new StringBuffer();
+//                while ((line = in.readLine()) != null) {
+//                    buff.append(line + "\n");
+//                }
+//                json_result = buff.toString().trim();
+//
+//                //<editor-fold desc="json 파싱 관련파트.">
+//                // json_result는 결과값으로 가져온 json String이다. json오브젝트에 이 스트링을 담는다.
+//
+//
+//                JSONObject jsonRes = null;
+//                try {
+//                    jsonRes = new JSONObject(json_result);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                // jsonRes오브젝트에서 로그인 메세지와, 로그인 정보가 담긴 쿠키를 추출한다.
+//                JSONObject json_cookie = null;
+//                String login_msg = null;
+//                try {
+//                    login_msg = jsonRes.getString("login_msg");
+//                    json_cookie = jsonRes.getJSONObject("login_cookie");
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                Log.e("parsed DATA", login_msg + json_cookie.toString());
+//
+//
+//                // RECV 데이터에 php에서 뱉은 echo가 들어간다!
+//                Log.e("RECV DATA", json_result);
+//
+//                //json을 성공적으로 서버에서 수신했다. 쿠키를 저장시키자
+//                if (json_result.contains("success")) {
+//
+//                    success = true;
+//                    // 추출한 쿠키를 쉐어드에 저장시킨다.
+//                    SharedPreferences pref_login = getSharedPreferences(getString(R.string.key_pref_Login), Activity.MODE_PRIVATE);
+//                    SharedPreferences.Editor editor = pref_login.edit();
+//                    try {
+//                        String cookie_email = json_cookie.getString("email");
+//                        String cookie_name = json_cookie.getString("name");
+//                        String cookie_birthday = json_cookie.getString("birthday");
+//
+//                        editor.putString(getString(R.string.cookie_email), cookie_email);
+//                        editor.putString(getString(R.string.cookie_name), cookie_name);
+//                        editor.putString(getString(R.string.cookie_birthday), cookie_birthday);
+//
+//                        editor.apply();
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                //</editor-fold>
+//
+//                Log.e("success", String.valueOf(success));
+//            } catch (MalformedURLException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//
+//
+//            return success;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Boolean success) {
+//            super.onPostExecute(success);
+//
+//            if (success) {
+////                Snackbar.make(findViewById(R.id.email_sign_in_button), "환영합니다. 계정"+email+"으로 가입하셨습니다.", Snackbar.LENGTH_LONG).show();
+//
+//
+//                Toast.makeText(LoginActivity.this, "환영합니다. 계정" + email + "으로 로그인하셨습니다.", Toast.LENGTH_SHORT).show();
+//
+//
+//                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+//                startActivity(intent);
+//
+//                finish();
+//            }
+//            //로그인이 실패하였다.
+//            //에러메시지를 확인하고, 해당 에러를 텍스트뷰에 세팅한다.
+//            else {
+//
+//                Toast toast = Toast.makeText(LoginActivity.this, "등록되지 않은 계정이거나, 아이디 혹은 비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT);
+//                int offsetX = 0;
+//                int offsetY = 0;
+//                toast.setGravity(Gravity.CENTER, offsetX, offsetY);
+//                toast.show();
+//
+//            }
+//
+//        }
+//    }
 }
 
