@@ -117,7 +117,6 @@ public class CommentFragment extends Fragment {
             @Override
             public void onRefresh() {
 
-
                 RefreshCommentTaskInFragment refreshCommentTaskInFragment = new RefreshCommentTaskInFragment();
                 refreshCommentTaskInFragment.execute();
             }

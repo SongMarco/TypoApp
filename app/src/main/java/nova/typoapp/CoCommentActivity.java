@@ -5,7 +5,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-public class CoCommentActivity extends AppCompatActivity {
+import nova.typoapp.cocoment.CoComentContent;
+
+public class CoCommentActivity extends AppCompatActivity implements CoComentFragment.OnListFragmentInteractionListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,5 +29,10 @@ public class CoCommentActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onListFragmentInteraction(CoComentContent.CoComentItem item) {
+
     }
 }
