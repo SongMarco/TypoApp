@@ -2,12 +2,12 @@
 <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/list"
+    android:id="@+id/recyclerViewSubComment"
     android:name="nova.typoapp.CoComentFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context="nova.typoapp.CoComentFragment"
-    tools:listitem="@layout/fragment_cocoment" />
+    tools:context="nova.typoapp.SubCommentFragment"
+    tools:listitem="@layout/fragment_subcoment_item" />

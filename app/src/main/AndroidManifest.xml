@@ -190,7 +190,7 @@
         <activity android:name=".permission.PermissionsActivity" />
 
         <activity
-            android:name=".CoCommentActivity"
+            android:name=".SubCommentActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:label="답글"/>
     </application>

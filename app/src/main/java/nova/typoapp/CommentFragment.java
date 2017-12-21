@@ -1,6 +1,5 @@
 package nova.typoapp;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -173,119 +172,6 @@ public class CommentFragment extends Fragment {
 
     }
 
-    public class CallCommentTask extends AsyncTask<Void, String, Void> {
-
-        Context context = getActivity();
-        ProgressDialog asyncDialog = new ProgressDialog(
-                context);
-
-
-        //온프리에서 다이얼로그를 띄운다.
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            //시작할 때 댓글 리스트를 클리어하자.
-            CommentContent.clearList();
-
-            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            asyncDialog.setMessage("덧글을 불러오는 중입니다...");
-
-            // show dialog
-            asyncDialog.show();
-
-
-        }
-
-        //두인백에서 http통신을 수행한다.
-
-        String json_result = "";
-
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-
-
-            //레트로핏 기초 컴포넌트 만드는 과정. 자주 복붙할 것.
-            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
-            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-
-            OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                    .addInterceptor(new ReceivedCookiesInterceptor(context))
-                    .addInterceptor(new AddCookiesInterceptor(context))
-                    .addInterceptor(httpLoggingInterceptor)
-                    .build();
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(API_URL)
-                    .client(okHttpClient)
-                    .build();
-
-            ApiService apiService = retrofit.create(ApiService.class);
-//            Log.e("myimg", "doInBackground: " + uploadImagePath);
-
-            //레트로핏 콜 객체를 만든다.
-            //feedID를 코멘트액티비티에서 static 변수로 가져온다.
-            Call<ResponseBody> retrofitCall;
-            retrofitCall = apiService.getCommentList(feedID);
-
-            //콜 객체를 실행하여, 레트로핏 통신을 실행
-            Log.e(TAG, "textCommentFeed: " + feedID);
-            try {
-
-                json_result = retrofitCall.execute().body().string();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            JSONArray jsonRes = null;
-            try {
-                jsonRes = new JSONArray(json_result);
-
-                for (int i = 0; i < jsonRes.length(); i++) {
-                    JSONObject jObject = jsonRes.getJSONObject(i);  // JSONObject 추출
-
-                    //jObject에 담긴 아이템 정보들을 빼낸다
-                    int commentID = jObject.getInt("commentID");
-                    int feedID = jObject.getInt("feedID");
-
-                    String writer = jObject.getString("writer");
-
-                    String content = jObject.getString("text_content");
-
-                    String writtenDate = jObject.getString("written_time");
-
-                    int depth = jObject.getInt("depth");
-
-                    String profileUrl = "";
-                    if (!jObject.getString("writer_profile_url").equals("")) {
-                        profileUrl = jObject.getString("writer_profile_url");
-                    }
-
-
-                    CommentItem productComment = new CommentItem(commentID, feedID, depth, writer, content, writtenDate, profileUrl);
-                    CommentContent.addItem(productComment);
-
-                }
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-            asyncDialog.dismiss();
-        }
-
-    }
-
     public class RefreshCommentTaskInFragment extends AsyncTask<Void, String, Void> {
 
         Context context = getContext();
@@ -370,13 +256,15 @@ public class CommentFragment extends Fragment {
 
                     int depth = jObject.getInt("depth");
 
+                    int subCommentNum = jObject.getInt("comment_subcomment_num");
+
                     String profileUrl = "";
                     if (!jObject.getString("writer_profile_url").equals("")) {
                         profileUrl = jObject.getString("writer_profile_url");
                     }
 
 
-                    CommentContent.CommentItem productComment = new CommentContent.CommentItem(commentID, feedID, depth, writer, content, writtenDate, profileUrl);
+                    CommentContent.CommentItem productComment = new CommentContent.CommentItem(commentID, feedID, depth, subCommentNum,  writer, content, writtenDate, profileUrl);
                     CommentContent.addItem(productComment);
 
 

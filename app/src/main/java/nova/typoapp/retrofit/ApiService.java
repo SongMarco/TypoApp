@@ -49,6 +49,12 @@ public interface ApiService {
     @POST("getCommentList.php")
     Call<ResponseBody> getCommentList(@Field("feedID") int feedID);
 
+    //대댓글 리스트를 불러오는 메소드
+    @FormUrlEncoded
+    @POST("getSubCommentList.php")
+    Call<ResponseBody> getSubCommentList(@Field("commentID") int commentID);
+
+
 
     //포스트 방식으로 글쓰기 해주기. formurlEncoded 와 필드 골뱅이를 주목할 것.
     @FormUrlEncoded
@@ -70,6 +76,10 @@ public interface ApiService {
     @POST("writeComment.php")
     Call<ResponseBody> writeComment( @Field("feedID") int feedID, @Field("content") String content);
 
+    //포스트 방식으로 대댓글 작성
+    @FormUrlEncoded
+    @POST("writeSubComment.php")
+    Call<ResponseBody> writeSubComment ( @Field("commentID") int commentID, @Field("content") String content);
 
     //회원가입
     @FormUrlEncoded
@@ -82,7 +92,7 @@ public interface ApiService {
     Call<LoginResult> loginMember(@Field("u_email") String email, @Field("u_pw") String pw);
 
     //회원 정보 확인(세션 정보 가져오기)
-    //아무것도 날리지 않는다. 인터셉터 객체가 콜 날릴 때 세션ID를 추가해준다.
+    //메소드상으로는 아무것도 넣지 않는다. 인터셉터 객체가 콜 날릴 때 세션ID를 추가해준다.
     @POST("looksess.php")
     Call<LoginInfo> lookSession();
 

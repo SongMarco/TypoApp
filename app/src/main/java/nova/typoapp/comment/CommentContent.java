@@ -73,12 +73,19 @@ public class CommentContent {
         public String imgProfileUrl;
 
         public String commentWriter;
+
+        public String commentWriterEmail;
+
+
         public String commentDate;
         public String commentContent;
 
         public int commentID;
         public int feedID;
+
         int depth;
+
+        int subCommentNum;
 
 
         public CommentItem(String id, String content, String details) {
@@ -111,13 +118,37 @@ public class CommentContent {
 
         }
 
-        public CommentItem (int commentID,  String commentWriter, String commentContent, String commentDate, int depth, String profileUrl){
-            this.feedID = feedID;
+        public CommentItem(int commentID, int feedID, int depth, int subCommentNum , String commentWriter, String commentContent, String commentDate, String imgProfileUrl){
+
             this.commentID = commentID;
+            this.feedID = feedID;
+
+            this.depth = depth;
+
+            this.subCommentNum = subCommentNum;
+
             this.commentWriter = commentWriter;
             this. commentContent = commentContent;
             this. commentDate =commentDate;
+            this.imgProfileUrl = imgProfileUrl;
 
+        }
+
+        public CommentItem(int commentID, int feedID, int depth, int subCommentNum , String commentWriter, String commentWriterEmail, String commentContent, String commentDate, String imgProfileUrl){
+
+            this.commentID = commentID;
+            this.feedID = feedID;
+
+            this.depth = depth;
+
+            this.subCommentNum = subCommentNum;
+
+            this.commentWriter = commentWriter;
+            this.commentWriterEmail = commentWriterEmail;
+
+            this. commentContent = commentContent;
+            this. commentDate =commentDate;
+            this.imgProfileUrl = imgProfileUrl;
 
         }
 

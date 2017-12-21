@@ -198,11 +198,21 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 Glide.with(itemHolder.mView).load(R.drawable.com_facebook_profile_picture_blank_square).into(itemHolder.mProfileView);
             }
 
+
+            /*
+            더보기 버튼에 리스너를 세팅한다.
+
+            사용자 계정이 작성자 계정(이메일)과 같으면
+            수정 / 삭제가 포함된 다이얼로그를 띄우고,
+            다르면 신고만 포함된 다이얼로그를 띄운다.
+             */
             itemHolder.mMoreView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     final Context context = v.getContext();
 
+
+                    // 더보기 버튼을 누른 경우
                     if (v.getId() == itemHolder.mMoreView.getId()) {
 
                         AlertDialog.Builder builderItem = new AlertDialog.Builder(context);
@@ -270,6 +280,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                                     .show();
 
                         }
+
                         //로그인한 사람과 게시물 작성자 다름 -> 신고 버튼만 세팅됨
                         else{
                             builderItem.setItems(R.array.edit_another, new DialogInterface.OnClickListener() {
@@ -365,8 +376,8 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
         @BindView(R.id.imageViewMore)
         ImageView mMoreView;
 
-        @BindView(R.id.layoutComment)
-        RelativeLayout mLayoutComment;
+        @BindView(R.id.layoutWriteComment)
+        RelativeLayout mLayoutWriteComment;
 
         @BindView(R.id.textViewCommentNum)
         TextView mCommentNum;
@@ -385,9 +396,9 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             mProfileView.setBackground(new ShapeDrawable(new OvalShape()));
             mProfileView.setClipToOutline(true);
 
-            mMoreView.setOnClickListener(this);
+//            mMoreView.setOnClickListener(this);
             mView.setOnClickListener(this);
-            mLayoutComment.setOnClickListener(this);
+            mLayoutWriteComment.setOnClickListener(this);
         }
 
         @Override

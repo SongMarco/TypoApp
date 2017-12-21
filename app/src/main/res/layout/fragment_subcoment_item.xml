@@ -3,29 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-
-    android:layout_margin="@dimen/margin_border">
-
-
+    android:orientation="horizontal">
 
     <ImageView
-        android:id="@+id/commentProfileImage"
+        android:id="@+id/subCommentProfileImage"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_margin="@dimen/margin_border"
         android:layout_gravity="top"
+        android:layout_margin="@dimen/margin_border"
         android:scaleType="centerCrop"
+
         app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
 
     <LinearLayout
-        android:id="@+id/layoutCommentBody"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:background="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
         android:orientation="vertical">
 
         <LinearLayout
@@ -39,7 +32,7 @@
             android:padding="@dimen/margin_balloon">
 
             <TextView
-                android:id="@+id/commentWriter"
+                android:id="@+id/subCommentWriter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -48,13 +41,13 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/commentContent"
+                android:id="@+id/subCommentContent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
 
 
-                android:text="텍스트내용텍스트내용"
+                android:text="텍스트내용텍스트내용텍스트내용텍스트내용텍스트내용텍스트내용텍스트내용텍스트내용"
                 android:textSize="15sp" />
         </LinearLayout>
 
@@ -66,25 +59,20 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/commentDate"
+                android:id="@+id/subCommentDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="2017년 2월 5일" />
 
             <TextView
-                android:id="@+id/textView4"
+                android:id="@+id/subCommentLike"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="좋아요" />
+                android:text="좋아요"
+                android:textAlignment="viewStart" />
 
-            <TextView
-                android:id="@+id/textViewCoComment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="답글 달기" />
         </LinearLayout>
 
         <LinearLayout
@@ -92,18 +80,9 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_border">
 
-            <TextView
-                android:id="@+id/textViewSubCommentNum"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="이전 답글 n개 보기"
-                android:textColor="@color/black" />
-
 
         </LinearLayout>
 
     </LinearLayout>
 
 </LinearLayout>
-
-

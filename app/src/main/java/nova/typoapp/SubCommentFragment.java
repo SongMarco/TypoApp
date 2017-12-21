@@ -3,16 +3,17 @@ package nova.typoapp;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import nova.typoapp.cocoment.CoComentContent;
-import nova.typoapp.cocoment.CoComentContent.CoComentItem;
-import nova.typoapp.cocoment.MyCoComentRecyclerViewAdapter;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import nova.typoapp.subcoment.MySubCommentRecyclerViewAdapter;
+import nova.typoapp.subcoment.SubCommentContent;
+import nova.typoapp.subcoment.SubCommentContent.SubCommentItem;
 
 /**
  * A fragment representing a list of Items.
@@ -20,7 +21,7 @@ import nova.typoapp.cocoment.MyCoComentRecyclerViewAdapter;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class CoComentFragment extends Fragment {
+public class SubCommentFragment extends Fragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -32,17 +33,30 @@ public class CoComentFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public CoComentFragment() {
+    public SubCommentFragment() {
     }
+
+
+
+
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static CoComentFragment newInstance(int columnCount) {
-        CoComentFragment fragment = new CoComentFragment();
+    public static SubCommentFragment newInstance(int columnCount) {
+        SubCommentFragment fragment = new SubCommentFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    // SubCommentActivity에서 콜하는 리사이클러뷰 업데이트. 이를 통해 대댓글 리스트가 갱신된다.
+    public void updateRecyclerView() {
+
+        recyclerViewSubComment.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerViewSubComment.setAdapter(subCommentRecyclerViewAdapter);
+        subCommentRecyclerViewAdapter.notifyDataSetChanged();
+
     }
 
     @Override
@@ -54,21 +68,26 @@ public class CoComentFragment extends Fragment {
         }
     }
 
+    @BindView(R.id.recyclerViewSubComment)
+    RecyclerView recyclerViewSubComment;
+
+    MySubCommentRecyclerViewAdapter subCommentRecyclerViewAdapter = new MySubCommentRecyclerViewAdapter(SubCommentContent.ITEMS, mListener);
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_cocoment_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_subcoment_list, container, false);
+
+        ButterKnife.bind(this, view);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
+
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            recyclerView.setAdapter(new MyCoComentRecyclerViewAdapter(CoComentContent.ITEMS, mListener));
+
+            recyclerView.setAdapter(subCommentRecyclerViewAdapter);
         }
         return view;
     }
@@ -103,6 +122,6 @@ public class CoComentFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(CoComentItem item);
+        void onListFragmentInteraction(SubCommentItem item);
     }
 }

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="nova.typoapp.CoCommentActivity">
+    tools:context="nova.typoapp.SubCommentActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -25,8 +25,8 @@
 
 
     <fragment
-        android:id="@+id/fragment"
-        android:name="nova.typoapp.CoComentFragment"
+        android:id="@+id/fragmentSubComment"
+        android:name="nova.typoapp.SubCommentFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="30" />
@@ -48,7 +48,7 @@
         android:orientation="horizontal">
 
         <EditText
-            android:id="@+id/editTextComment"
+            android:id="@+id/editTextSubComment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -59,7 +59,7 @@
             android:inputType="textPersonName" />
 
         <Button
-            android:id="@+id/buttonSendComment"
+            android:id="@+id/buttonSendSubComment"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="center"

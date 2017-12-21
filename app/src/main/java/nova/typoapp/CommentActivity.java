@@ -384,11 +384,17 @@ implements CommentFragment.OnListFragmentInteractionListener {
 
                     String writer = jObject.getString("writer");
 
+                    String writerEmail =  jObject.getString("writer_email");
+
+
+
                     String content = jObject.getString("text_content");
 
                     String writtenDate = jObject.getString("written_time");
 
                     int depth = jObject.getInt("depth");
+
+                    int subCommentNum = jObject.getInt("comment_subcomment_num");
 
                     String profileUrl = "";
                     if (!jObject.getString("writer_profile_url").equals("")) {
@@ -397,10 +403,11 @@ implements CommentFragment.OnListFragmentInteractionListener {
 
 
                     //아이템 객체에 데이터를 다 담은 후, 아이템을 리스트에 추가한다.
-                    CommentContent.CommentItem productComment = new CommentContent.CommentItem(commentID, feedID, depth, writer, content, writtenDate, profileUrl);
+                    //주의사항 : 리프레시는 글을 작성할 때에는 액티비티, 당겨서 새로고침을 할 때에는 프래그먼트에서 콜 되는 것에 유의하라.
+                    //아래 생성자를 고칠 경우, 프래그먼트의 생성자 또한 고쳐야 한다.
+                    // 더 좋은 방법은 새로고침 태스크를 스태틱하게 만들어서 어디서든 콜 할 수 있게 만드는 것인데, 아직 적용하지 못했다.
+                    CommentContent.CommentItem productComment = new CommentContent.CommentItem(commentID, feedID, depth, subCommentNum, writer, writerEmail , content, writtenDate, profileUrl);
                     CommentContent.addItem(productComment);
-
-
 
                 }
 
@@ -444,5 +451,13 @@ implements CommentFragment.OnListFragmentInteractionListener {
     @Override
     public void onListFragmentInteraction(CommentContent.CommentItem item) {
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        RefreshCommentTask refreshCommentTask = new RefreshCommentTask();
+        refreshCommentTask.execute();
     }
 }
