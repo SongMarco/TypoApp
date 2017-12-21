@@ -62,7 +62,7 @@ public class MyCoComentRecyclerViewAdapter extends RecyclerView.Adapter<MyCoCome
         public final TextView mIdView;
         public final TextView mContentView;
         public CoComentItem mItem;
-
+//
         public ViewHolder(View view) {
             super(view);
             mView = view;
