@@ -1,7 +1,6 @@
 package nova.typoapp;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -76,6 +75,12 @@ implements CommentFragment.OnListFragmentInteractionListener {
 
     public static String TAG = "commentTag";
 
+    public void updateCommentList(){
+
+        RefreshCommentTask refreshCommentTask = new RefreshCommentTask();
+        refreshCommentTask.execute();
+
+    }
 
     /*
     댓글 화면 초기화
@@ -119,90 +124,6 @@ implements CommentFragment.OnListFragmentInteractionListener {
 
 
     }
-
-    //댓글을 불러오는 태스크
-    // 댓글 작성에 필요한 태스크
-
-    public class CallCommentTask extends AsyncTask<Void, String, Void> {
-
-        ProgressDialog asyncDialog = new ProgressDialog(
-                CommentActivity.this);
-
-
-        //온프리에서 다이얼로그를 띄운다.
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            asyncDialog.setMessage("댓글을 불러오는 중입니다...");
-
-            // show dialog
-            asyncDialog.show();
-        }
-
-        //두인백에서 http통신을 수행한다.
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-
-            //레트로핏 기초 컴포넌트 만드는 과정. 자주 복붙할 것.
-            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
-            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-
-            OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                    .addInterceptor(new ReceivedCookiesInterceptor(CommentActivity.this))
-                    .addInterceptor(new AddCookiesInterceptor(CommentActivity.this))
-                    .addInterceptor(httpLoggingInterceptor)
-                    .build();
-
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(API_URL)
-                    .client(okHttpClient)
-                    .build();
-
-            ApiService apiService = retrofit.create(ApiService.class);
-//            Log.e("myimg", "doInBackground: " + uploadImagePath);
-
-
-
-            //레트로핏 콜을 만든다.
-            Call<ResponseBody> retrofitCall;
-
-
-            retrofitCall = apiService.writeComment(feedID ,textCommentContent);
-
-            Log.e(TAG, "textCommentFeed: "+feedID);
-            try {
-
-                retrofitCall.execute();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-
-            return null;
-        }
-
-
-        //작성 완료. 다이얼로그 닫아주고 댓글창 리프레시하고 종료
-        @Override
-
-
-        protected void onPostExecute(Void voids) {
-
-            super.onPostExecute(voids);
-
-
-
-            //리프레시 태스크 돌릴 것
-            asyncDialog.dismiss();
-        }
-    }
-
 
 
     // 댓글 작성에 필요한 태스크
@@ -299,7 +220,7 @@ implements CommentFragment.OnListFragmentInteractionListener {
     public class RefreshCommentTask extends AsyncTask<Void, String, Void> {
 
 
-        Context context = CommentActivity.this;
+//        Context context = CommentActivity.this;
 
 
 
@@ -434,13 +355,13 @@ implements CommentFragment.OnListFragmentInteractionListener {
             editTextComment.setText("");
 
 
-            // 댓글 프래그먼트를 가져와서, updateRecyclerView 메소드를 콜하여 리사이클러뷰를 업데이트 한다.
-            CommentFragment commentFragment = (CommentFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentCommentList);
+            // 댓글 프래그먼트를 가져와서, updateRecyclerViewComment 메소드를 콜하여 리사이클러뷰를 업데이트 한다.
 
+            CommentFragment commentFragment = (CommentFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentCommentList);
             if(commentFragment != null){
 
 //                Toast.makeText(context, "update called", Toast.LENGTH_SHORT).show();
-                commentFragment.updateRecyclerView();
+                commentFragment.updateRecyclerViewComment();
 
             }
 

@@ -73,7 +73,7 @@ public class CommentFragment extends Fragment {
     }
 
     //리사이클러뷰를 업데이트하라.
-    public void updateRecyclerView() {
+    public void updateRecyclerViewComment() {
 
         recyclerViewList.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewList.setAdapter(commentRecyclerViewAdapter);
@@ -250,6 +250,8 @@ public class CommentFragment extends Fragment {
 
                     String writer = jObject.getString("writer");
 
+                    String writerEmail =  jObject.getString("writer_email");
+
                     String content = jObject.getString("text_content");
 
                     String writtenDate = jObject.getString("written_time");
@@ -264,7 +266,7 @@ public class CommentFragment extends Fragment {
                     }
 
 
-                    CommentContent.CommentItem productComment = new CommentContent.CommentItem(commentID, feedID, depth, subCommentNum,  writer, content, writtenDate, profileUrl);
+                    CommentContent.CommentItem productComment = new CommentContent.CommentItem(commentID, feedID, depth, subCommentNum, writer, writerEmail , content, writtenDate, profileUrl);
                     CommentContent.addItem(productComment);
 
 
@@ -285,7 +287,7 @@ public class CommentFragment extends Fragment {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            updateRecyclerView();
+            updateRecyclerViewComment();
 
             mSwipeViewComment.setRefreshing(false);
 

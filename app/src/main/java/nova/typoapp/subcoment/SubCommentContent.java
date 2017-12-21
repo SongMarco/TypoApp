@@ -58,6 +58,10 @@ public class SubCommentContent {
         public String subCommentimgProfileUrl;
 
         public String subCommentWriter;
+
+        public String subCommentWriterEmail;
+
+
         public String subCommentDate;
         public String subCommentContent;
 
@@ -84,6 +88,19 @@ public class SubCommentContent {
         }
 
 
+        public SubCommentItem(int commentID, int subCommentID, int depth, String commentWriter, String subCommentWriterEmail,  String commentContent, String commentDate , String imgProfileUrl) {
+            this.commentID = commentID;
+            this.subCommentID = subCommentID;
+            this.depth = depth;
+
+            this.subCommentWriter = commentWriter;
+            this.subCommentWriterEmail = subCommentWriterEmail;
+
+            this. subCommentContent =commentContent;
+            this. subCommentDate = commentDate;
+
+            this.subCommentimgProfileUrl = imgProfileUrl;
+        }
 
 
 

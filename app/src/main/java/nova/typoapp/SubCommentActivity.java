@@ -49,6 +49,13 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
     int commentID;
 
 
+    public void updateSubCommentList(){
+
+        RefreshSubCommentTask refreshSubCommentTask = new RefreshSubCommentTask();
+        refreshSubCommentTask.execute();
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -264,9 +271,14 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 
                     String writer = jObject.getString("writer");
 
+                    String writerEmail = jObject.getString("writer_email");
+
+
                     String content = jObject.getString("text_content");
 
                     String writtenDate = jObject.getString("written_time");
+
+
 
                     int depth = jObject.getInt("depth");
 
@@ -279,7 +291,7 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 
 
                     //아이템 객체에 데이터를 다 담은 후, 아이템을 리스트에 추가한다.
-                    SubCommentContent.SubCommentItem productSubComment = new SubCommentContent.SubCommentItem(commentID, subCommentID, depth,  writer, content, writtenDate, profileUrl);
+                    SubCommentContent.SubCommentItem productSubComment = new SubCommentContent.SubCommentItem(commentID, subCommentID, depth,  writer, writerEmail,content, writtenDate, profileUrl);
                     SubCommentContent.addItem(productSubComment);
 
                 }
@@ -307,7 +319,7 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
             editTextSubComment.setText("");
 
 
-            // 댓글 프래그먼트를 가져와서, updateRecyclerView 메소드를 콜하여 리사이클러뷰를 업데이트 한다.
+            // 댓글 프래그먼트를 가져와서, updateRecyclerViewComment 메소드를 콜하여 리사이클러뷰를 업데이트 한다.
             SubCommentFragment subCommentFragment = (SubCommentFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentSubComment);
 
             if(subCommentFragment != null){
@@ -333,6 +345,16 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+
+        RefreshSubCommentTask refreshSubCommentTask = new RefreshSubCommentTask();
+        refreshSubCommentTask.execute();
+
+
     }
 
     @Override

@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -153,7 +154,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             final VHItem itemHolder = (VHItem) holder;
 
             final FeedItem item = getItem(position);
-            Context context = itemHolder.mView.getContext();
+            final Context context = itemHolder.mView.getContext();
 
             itemHolder.mWriterView.setText("" + item.writer);
             itemHolder.mIdView.setText("단어 : " + item.title);
@@ -197,6 +198,41 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
                 Glide.with(itemHolder.mView).load(R.drawable.com_facebook_profile_picture_blank_square).into(itemHolder.mProfileView);
             }
+
+
+            /*
+            좋아요 버튼에 리스너를 세팅
+             */
+
+            itemHolder.buttonLikeFeed.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+
+                    Toast.makeText(v.getContext(), "좋아요를 눌렀습니다" + item.getFeedID(), Toast.LENGTH_SHORT).show();
+
+//                    Log.e("omg" ,"onClick: "+ Arrays.toString(itemHolder.buttonLikeFeed.getCompoundDrawables()));
+
+
+                    //좋아요가 되어있다.
+                    /*
+                    의문사항 - 맨 처음엔 ischecked 가 false로 들어가야 하는데. true로 들어가네?
+                     */
+                    if (itemHolder.buttonLikeFeed.isChecked() == true) {
+
+//                        textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.icon, 0, 0, 0);
+
+                        itemHolder.buttonLikeFeed.setCompoundDrawablesWithIntrinsicBounds(R.drawable.likegrey , 0,0,0 );
+                    }
+                    //좋아요가 안 되어있다.
+                    else {
+                        itemHolder.buttonLikeFeed.setCompoundDrawablesWithIntrinsicBounds(R.drawable.likewhite , 0,0,0 );
+
+                    } // end if
+                }
+
+                });
+
 
 
             /*
@@ -251,8 +287,8 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                                                         public void onClick(DialogInterface dialog, int which) {
 
 
-                                                            DeleteTask deleteTask = new DeleteTask(context);
-                                                            deleteTask.execute(item.getFeedID());
+                                                            DeleteFeedTask deleteFeedTask = new DeleteFeedTask(context);
+                                                            deleteFeedTask.execute(item.getFeedID());
 
 
                                                         }
@@ -382,6 +418,8 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
         @BindView(R.id.textViewCommentNum)
         TextView mCommentNum;
 
+        @BindView(R.id.buttonLikeFeed)
+        ToggleButton buttonLikeFeed;
 
         public FeedItem mItem;
 
@@ -399,6 +437,8 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 //            mMoreView.setOnClickListener(this);
             mView.setOnClickListener(this);
             mLayoutWriteComment.setOnClickListener(this);
+
+            buttonLikeFeed.setOnClickListener(this);
         }
 
         @Override
@@ -411,7 +451,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             final Context context = v.getContext();
 
             // 더보기 버튼 이외의 클릭에 대해서는 댓글달기로 이동한다.
-            if(v.getId() != mMoreView.getId()){
+            if(v.getId() != mMoreView.getId() && v.getId() != buttonLikeFeed.getId() ){
                 FeedItem item = ITEMS.get(getAdapterPosition() - 1);
 
                 Intent intent = new Intent(v.getContext(), CommentActivity.class);
@@ -428,13 +468,13 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
     String json_result = "";
 
-    public class DeleteTask extends AsyncTask<Integer, String, String> {
+    public class DeleteFeedTask extends AsyncTask<Integer, String, String> {
 
         private Context mContext;
 
         // context를 가져오는 생성자. 이를 통해 메인 액티비티의 함수에 접근할 수 있다.
 
-        public DeleteTask(Context context) {
+        public DeleteFeedTask(Context context) {
             mContext = context;
         }
 
@@ -469,6 +509,8 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
             NewsFeedFragment.isItemDeleted = true;
             //삭제가 완료되었다. 여기서 새로고침을 진행하자
+            //메인액티비티는 뷰페이저로 구성되어 있으므로, 페이저 어댑터를 불러와서 notify 시킨다.
+            // 대댓글과 댓글은 다른 방식으로 새로고침이 구현되어 있다.
             MainActivity activity = (MainActivity) mContext;
             activity.getPagerAdapter().notifyDataSetChanged();
 

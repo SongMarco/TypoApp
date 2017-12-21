@@ -311,7 +311,7 @@ public class NewsFeedFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-//        updateRecyclerView();
+//        updateRecyclerViewComment();
 
         // restore RecyclerView state
 //        if (mBundleRecyclerViewState != null) {

@@ -174,14 +174,15 @@
                 android:focusable="true"
                 android:gravity="center">
 
-                <TextView
-                    android:id="@android:id/button1"
+                <ToggleButton
+                    android:id="@+id/buttonLikeFeed"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
                     android:background="@android:color/white"
-                    android:drawableLeft="@drawable/likewhite"
+                    android:drawableStart="@drawable/likewhite"
+
 
 
                     android:drawablePadding="6dp"
@@ -189,6 +190,8 @@
                     android:duplicateParentState="true"
                     android:gravity="center"
                     android:text="좋아요"
+                    android:textOff="좋아요"
+                    android:textOn="좋아요"
                     android:textSize="15sp" />
 
             </RelativeLayout>

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,14 +21,23 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.io.IOException;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import nova.typoapp.CommentActivity;
 import nova.typoapp.CommentFragment.OnListFragmentInteractionListener;
+import nova.typoapp.EditCommentActivity;
 import nova.typoapp.R;
 import nova.typoapp.SubCommentActivity;
 import nova.typoapp.comment.CommentContent.CommentItem;
+import nova.typoapp.retrofit.ApiService;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Retrofit;
+
+import static nova.typoapp.retrofit.ApiService.API_URL;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link CommentItem} and makes a call to the
@@ -127,14 +137,14 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
                                 switch (which) {
                                     case 0:
 
-//                                        Intent intent = new Intent(context, WriteActivity.class);
-////                                        intent.putExtra("imgUrl", item.getImgUrl());
-////                                        intent.putExtra("title", item.getTitle());
-////                                        intent.putExtra("content", item.getContent());
-////                                        intent.putExtra("feedID", item.getFeedID());
-//                                        context.startActivity(intent);
+                                        Intent intent = new Intent(context, EditCommentActivity.class);
 
-                                        Toast.makeText(context, "수정 클릭 = "+item.commentID, Toast.LENGTH_SHORT ).show();
+                                        intent.putExtra("content", item.commentContent);
+                                        intent.putExtra("commentID", item.commentID);
+                                        context.startActivity(intent);
+
+//                                      Toast.makeText(context, "수정 클릭 = "+item.commentID, Toast.LENGTH_SHORT ).show();
+
                                         break;
                                     case 1:
 
@@ -145,9 +155,9 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
                                                     @Override
                                                     public void onClick(DialogInterface dialog, int which) {
 
-//                                                        DeleteTask deleteTask = new DeleteTask(context);
-//                                                        deleteTask.execute(item.getFeedID());
-                                                        Toast.makeText(context, "삭제 클릭 = "+item.commentID, Toast.LENGTH_SHORT ).show();
+                                                        DeleteCommentTask deleteCommentTask = new DeleteCommentTask(context);
+                                                        deleteCommentTask.execute(item.commentID);
+//                                                        Toast.makeText(context, "삭제 클릭 = "+item.commentID, Toast.LENGTH_SHORT ).show();
 
                                                     }
                                                 })
@@ -281,5 +291,79 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
 //        public String toString() {
 //            return super.toString() + " '" + mContentView.getText() + "'";
 //        }
+    }
+
+    String json_result = "";
+
+    public class DeleteCommentTask extends AsyncTask<Integer, String, String> {
+
+        private Context mContext;
+
+        // context를 가져오는 생성자. 이를 통해 메인 액티비티의 함수에 접근할 수 있다.
+
+        public DeleteCommentTask(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        protected String doInBackground(Integer... integers) {
+
+            //region//글 삭제하기 - DB상에서 뉴스피드 글을 삭제한다.
+
+            Retrofit retrofit = new Retrofit.Builder().baseUrl(API_URL).build();
+            ApiService apiService = retrofit.create(ApiService.class);
+
+            Call<ResponseBody> comment = apiService.deleteComment(integers[0]);
+
+
+            try {
+
+                json_result = comment.execute().body().string();
+                return json_result;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            return null;
+        }
+
+        @Override
+
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+
+            //
+
+            /*
+            서버에서 댓글 삭제가 완료되었다. 댓글 리스트의 새로고침을 진행하자
+
+            CommentActivity 를 컨텍스트에서 가져온 후,
+            액티비티의 updateCommentList 메소드를 콜한다.
+
+            이 메소드는 서버에서 댓글 리스트를 받아와 리사이클러뷰를 다시 세팅한다.
+
+            따라서 새로고침이 완료된다.
+             */
+            CommentActivity commentActivity = (CommentActivity)mContext;
+            commentActivity.updateCommentList();
+
+//            CommentFragment commentFragment = (CommentFragment) commentActivity.getSupportFragmentManager().findFragmentById(R.id.fragmentCommentList);
+//
+//            if(commentFragment != null){
+//
+//                Toast.makeText(mContext, "update called", Toast.LENGTH_SHORT).show();
+//                commentFragment.RefreshCommentTaskInFragment refreshCommentTaskInFragment = new CommentFragment.RefreshCommentTaskInFragment();
+//
+//            }
+
+
+
+            Log.e("wow", result);
+
+
+        }
+
     }
 }

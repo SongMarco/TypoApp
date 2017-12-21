@@ -71,6 +71,12 @@ public interface ApiService {
                                 @Field("content") String content,
                                 @Field("imgUrl") String imgUrl);
 
+    //포스트 방식으로 댓 수정
+    @FormUrlEncoded
+    @POST("editComment.php")
+    Call<ResponseBody> editComment(@Field("commentID") int commentID, @Field("content") String content );
+
+
     //포스트 방식으로 댓글 작성
     @FormUrlEncoded
     @POST("writeComment.php")
@@ -111,5 +117,19 @@ public interface ApiService {
     @FormUrlEncoded
     @POST("deleteFeed.php")
     Call<ResponseBody> deleteFeed(@Field("feedID") int feedID);
+
+
+    //댓글 삭제하기
+    @FormUrlEncoded
+    @POST("deleteComment.php")
+    Call<ResponseBody> deleteComment(@Field("commentID") int commentID);
+
+    //대댓글 삭제하기.
+    //보내는 변수는 댓글 삭제와 같다.
+    //DB상에서 둘 다 commentID를 id값으로 사용하기 때문이다.
+    //대댓글은 depth 와, subcomment_ comment_ id 변수를 가진다. (댓글 DB(table_comment) 참조)
+    @FormUrlEncoded
+    @POST("deleteSubComment.php")
+    Call<ResponseBody> deleteSubComment( @Field("commentID") int commentID );
 
 }
