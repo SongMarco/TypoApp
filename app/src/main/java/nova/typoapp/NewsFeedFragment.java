@@ -26,12 +26,18 @@ import butterknife.ButterKnife;
 import nova.typoapp.newsfeed.MyNewsFeedRecyclerViewAdapter;
 import nova.typoapp.newsfeed.NewsFeedContent;
 import nova.typoapp.newsfeed.NewsFeedContent.FeedItem;
+import nova.typoapp.retrofit.AddCookiesInterceptor;
 import nova.typoapp.retrofit.ApiService;
+import nova.typoapp.retrofit.ReceivedCookiesInterceptor;
+import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+
+import static nova.typoapp.retrofit.ApiService.API_URL;
 
 /**
  * A fragment representing a list of Items.
@@ -148,12 +154,29 @@ public class NewsFeedFragment extends Fragment {
         // 게시물 리스트 불러오기
         //댓글을 달러 간 것이 아니라면 새로 불러와라.
 
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(ApiService.API_URL).build();
-        ApiService apiService = retrofit.create(ApiService.class);
+        //레트로핏 기초 컴포넌트 만드는 과정. 자주 복붙할 것.
+        HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+        httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+//                    .addInterceptor(new ReceivedCookiesInterceptor(getContext()))
+//                    .addInterceptor(new AddCookiesInterceptor(getContext()))
+//                    .addInterceptor(httpLoggingInterceptor)
+                .build();
+
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(API_URL)
+                .client(okHttpClient)
+                .build();
 
         NewsFeedContent.ITEMS.clear();
 
-        final Call<ResponseBody> comment = apiService.getFeedList();
+        ApiService apiService = retrofit.create(ApiService.class);
+//            Log.e("myimg", "doInBackground: " + uploadImagePath);
+        Call<ResponseBody> retrofitCall;
+
+        retrofitCall = apiService.getFeedList();
 
 
         final ProgressDialog asyncDialog = new ProgressDialog(
@@ -163,7 +186,7 @@ public class NewsFeedFragment extends Fragment {
         // show dialog
         asyncDialog.show();
 
-        comment.enqueue(new Callback<ResponseBody>() {
+        retrofitCall.enqueue(new Callback<ResponseBody>() {
 
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -205,14 +228,15 @@ public class NewsFeedFragment extends Fragment {
                                 profileUrl = jObject.getString("writer_profile");
                             }
 
+                            String isLiked = jObject.getString("is_liked");
 
-
-                            Log.e("myCommentNum", "onResponse: " + commentNum);
+//                    Log.e("hoss", "onResponse: 작성자 email = "+writerEmail );
+//                    Log.e("myCommentNum", "onResponse: " + commentNum);
 //                            Log.v("hey", writer+title+content);
 
 //                            FeedItem productFeed = NewsFeedContent.createFeed4(writer, title, content, imgUrl);
 //                                FeedItem productFeed = NewsFeedContent.createFeed7(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate);
-                            FeedItem productFeed = new FeedItem(feedNum, likeFeed,  writer, title, content, imgUrl, profileUrl, writtenDate, commentNum, writerEmail);
+                            FeedItem productFeed = new FeedItem(feedNum, likeFeed , isLiked,writer  ,title, content, imgUrl, profileUrl, writtenDate, commentNum, writerEmail);
                             NewsFeedContent.addItem(productFeed);
 
 
@@ -239,6 +263,7 @@ public class NewsFeedFragment extends Fragment {
                                 recyclerViewNewsFeed.setLayoutManager(new LinearLayoutManager(getContext()));
                             }
 
+                            myNewsFeedRecyclerViewAdapter.notifyDataSetChanged();
                             recyclerViewNewsFeed.setAdapter(myNewsFeedRecyclerViewAdapter);
 
                         }
@@ -366,25 +391,41 @@ public class NewsFeedFragment extends Fragment {
         @Override
         protected String doInBackground(Void... voids) {
 
-            Retrofit retrofit = new Retrofit.Builder().baseUrl(ApiService.API_URL).build();
-            ApiService apiService = retrofit.create(ApiService.class);
+            //레트로핏 기초 컴포넌트 만드는 과정. 자주 복붙할 것.
+            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(new ReceivedCookiesInterceptor(getContext()))
+                    .addInterceptor(new AddCookiesInterceptor(getContext()))
+                    .addInterceptor(httpLoggingInterceptor)
+                    .build();
+
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(API_URL)
+                    .client(okHttpClient)
+                    .build();
 
             NewsFeedContent.ITEMS.clear();
 
-            final Call<ResponseBody> comment = apiService.getFeedList();
+            ApiService apiService = retrofit.create(ApiService.class);
+//            Log.e("myimg", "doInBackground: " + uploadImagePath);
+            Call<ResponseBody> retrofitCall;
+
+            retrofitCall = apiService.getFeedList();
 
             // show dialog
 
 
             try {
-                json_result = comment.execute().body().string();
+                json_result = retrofitCall.execute().body().string();
                 JSONArray jsonRes = null;
 
                 jsonRes = new JSONArray(json_result);
 
                 for (int i = 0; i < jsonRes.length(); i++) {
                     JSONObject jObject = jsonRes.getJSONObject(i);  // JSONObject 추출
-
                     int feedNum = jObject.getInt("feedNum");
                     String writer = jObject.getString("writer");
                     String title = jObject.getString("title");
@@ -392,11 +433,15 @@ public class NewsFeedFragment extends Fragment {
                     String writtenDate = jObject.getString("written_time");
 
                     String writerEmail = jObject.getString("writer_email");
+//                            Log.e("hoss", "onResponse: 작성자 email = "+writerEmail );
+
 
                     String imgUrl = "";
                     String profileUrl = "";
+
                     int commentNum = jObject.getInt("comment_num");
 
+                    int likeFeed = jObject.getInt("feed_like");
 
                     if (!Objects.equals(jObject.getString("imgUrl"), "")) {
                         imgUrl = jObject.getString("imgUrl");
@@ -406,21 +451,19 @@ public class NewsFeedFragment extends Fragment {
                         profileUrl = jObject.getString("writer_profile");
                     }
 
+                    String isLiked = jObject.getString("is_liked");
+
 //                    Log.e("hoss", "onResponse: 작성자 email = "+writerEmail );
 //                    Log.e("myCommentNum", "onResponse: " + commentNum);
 //                            Log.v("hey", writer+title+content);
 
 //                            FeedItem productFeed = NewsFeedContent.createFeed4(writer, title, content, imgUrl);
 //                                FeedItem productFeed = NewsFeedContent.createFeed7(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate);
-                    FeedItem productFeed = new FeedItem(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate, commentNum, writerEmail);
+                    FeedItem productFeed = new FeedItem(feedNum, likeFeed , isLiked,writer  ,title, content, imgUrl, profileUrl, writtenDate, commentNum, writerEmail);
                     NewsFeedContent.addItem(productFeed);
 
 
                 }
-                for (int i = 0; i < 10; i++) {
-                    Log.v("hey", "" + NewsFeedContent.ITEMS.get(i).content);
-                }
-
 
 // Set the adapter
                 if (recyclerViewNewsFeed != null) {
@@ -448,7 +491,6 @@ public class NewsFeedFragment extends Fragment {
                             });
                         }
                     }).start();
-
                 }
 
 

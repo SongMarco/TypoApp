@@ -132,4 +132,10 @@ public interface ApiService {
     @POST("deleteSubComment.php")
     Call<ResponseBody> deleteSubComment( @Field("commentID") int commentID );
 
+    //게시글에 좋아요 적용하기(이미 좋아요 적용되있으면 좋아요 해제, 좋아하지 않으면 좋아요 적용)
+    @FormUrlEncoded
+    @POST("likeFeed.php")
+    Call<ResponseBody> likeFeed(@Field("feedID") int feedID, @Field("type") String type );
+
+
 }

@@ -38,8 +38,12 @@ import nova.typoapp.NewsFeedFragment.OnListFragmentInteractionListener;
 import nova.typoapp.R;
 import nova.typoapp.WriteActivity;
 import nova.typoapp.newsfeed.NewsFeedContent.FeedItem;
+import nova.typoapp.retrofit.AddCookiesInterceptor;
 import nova.typoapp.retrofit.ApiService;
+import nova.typoapp.retrofit.ReceivedCookiesInterceptor;
+import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 
@@ -215,9 +219,24 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 Glide.with(itemHolder.mView).load(R.drawable.com_facebook_profile_picture_blank_square).into(itemHolder.mProfileView);
             }
 
+            /*
+            좋아요 버튼 세팅
+             */
+
+            //이미 좋아요 한 버튼임 -> 좋아요모양 세팅
+            if(item.isLiked.equals("true")){
+                itemHolder.buttonLikeFeed.setCompoundDrawablesWithIntrinsicBounds(R.drawable.likegrey, 0, 0, 0);
+
+                itemHolder.buttonLikeFeed.setChecked(true);
+            }
+            //좋아요 안한 버튼임
+            else{
+
+            }
+
 
             /*
-            좋아요 버튼에 리스너를 세팅
+            좋아요 버튼에 setOnCheckedChangeListener 리스너를 세팅
              */
 
              /*
@@ -232,19 +251,26 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
 
                     if (isChecked) {
-                        Toast.makeText(buttonView.getContext(), "좋아요 적용" + item.getFeedID(), Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(buttonView.getContext(), "좋아요 적용" + item.getFeedID(), Toast.LENGTH_SHORT).show();
                         itemHolder.buttonLikeFeed.setCompoundDrawablesWithIntrinsicBounds(R.drawable.likegrey, 0, 0, 0);
 
                         item.likeFeedNum++;
                         itemHolder.textViewLikeFeed.setText("좋아요 " + item.likeFeedNum + "개");
 
+                        ApplyLikeFeedTask likeFeedTask = new ApplyLikeFeedTask(context);
+                        likeFeedTask.execute(item.feedID);
+
                     } else { //optional + , your preference on what to to :)
 
-                        Toast.makeText(buttonView.getContext(), "좋아요 취소" + item.getFeedID(), Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(buttonView.getContext(), "좋아요 취소" + item.getFeedID(), Toast.LENGTH_SHORT).show();
                         itemHolder.buttonLikeFeed.setCompoundDrawablesWithIntrinsicBounds(R.drawable.likewhite, 0, 0, 0);
 
                         item.likeFeedNum--;
                         itemHolder.textViewLikeFeed.setText("좋아요 " + item.likeFeedNum + "개");
+
+                        ApplyLikeFeedTask likeFeedTask = new ApplyLikeFeedTask(context);
+                        likeFeedTask.execute(item.feedID);
+
                     }
 
 
@@ -534,6 +560,79 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             // 대댓글과 댓글은 다른 방식으로 새로고침이 구현되어 있다.
             MainActivity activity = (MainActivity) mContext;
             activity.getPagerAdapter().notifyDataSetChanged();
+
+
+            Log.e("wow", result);
+
+
+        }
+
+    }
+
+
+    public class ApplyLikeFeedTask extends AsyncTask<Integer, String, String> {
+
+        private Context mContext;
+
+        // context를 가져오는 생성자. 이를 통해 메인 액티비티의 함수에 접근할 수 있다.
+
+        public ApplyLikeFeedTask(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        protected String doInBackground(Integer... integers) {
+
+            //region//글 삭제하기 - DB상에서 뉴스피드 글을 삭제한다.
+            //레트로핏 기초 컴포넌트 만드는 과정. 자주 복붙할 것.
+            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(new ReceivedCookiesInterceptor(mContext))
+                    .addInterceptor(new AddCookiesInterceptor(mContext))
+                    .addInterceptor(httpLoggingInterceptor)
+                    .build();
+
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(API_URL)
+                    .client(okHttpClient)
+                    .build();
+
+            ApiService apiService = retrofit.create(ApiService.class);
+//            Log.e("myimg", "doInBackground: " + uploadImagePath);
+
+            String type = "feed";
+            Call<ResponseBody> comment = apiService.likeFeed(integers[0], type );
+
+
+            try {
+
+                json_result = comment.execute().body().string();
+                return json_result;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            return null;
+        }
+
+        @Override
+
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+
+
+            //새로고침을 적용해야 한다. 어떻게 할지 고민해보라
+            //좋아요 갯수 증가는 changed 리스너에서 처리했다.
+
+
+
+//            MainActivity activity = (MainActivity) mContext;
+//            activity.getPagerAdapter().notifyDataSetChanged();
 
 
             Log.e("wow", result);

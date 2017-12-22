@@ -105,6 +105,7 @@ public class NewsFeedContent {
 
 
 
+        public String isLiked;
         public String details = "aa";
 
         public FeedItem(String writer, String title, String content) {
@@ -185,6 +186,26 @@ public class NewsFeedContent {
             this.commentNum = commentNum;
             this.writerEmail = writerEmail;
         }
+
+        public FeedItem(int feedID, int likeFeedNum, String isLiked  ,String writer, String title, String content, String imgUrl, String imgProfileUrl, String writtenDate, int commentNum, String writerEmail) {
+            this.feedID = feedID;
+
+            this.likeFeedNum = likeFeedNum;
+
+            this.isLiked = isLiked;
+
+
+            this.writer = writer;
+            this.title = title;
+            this.content = content;
+            this.imgUrl = imgUrl;
+            this.imgProfileUrl = imgProfileUrl;
+            this.writtenDate = writtenDate;
+            this.commentNum = commentNum;
+            this.writerEmail = writerEmail;
+        }
+
+
 
 
         @Override
