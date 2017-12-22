@@ -135,6 +135,14 @@
                 android:textAppearance="?attr/textAppearanceListItem" />
 
             <TextView
+                android:id="@+id/textViewLikeFeed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="좋아요 n개"
+                android:layout_margin="@dimen/text_margin"/>
+
+            <TextView
                 android:id="@+id/textViewCommentNum"
                 android:layout_width="wrap_content"
 
@@ -174,19 +182,20 @@
                 android:focusable="true"
                 android:gravity="center">
 
+                <!--   style="?android:attr/borderlessButtonStyle" 이건 그림자를 없애기 위한 코드이다.-->
                 <ToggleButton
                     android:id="@+id/buttonLikeFeed"
+                    style="?android:attr/borderlessButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
                     android:background="@android:color/white"
-                    android:drawableStart="@drawable/likewhite"
 
 
 
                     android:drawablePadding="6dp"
-
+                    android:drawableStart="@drawable/likewhite"
                     android:duplicateParentState="true"
                     android:gravity="center"
                     android:text="좋아요"

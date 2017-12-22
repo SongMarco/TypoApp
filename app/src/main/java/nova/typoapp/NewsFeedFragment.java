@@ -195,6 +195,7 @@ public class NewsFeedFragment extends Fragment {
 
                             int commentNum = jObject.getInt("comment_num");
 
+                            int likeFeed = jObject.getInt("feed_like");
 
                             if (!Objects.equals(jObject.getString("imgUrl"), "")) {
                                 imgUrl = jObject.getString("imgUrl");
@@ -205,12 +206,13 @@ public class NewsFeedFragment extends Fragment {
                             }
 
 
+
                             Log.e("myCommentNum", "onResponse: " + commentNum);
 //                            Log.v("hey", writer+title+content);
 
 //                            FeedItem productFeed = NewsFeedContent.createFeed4(writer, title, content, imgUrl);
 //                                FeedItem productFeed = NewsFeedContent.createFeed7(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate);
-                            FeedItem productFeed = new FeedItem(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate, commentNum, writerEmail);
+                            FeedItem productFeed = new FeedItem(feedNum, likeFeed,  writer, title, content, imgUrl, profileUrl, writtenDate, commentNum, writerEmail);
                             NewsFeedContent.addItem(productFeed);
 
 
@@ -311,21 +313,6 @@ public class NewsFeedFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-//        updateRecyclerViewComment();
-
-        // restore RecyclerView state
-//        if (mBundleRecyclerViewState != null) {
-//            Toast.makeText(getActivity(), "restoreView called", Toast.LENGTH_SHORT).show();
-//            Parcelable listState = mBundleRecyclerViewState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
-//            recyclerViewNewsFeed.getLayoutManager().onRestoreInstanceState(listState);
-////
-////            final int[] position = mBundleRecyclerViewState.getIntArray("ARTICLE_SCROLL_POSITION");
-////
-////            Log.e("omg", "onResume: "+position[0]+"opgg"+position[1] );
-//
-//
-//
-//        }
     }
 
     public interface OnListFragmentInteractionListener {

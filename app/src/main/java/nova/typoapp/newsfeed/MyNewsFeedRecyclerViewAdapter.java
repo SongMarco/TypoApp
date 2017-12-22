@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -160,7 +161,22 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             itemHolder.mIdView.setText("단어 : " + item.title);
             itemHolder.mContentView.setText("뜻 : " + item.content);
             itemHolder.mDateView.setText(item.writtenDate);
-            itemHolder.mCommentNum.setText("댓글 " + item.commentNum + "개");
+
+            itemHolder.textViewLikeFeed.setText("좋아요 " + item.likeFeedNum + "개");
+
+            //댓글이 0개면 댓글 개수를 표시하지 않는다.
+            if(item.commentNum == 0){
+
+                itemHolder.mCommentNum.setVisibility(View.GONE);
+            }
+            //1개 이상이다. 댓글 개수를 표시한다.
+            else{
+                itemHolder.mCommentNum.setText("댓글 " + item.commentNum + "개");
+
+            }
+
+
+
 
             SharedPreferences pref_login =  context.getSharedPreferences(context.getString(R.string.key_pref_Login), Context.MODE_PRIVATE );
             final String loginEmail = pref_login.getString("cookie_email","");
@@ -204,35 +220,37 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             좋아요 버튼에 리스너를 세팅
              */
 
-            itemHolder.buttonLikeFeed.setOnClickListener(new View.OnClickListener() {
+             /*
+            체크 상태가 변화하고 이 함수로 들어간다.
+
+            바뀌어서 체크된 상태다 -> 좋아요 적용
+            바뀌어서 체크가 안된 상태 -> 좋아요 해제
+             */
+            itemHolder.buttonLikeFeed.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
-                public void onClick(View v) {
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
 
-                    Toast.makeText(v.getContext(), "좋아요를 눌렀습니다" + item.getFeedID(), Toast.LENGTH_SHORT).show();
+                    if (isChecked) {
+                        Toast.makeText(buttonView.getContext(), "좋아요 적용" + item.getFeedID(), Toast.LENGTH_SHORT).show();
+                        itemHolder.buttonLikeFeed.setCompoundDrawablesWithIntrinsicBounds(R.drawable.likegrey, 0, 0, 0);
 
-//                    Log.e("omg" ,"onClick: "+ Arrays.toString(itemHolder.buttonLikeFeed.getCompoundDrawables()));
+                        item.likeFeedNum++;
+                        itemHolder.textViewLikeFeed.setText("좋아요 " + item.likeFeedNum + "개");
 
+                    } else { //optional + , your preference on what to to :)
 
-                    //좋아요가 되어있다.
-                    /*
-                    의문사항 - 맨 처음엔 ischecked 가 false로 들어가야 하는데. true로 들어가네?
-                     */
-                    if (itemHolder.buttonLikeFeed.isChecked() == true) {
+                        Toast.makeText(buttonView.getContext(), "좋아요 취소" + item.getFeedID(), Toast.LENGTH_SHORT).show();
+                        itemHolder.buttonLikeFeed.setCompoundDrawablesWithIntrinsicBounds(R.drawable.likewhite, 0, 0, 0);
 
-//                        textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.icon, 0, 0, 0);
-
-                        itemHolder.buttonLikeFeed.setCompoundDrawablesWithIntrinsicBounds(R.drawable.likegrey , 0,0,0 );
+                        item.likeFeedNum--;
+                        itemHolder.textViewLikeFeed.setText("좋아요 " + item.likeFeedNum + "개");
                     }
-                    //좋아요가 안 되어있다.
-                    else {
-                        itemHolder.buttonLikeFeed.setCompoundDrawablesWithIntrinsicBounds(R.drawable.likewhite , 0,0,0 );
 
-                    } // end if
+
                 }
 
-                });
-
+            });
 
 
             /*
@@ -420,6 +438,9 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
         @BindView(R.id.buttonLikeFeed)
         ToggleButton buttonLikeFeed;
+
+        @BindView(R.id.textViewLikeFeed)
+        TextView textViewLikeFeed;
 
         public FeedItem mItem;
 
