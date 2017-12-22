@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -289,21 +290,24 @@ public class MainActivity extends AppCompatActivity
             super(fm);
         }
 
-
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            return super.instantiateItem(container, position);
+        }
 
         /*
-        겟아이템포지션 메소드
+                겟아이템포지션 메소드
 
-        뉴스피드 페이지를 새로고침 하도록 하는 메소드.
-        onResume에서 notifyDatasetchanged가 콜되면,
-        이 메소드가 콜되면서 페이지를 새로고치게 된다.
+                뉴스피드 페이지를 새로고침 하도록 하는 메소드.
+                onResume에서 notifyDatasetchanged가 콜되면,
+                이 메소드가 콜되면서 페이지를 새로고치게 된다.
 
-        원리는 사실 이 함수가 아이템의 위치를 주는데,
-        뷰페이저가 아이템의 위치를 모르게 함으로써 모든 페이지를 새로 고치게 한다.
+                원리는 사실 이 함수가 아이템의 위치를 주는데,
+                뷰페이저가 아이템의 위치를 모르게 함으로써 모든 페이지를 새로 고치게 한다.
 
-        합리적인 구조는 아니지만 구현이 간단하여 일단 구현해놨다. 리팩토링이 필요하다.
+                합리적인 구조는 아니지만 구현이 간단하여 일단 구현해놨다. 리팩토링이 필요하다.
 
-         */
+                 */
         @Override
         public int getItemPosition(Object object) {
 
@@ -388,7 +392,7 @@ public class MainActivity extends AppCompatActivity
     public void onResume() {
         super.onResume();
 
-//        Toast.makeText(this, "onResume called", Toast.LENGTH_SHORT).show();
+////        Toast.makeText(this, "MainonResume called", Toast.LENGTH_SHORT).show();
         mSectionsPagerAdapter.notifyDataSetChanged();
     }
 

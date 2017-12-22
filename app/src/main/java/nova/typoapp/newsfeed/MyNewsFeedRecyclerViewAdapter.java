@@ -562,6 +562,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             activity.getPagerAdapter().notifyDataSetChanged();
 
 
+
             Log.e("wow", result);
 
 

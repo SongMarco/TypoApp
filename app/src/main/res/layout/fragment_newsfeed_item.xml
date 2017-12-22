@@ -100,11 +100,11 @@
 
         <ImageView
             android:id="@+id/imageViewItem"
-            android:layout_width="250dp"
+            android:layout_width="300dp"
+
+            android:layout_height="150dp"
 
             android:layout_gravity="center"
-
-            android:layout_height="wrap_content"
 
             android:scaleType="fitCenter"
             app:srcCompat="@android:drawable/ic_menu_report_image" />
