@@ -74,11 +74,11 @@ public class SearchActivity extends AppCompatActivity implements  SearchWordFrag
             }
         });
 
-        //포커스를 요청하여, 에딧 텍스트에 키패드를 불러온다.
-        //참고사항 - manifest의 액티비티 태그에 android:windowSoftInputMode="stateAlwaysVisible" 속성이 있어야
-        //requestFocus 했을 때 키패드가 생성된다.
-        editTextSearch.setFocusableInTouchMode(true);
-        editTextSearch.requestFocus();
+//        //포커스를 요청하여, 에딧 텍스트에 키패드를 불러온다.
+//        //참고사항 - manifest의 액티비티 태그에 android:windowSoftInputMode="stateAlwaysVisible" 속성이 있어야
+//        //requestFocus 했을 때 키패드가 생성된다.
+//        editTextSearch.setFocusableInTouchMode(true);
+//        editTextSearch.requestFocus();
 
     }
 

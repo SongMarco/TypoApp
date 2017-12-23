@@ -206,7 +206,6 @@
 
             android:name=".SearchActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysVisible"
 
 
             />
