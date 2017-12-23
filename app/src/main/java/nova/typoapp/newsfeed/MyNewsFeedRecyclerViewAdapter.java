@@ -285,6 +285,48 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
             });
 
+            /*
+
+            댓글 갯수와 댓글 달기에 리스너를 세팅하여,
+            클릭시 댓글 액티비티로 이동시킨다.
+
+             */
+
+            View.OnClickListener mCommentClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    //댓글 달기 버튼 혹은 댓글 갯수를 클릭했다면 댓글 액티비티로 이동시킨다.
+                    if(v.getId()== itemHolder.mCommentNum.getId() || v.getId() == itemHolder.mLayoutWriteComment.getId() ){
+                        Intent intent = new Intent(v.getContext(), CommentActivity.class);
+                        intent.putExtra("feedID", item.getFeedID());
+
+
+                        //좋아요를 누른 상태라면 isLiked 를 true 로 세팅해 보내서, 댓글에서도 좋아요를 적용한다.
+                        if( itemHolder.buttonLikeFeed.isChecked() ){
+                            intent.putExtra("isLiked", true);
+                        }
+                        else{
+                            intent.putExtra("isLiked", false);
+                        }
+
+                        intent.putExtra("likeNum", item.likeFeedNum);
+
+                        v.getContext().startActivity(intent);
+                    }
+
+
+
+
+                }
+            };
+
+
+            itemHolder.mCommentNum.setOnClickListener(mCommentClickListener);
+            itemHolder.mLayoutWriteComment.setOnClickListener(mCommentClickListener);
+
+
+
 
             /*
             더보기 버튼에 리스너를 세팅한다.
@@ -507,18 +549,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
             FeedItem item = ITEMS.get(getAdapterPosition() - 1);
 
-            // 더보기 버튼, 좋아요 버튼, 좋아요 갯수  이외의 클릭에 대해서는 댓글달기로 이동한다.
-            if(v.getId() != mMoreView.getId() && v.getId() != buttonLikeFeed.getId() && v.getId()!= textViewLikeFeed.getId() ){
 
-
-                Intent intent = new Intent(v.getContext(), CommentActivity.class);
-                intent.putExtra("feedID", item.getFeedID());
-
-                intent.putExtra("likeNum", item.likeFeedNum);
-//                NewsFeedFragment.isWentCommentActivity = true;
-                v.getContext().startActivity(intent);
-//                Toast.makeText(v.getContext(), "ROW PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
-            }
 
             if(v.getId() == textViewLikeFeed.getId()){
 

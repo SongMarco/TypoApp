@@ -13,27 +13,54 @@
     >
 
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_margin="@dimen/margin_balloon"
+        >
 
         <TextView
             android:id="@+id/textViewLikeInComment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="@dimen/text_margin"
-            android:layout_weight="0"
-            android:gravity="center"
-            android:text="좋아요 n개"
+
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+
 
             android:padding="@dimen/margin_balloon"
-            android:textAlignment="textStart"
-            android:textSize="18sp" />
+            android:text="좋아요 n개"
+            android:textSize="16sp" />
 
-    </LinearLayout>
+        <ToggleButton
+            android:id="@+id/buttonLikeFeedInComment"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+
+
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+
+
+            android:checked="false"
+
+
+
+            android:drawableStart="@drawable/likewhite"
+            android:duplicateParentState="true"
+            android:gravity="center"
+
+
+            android:padding="@dimen/margin_balloon"
+            android:text=""
+            android:textOff=""
+
+            android:textOn="" />
+
+    </RelativeLayout>
 
     <View
         style="@style/border_margin"
@@ -49,6 +76,8 @@
         android:name="nova.typoapp.CommentFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:layout_weight="30" />
 
     <View

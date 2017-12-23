@@ -1,15 +1,18 @@
 package nova.typoapp;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,6 +68,11 @@ implements CommentFragment.OnListFragmentInteractionListener {
     @BindView(R.id.textViewLikeInComment)
     TextView textViewLikeInComment;
 
+
+    @BindView(R.id.buttonLikeFeedInComment)
+    ToggleButton buttonLikeFeedInComment;
+
+
     String textCommentContent;
 
 
@@ -86,6 +94,10 @@ implements CommentFragment.OnListFragmentInteractionListener {
 
     }
 
+
+    int likeNum;
+
+    Boolean isLiked;
     /*
     댓글 화면 초기화
      */
@@ -97,7 +109,7 @@ implements CommentFragment.OnListFragmentInteractionListener {
 
 
 
-        int likeNum = getIntent().getIntExtra("likeNum", 0);
+        likeNum = getIntent().getIntExtra("likeNum", 0);
         textViewLikeInComment.setText("좋아요 "+likeNum+"개");
         /*
         새로고침 태스크를 실행한다.
@@ -108,6 +120,7 @@ implements CommentFragment.OnListFragmentInteractionListener {
         RefreshCommentTask refreshCommentTask = new RefreshCommentTask();
         refreshCommentTask.execute();
 
+
         //리프레시 태스크에서 해당 명령어를 수행하므로, 주석처리 하였다. 추후 오류가 없을시 삭제할 것
 //        //리프레시 태스크에서 리사이클러뷰를 다 세팅하면 리스트를 클리어한다.
 //        CommentContent.clearList();
@@ -115,6 +128,65 @@ implements CommentFragment.OnListFragmentInteractionListener {
         //댓글 쓰려는 글의 ID를 겟인텐트로 가져온다.
         feedID = getIntent().getIntExtra("feedID", 0);
         Log.e(TAG, "onCreate: "+feedID);
+
+
+
+
+        isLiked = getIntent().getBooleanExtra("isLiked", false);
+        if(isLiked){
+            buttonLikeFeedInComment.setChecked(true);
+            buttonLikeFeedInComment.setCompoundDrawablesWithIntrinsicBounds(R.drawable.likegrey, 0, 0, 0);
+        }
+        else{
+
+        }
+
+
+           /*
+            좋아요 버튼에 setOnCheckedChangeListener 리스너를 세팅
+             */
+
+             /*
+            체크 상태가 변화하고 이 함수로 들어간다.
+
+            바뀌어서 체크된 상태다 -> 좋아요 적용
+            바뀌어서 체크가 안된 상태 -> 좋아요 해제
+             */
+       buttonLikeFeedInComment.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if (isChecked) {
+//                        Toast.makeText(buttonView.getContext(), "좋아요 적용" + item.getFeedID(), Toast.LENGTH_SHORT).show();
+                    buttonLikeFeedInComment.setCompoundDrawablesWithIntrinsicBounds(R.drawable.likegrey, 0, 0, 0);
+
+                    likeNum++;
+                    textViewLikeInComment.setText("좋아요 "+likeNum+"개");
+
+                    LikeFeedTaskInComment likeFeedTask = new LikeFeedTaskInComment(CommentActivity.this);
+                    likeFeedTask.execute(feedID);
+
+                } else { //optional + , your preference on what to to :)
+
+//                        Toast.makeText(buttonView.getContext(), "좋아요 취소" + item.getFeedID(), Toast.LENGTH_SHORT).show();
+
+                    buttonLikeFeedInComment.setCompoundDrawablesWithIntrinsicBounds(R.drawable.likewhite, 0, 0, 0);
+
+                    likeNum--;
+                    textViewLikeInComment.setText("좋아요 "+likeNum+"개");
+
+
+                    LikeFeedTaskInComment likeFeedTask = new LikeFeedTaskInComment(CommentActivity.this);
+                    likeFeedTask.execute(feedID);
+                }
+
+
+            }
+
+        });
+
+
+
 
 
     }
@@ -386,6 +458,72 @@ implements CommentFragment.OnListFragmentInteractionListener {
         }
 
     }
+
+
+    String json_result = "";
+    public class LikeFeedTaskInComment extends AsyncTask<Integer, String, String> {
+
+        private Context mContext;
+
+        // context를 가져오는 생성자. 이를 통해 메인 액티비티의 함수에 접근할 수 있다.
+
+        public LikeFeedTaskInComment (Context context) {
+            mContext = context;
+        }
+
+        @Override
+        protected String doInBackground(Integer... integers) {
+
+            //region//글 삭제하기 - DB상에서 뉴스피드 글을 삭제한다.
+            //레트로핏 기초 컴포넌트 만드는 과정. 자주 복붙할 것.
+            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(new ReceivedCookiesInterceptor(mContext))
+                    .addInterceptor(new AddCookiesInterceptor(mContext))
+                    .addInterceptor(httpLoggingInterceptor)
+                    .build();
+
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(API_URL)
+                    .client(okHttpClient)
+                    .build();
+
+            ApiService apiService = retrofit.create(ApiService.class);
+//            Log.e("myimg", "doInBackground: " + uploadImagePath);
+
+            String type = "feed";
+            Call<ResponseBody> comment = apiService.likeFeed(integers[0], type );
+
+
+            try {
+
+                json_result = comment.execute().body().string();
+                return json_result;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            return null;
+        }
+
+        @Override
+
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+
+
+
+        }
+
+    }
+
+
+
 
     @Override
     public void onListFragmentInteraction(CommentContent.CommentItem item) {
