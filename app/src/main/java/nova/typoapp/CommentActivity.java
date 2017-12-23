@@ -1,6 +1,7 @@
 package nova.typoapp;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,6 +62,8 @@ implements CommentFragment.OnListFragmentInteractionListener {
     @BindView(R.id.parentLayoutComment)
     LinearLayout layoutComment;
 
+    @BindView(R.id.textViewLikeInComment)
+    TextView textViewLikeInComment;
 
     String textCommentContent;
 
@@ -91,8 +95,10 @@ implements CommentFragment.OnListFragmentInteractionListener {
         setContentView(R.layout.activity_comment);
         ButterKnife.bind(this);
 
-        CommentFragment commentFragment = (CommentFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentCommentList);
 
+
+        int likeNum = getIntent().getIntExtra("likeNum", 0);
+        textViewLikeInComment.setText("좋아요 "+likeNum+"개");
         /*
         새로고침 태스크를 실행한다.
         이 태스크는 http 통신 후 서버에서 게시물의 댓글을
@@ -109,6 +115,8 @@ implements CommentFragment.OnListFragmentInteractionListener {
         //댓글 쓰려는 글의 ID를 겟인텐트로 가져온다.
         feedID = getIntent().getIntExtra("feedID", 0);
         Log.e(TAG, "onCreate: "+feedID);
+
+
     }
 
     @OnClick(R.id.buttonSendComment)
@@ -124,6 +132,16 @@ implements CommentFragment.OnListFragmentInteractionListener {
 
 
     }
+
+    @OnClick(R.id.textViewLikeInComment)
+    void getLikeList(){
+
+        Intent intent = new Intent( CommentActivity.this, LikeListActivity.class);
+        intent.putExtra("feedID",feedID);
+//                NewsFeedFragment.isWentCommentActivity = true;
+        startActivity(intent);
+    }
+
 
 
     // 댓글 작성에 필요한 태스크

@@ -196,11 +196,20 @@
             android:name=".EditCommentActivity"
             android:label="수정"
             android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysVisible" />
+        <activity
+            android:name=".LikeListActivity"
+            android:label="좋아요 리스트"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:label="검색"
+
+            android:name=".SearchActivity"
+            android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysVisible"
-            >
 
 
-        </activity>
+            />
     </application>
 
 </manifest>

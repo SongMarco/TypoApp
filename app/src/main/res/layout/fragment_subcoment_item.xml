@@ -79,7 +79,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="좋아요"
-                android:textAlignment="viewStart" />
+                android:textAlignment="viewStart"
+                android:visibility="invisible" />
 
         </LinearLayout>
 

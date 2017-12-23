@@ -1,9 +1,7 @@
 package nova.typoapp.newsfeed;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Helper class for providing sample content for user interfaces created by
@@ -11,31 +9,21 @@ import java.util.Map;
  * <p>
  * TODO: Replace all uses of this class before publishing your app.
  */
-public class NewsFeedContent {
+public class SearchFeedContent {
 
     /**
      * An array of sample (dummy) items.
      */
-    public static List<FeedItem> ITEMS = new ArrayList<FeedItem>();
+    public static List<FeedItem> ITEMS_SEARCH = new ArrayList<FeedItem>();
 
 
 
     public static boolean called = false;
-    /**
-     * A map of sample (dummy) items, by ID.
-     */
-    public static final Map<String, FeedItem> ITEM_MAP = new HashMap<String, FeedItem>();
-
-    private static final int COUNT = 25;
-
 
     public static void addItem(FeedItem item) {
-        ITEMS.add(item);
+        ITEMS_SEARCH.add(item);
 //        ITEM_MAP.put(item.title, item);
     }
-
-
-
 
     //이곳에서 본격적으로 아이템의 뷰를 세팅한다.
     //여기서 아이템을 본격적으로 만들게 된다 @@@ 메소드를 고치던가 하자.

@@ -2,6 +2,9 @@ package nova.typoapp;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +13,11 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,14 +41,25 @@ import retrofit2.Retrofit;
 
 import static nova.typoapp.retrofit.ApiService.API_URL;
 
-public class SubCommentActivity extends AppCompatActivity implements SubCommentFragment.OnListFragmentInteractionListener{
+public class SubCommentActivity extends AppCompatActivity implements SubCommentFragment.OnListFragmentInteractionListener {
 
 
-    @BindView (R.id.buttonSendSubComment)
+    @BindView(R.id.buttonSendSubComment)
     Button buttonSendSubComment;
 
     @BindView(R.id.editTextSubComment)
     EditText editTextSubComment;
+
+    //원 댓글 뷰
+    @BindView(R.id.subCommentCommentProfileImage)
+    ImageView mSubCommentCommentProfileImage;
+    @BindView(R.id.subCommentCommentWriter)
+    TextView mSubCommentCommentWriter;
+    @BindView(R.id.subCommentCommentContent)
+    TextView mSubCommentCommentContent;
+    @BindView(R.id.subCommentCommentDate)
+    TextView mSubCommentCommentDate;
+
 
     String textSubCommentContent;
 
@@ -49,7 +68,7 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
     int commentID;
 
 
-    public void updateSubCommentList(){
+    public void updateSubCommentList() {
 
         RefreshSubCommentTask refreshSubCommentTask = new RefreshSubCommentTask();
         refreshSubCommentTask.execute();
@@ -68,18 +87,52 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-
-
         commentID = getIntent().getIntExtra("commentID", -1);
+
+
+
+        //댓글의 데이터를 인텐트에서 가져온다
+        Intent gotIntent = getIntent();
+
+        String imgProfileUrl = gotIntent.getStringExtra("imgProfileUrl");
+        String commentWriter = gotIntent.getStringExtra("commentWriter");
+        String commentContent = gotIntent.getStringExtra("commentContent");
+        String commentDate = gotIntent.getStringExtra("commentDate");
+
+//        intent.putExtra("imgProfileUrl", item.imgProfileUrl);
+//        intent.putExtra("commentWriter", item.commentWriter);
+//        intent.putExtra("commentContent", item.commentContent);
+//        intent.putExtra("commentDate", item.commentDate);
+
+        //프로필 이미지를 동그랗게 하기 위한 코드.
+        mSubCommentCommentProfileImage.setBackground(new ShapeDrawable(new OvalShape()));
+        mSubCommentCommentProfileImage.setClipToOutline(true);
+
+        //답글을 달 댓글의 뷰를 세팅한다.
+
+        //프로필 이미지 세팅하기
+        RequestOptions requestOptions = new RequestOptions()
+                .error(R.drawable.com_facebook_profile_picture_blank_square);
+
+        Glide.with(SubCommentActivity.this).load(imgProfileUrl)
+                .apply(requestOptions)
+                .into(mSubCommentCommentProfileImage);
+
+        mSubCommentCommentWriter.setText(commentWriter);
+
+        mSubCommentCommentContent.setText(commentContent);
+
+        mSubCommentCommentDate.setText(commentDate);
+
+
 
         RefreshSubCommentTask refreshSubCommentTask = new RefreshSubCommentTask();
         refreshSubCommentTask.execute();
     }
 
     @OnClick(R.id.buttonSendSubComment)
-    void sendSubComment(){
+    void sendSubComment() {
         textSubCommentContent = editTextSubComment.getText().toString();
-
 
 
         WriteSubCommentTask writeSubCommentTask = new WriteSubCommentTask();
@@ -88,7 +141,6 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 
     }
     // 댓글 작성에 필요한 태스크
-
 
 
     public class WriteSubCommentTask extends AsyncTask<Void, String, Void> {
@@ -114,6 +166,7 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
         //두인백에서 http통신을 수행한다.
 
         String json_result = "";
+
         @Override
         protected Void doInBackground(Void... voids) {
 
@@ -139,9 +192,9 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 
 
             //이전 액티비티에서 commentID를 인텐트로 보내줘야 한다.
-            retrofitCall = apiService.writeSubComment(commentID  , textSubCommentContent);
+            retrofitCall = apiService.writeSubComment(commentID, textSubCommentContent);
 
-            Log.e(TAG, "commentID = "+commentID+", content = "+textSubCommentContent);
+            Log.e(TAG, "commentID = " + commentID + ", content = " + textSubCommentContent);
             try {
 
                 json_result = retrofitCall.execute().body().string();
@@ -149,7 +202,6 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
 
 
             return null;
@@ -163,7 +215,6 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
         protected void onPostExecute(Void voids) {
 
             super.onPostExecute(voids);
-
 
 
             //리프레시 태스크 돌릴 것
@@ -188,7 +239,6 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
         Context context = SubCommentActivity.this;
 
 
-
         //본래 온프리에서 로딩 표시를 했으나, 충분히 속도가 빠르므로 그냥 두었다.
         //데이터를 더 추가하여 테스트 후 주석된 부분의 삭제 여부를 결정하라
         @Override
@@ -203,11 +253,11 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
         }
 
 
-
         //doInBackground 에서 댓글을 가져오기 위한 http 통신을 수행한다.
         // 통신에는 레트로핏2가 사용됐다.
 
         String json_result = "";
+
         @Override
         protected Void doInBackground(Void... voids) {
 
@@ -279,9 +329,7 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
                     String writtenDate = jObject.getString("written_time");
 
 
-
                     int depth = jObject.getInt("depth");
-
 
 
                     String profileUrl = "";
@@ -291,7 +339,7 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 
 
                     //아이템 객체에 데이터를 다 담은 후, 아이템을 리스트에 추가한다.
-                    SubCommentContent.SubCommentItem productSubComment = new SubCommentContent.SubCommentItem(commentID, subCommentID, depth,  writer, writerEmail,content, writtenDate, profileUrl);
+                    SubCommentContent.SubCommentItem productSubComment = new SubCommentContent.SubCommentItem(commentID, subCommentID, depth, writer, writerEmail, content, writtenDate, profileUrl);
                     SubCommentContent.addItem(productSubComment);
 
                 }
@@ -300,8 +348,8 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
                 e.printStackTrace();
             }
 
-            for (CommentContent.CommentItem item  : CommentContent.ITEMS){
-                Log.i(TAG,"item writer: "+item.commentWriter+ "item content: "+item.commentContent);
+            for (CommentContent.CommentItem item : CommentContent.ITEMS) {
+                Log.i(TAG, "item writer: " + item.commentWriter + "item content: " + item.commentContent);
             }
 
             return null;
@@ -322,7 +370,7 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
             // 댓글 프래그먼트를 가져와서, updateRecyclerViewComment 메소드를 콜하여 리사이클러뷰를 업데이트 한다.
             SubCommentFragment subCommentFragment = (SubCommentFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentSubComment);
 
-            if(subCommentFragment != null){
+            if (subCommentFragment != null) {
 
 //                Toast.makeText(context, "update called", Toast.LENGTH_SHORT).show();
                 subCommentFragment.updateRecyclerView();

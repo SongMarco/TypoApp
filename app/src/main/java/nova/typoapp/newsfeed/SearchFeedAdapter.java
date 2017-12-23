@@ -48,7 +48,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 
-import static nova.typoapp.newsfeed.NewsFeedContent.ITEMS;
+import static nova.typoapp.newsfeed.SearchFeedContent.ITEMS_SEARCH;
 import static nova.typoapp.retrofit.ApiService.API_URL;
 
 /**
@@ -63,13 +63,13 @@ import static nova.typoapp.retrofit.ApiService.API_URL;
  https://stackoverflow.com/questions/30284067/handle-button-click-inside-a-row-in-recyclerview
  */
 
-public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class SearchFeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
 
     // 아이템들의 리스트를 만든다.
-    private final List<FeedItem> mValues;
+    private final List<SearchFeedContent.FeedItem> mValues;
 
     // 아이템 요소를 클릭할 때 반응할 클릭 리스너다.
     // 이 리스너는 바깥에서 이 리사이클러뷰를 호출할 때 사용된다.
@@ -83,32 +83,29 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
     리사이클러뷰 생성자들.
      */
 
-    public MyNewsFeedRecyclerViewAdapter(List<FeedItem> items, ClickListener clickListener) {
-        mValues = items;
-        this.listener = clickListener;
+//
+//    public SearchFeedAdapter(List<FeedItem> items, ClickListener clickListener) {
+//        mValues = items;
+//        this.listener = clickListener;
+//    }
+
+    public SearchFeedAdapter(List< SearchFeedContent.FeedItem> itemsSearch) {
+        mValues = itemsSearch;
     }
 
-    public MyNewsFeedRecyclerViewAdapter(List<FeedItem> items) {
-        mValues = items;
 
-    }
-
-
-
-    //왜 1을 더하지? 헤더가 있으니까!
+    //헤더가 없으므로 그대로 줌
     @Override
     public int getItemCount() {
-        return mValues.size() + 1;
+        return mValues.size();
     }
 
     //헤더자리인지 검사 후 헤더자리면 헤더로 타입을 주고
     // 아니라면 일반 아이템으로 타입을 준다.
     @Override
     public int getItemViewType(int position) {
-        if (isPositionHeader(position))
-            return TYPE_HEADER;
 
-        else return TYPE_ITEM;
+        return TYPE_ITEM;
     }
 
     //헤더인지 검사하는 함수 - position == 0인지 검사
@@ -116,10 +113,9 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
         return position == 0;
     }
 
-    //아이템을 건져올 때는 1을 빼자 왜?? 헤더를 제외해야 하니까
-    // ex) 리사이클러뷰에서 5번째 아이템은 아이템어레이에선 4번째다.
-    private FeedItem getItem(int position) {
-        return ITEMS.get(position - 1);
+
+    private SearchFeedContent.FeedItem getItem(int position) {
+        return ITEMS_SEARCH.get(position);
     }
 
 
@@ -165,7 +161,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
             final VHItem itemHolder = (VHItem) holder;
 
-            final FeedItem item = getItem(position);
+            final SearchFeedContent.FeedItem item = getItem(position);
             final Context context = itemHolder.mView.getContext();
 
             itemHolder.mWriterView.setText("" + item.writer);
@@ -304,9 +300,9 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
                         AlertDialog.Builder builderItem = new AlertDialog.Builder(context);
 
-                                // 여기서 분기를 가른다.
-                                // 작성자 이메일 = 쉐어드에 담긴 로그인 이메일이면 수정삭제 가능
-                                // 아니면 수정 삭제 불가. else문에서 신고만 보이게 해라
+                        // 여기서 분기를 가른다.
+                        // 작성자 이메일 = 쉐어드에 담긴 로그인 이메일이면 수정삭제 가능
+                        // 아니면 수정 삭제 불가. else문에서 신고만 보이게 해라
 
                         //로그인 이메일과 게시물의 작성자가 같음 -> 수정삭제 세팅
                         if(loginEmail.equals(item.writerEmail)){
@@ -378,7 +374,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                                     switch (which) {
                                         case 0:
 
-                                        Toast.makeText(context, "신고를 클릭했습니다. " + String.valueOf(item.getInfo()), Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(context, "신고를 클릭했습니다. " + String.valueOf(item.getInfo()), Toast.LENGTH_SHORT).show();
                                             break;
 
                                     }
@@ -505,7 +501,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
         public void onClick(View v) {
             final Context context = v.getContext();
 
-            FeedItem item = ITEMS.get(getAdapterPosition() - 1);
+            SearchFeedContent.FeedItem item = ITEMS_SEARCH.get(getAdapterPosition());
 
             // 더보기 버튼, 좋아요 버튼, 좋아요 갯수  이외의 클릭에 대해서는 댓글달기로 이동한다.
             if(v.getId() != mMoreView.getId() && v.getId() != buttonLikeFeed.getId() && v.getId()!= textViewLikeFeed.getId() ){
@@ -513,8 +509,6 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
                 Intent intent = new Intent(v.getContext(), CommentActivity.class);
                 intent.putExtra("feedID", item.getFeedID());
-
-                intent.putExtra("likeNum", item.likeFeedNum);
 //                NewsFeedFragment.isWentCommentActivity = true;
                 v.getContext().startActivity(intent);
 //                Toast.makeText(v.getContext(), "ROW PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();

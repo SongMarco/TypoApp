@@ -274,10 +274,19 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
             if (v.getId() == mCoComment.getId() || v.getId() == mSubCommentNum.getId()) {
 
 
+
                 CommentItem item = CommentContent.ITEMS.get(getAdapterPosition());
 
                 Intent intent = new Intent(v.getContext(), SubCommentActivity.class);
                 intent.putExtra("commentID", item.commentID);
+
+                // 프로필 url 정보, 작성자, 댓글 내용, 댓글 날짜 전달해주고, 넘어가서 뷰에서 세팅하라
+
+                intent.putExtra("imgProfileUrl", item.imgProfileUrl);
+                intent.putExtra("commentWriter", item.commentWriter);
+                intent.putExtra("commentContent", item.commentContent);
+                intent.putExtra("commentDate", item.commentDate);
+
 //                NewsFeedFragment.isWentCommentActivity = true;
                 v.getContext().startActivity(intent);
 //                Toast.makeText(v.getContext(), "ROW PRESSED = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();

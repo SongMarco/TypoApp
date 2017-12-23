@@ -9,7 +9,7 @@
     <string name="action_settings">설정</string>
     <string name="action_profile">프로필 보기</string>
     <string name="action_logout">로그아웃</string>
-
+    <string name="action_search">검색</string>
 
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_login">로그인</string>

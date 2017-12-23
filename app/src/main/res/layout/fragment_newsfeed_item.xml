@@ -138,9 +138,12 @@
                 android:id="@+id/textViewLikeFeed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="@dimen/text_margin"
                 android:layout_weight="0"
+
+                android:padding="@dimen/margin_border"
                 android:text="좋아요 n개"
-                android:layout_margin="@dimen/text_margin"/>
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/textViewCommentNum"
@@ -149,7 +152,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|center"
                 android:layout_margin="@dimen/text_margin"
-                android:text="댓글 n개" />
+
+                android:padding="@dimen/margin_border"
+                android:text="댓글 n개"
+                android:textSize="16sp" />
 
 
         </LinearLayout>

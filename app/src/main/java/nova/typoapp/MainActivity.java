@@ -38,11 +38,9 @@ import nova.typoapp.newsfeed.NewsFeedContent;
 페이지는 총 3페이지로 되어 있다.
 1페이지는 뉴스피드 페이지이다. 사용자가 단어를 등록하고, 댓글과 좋아요로 소통할 수 있다.
 2페이지, 3페이지는 미구현이다. 2페이지는 소모임 컨텐츠, 3페이지는 게임을 구현할 예정이다.(변경 가능)
-https://goo.gl/PWL4q3
 
 페이지 이동으로 프래그먼트를 가져올 때에는, getItem으로 호출한다.
 이 때 액티비티에 인터페이스(OnListFragmentInteractionListener)를 적용하는 것을 잊지말라.
-어떤 기능을 하는지는 모르겠지만, 적용하지 않을 경우 오류가 발생한다.
 
 
 */
@@ -64,9 +62,7 @@ public class MainActivity extends AppCompatActivity
     //페이저 어댑터는 뷰페이저에 사용되는 어댑터이다. 각 프래그먼트 객체를 불러올 때 사용한다.
     private SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());;
 
-
     /*
-
     메인액티비티 초기화.
 
     뷰를 세팅할 때 버터나이프를 자주 사용하는데,
@@ -138,6 +134,17 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         switch(id){
+            case R.id.action_search:
+
+
+                intent = new Intent(MainActivity.this, SearchActivity.class);
+                startActivity(intent);
+
+                break;
+
+
+
+
 
             //설정 아이템 클릭 -> 설정 액티비티로 이동(미구현, 토스트만 표시)
             case R.id.action_settings:

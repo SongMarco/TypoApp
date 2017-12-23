@@ -54,6 +54,20 @@ public interface ApiService {
     @POST("getSubCommentList.php")
     Call<ResponseBody> getSubCommentList(@Field("commentID") int commentID);
 
+    //게시물을 검색하는 메소드
+    @FormUrlEncoded
+    @POST("searchFeed.php")
+    Call<ResponseBody> searchFeed(@Field("searchWord") String  searchWord);
+
+
+
+
+    //게시물에 좋아요를 한 사람의 리스트를 불러오는 메소드
+    @FormUrlEncoded
+    @POST("getLikeList.php")
+    Call<ResponseBody> getLikeList(@Field("feedID") int feedID);
+
+
 
 
     //포스트 방식으로 글쓰기 해주기. formurlEncoded 와 필드 골뱅이를 주목할 것.
