@@ -11,10 +11,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -220,6 +222,19 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
             //리프레시 태스크 돌릴 것
 
 
+
+
+            //입력을 완료하면 에딧텍스트의 포커스를 해제하고, 키보드를 닫는다.
+            editTextSubComment.setText("");
+            editTextSubComment.clearFocus();
+
+            InputMethodManager keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            keyboard.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+
+            Toast.makeText(context, "답글이 등록되었습니다.", Toast.LENGTH_SHORT).show();
+
+
+
             RefreshSubCommentTask refreshSubCommentTask = new RefreshSubCommentTask();
             refreshSubCommentTask.execute();
 
@@ -364,7 +379,6 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 //            asyncDialog.dismiss();
 
 
-            editTextSubComment.setText("");
 
 
             // 댓글 프래그먼트를 가져와서, updateRecyclerViewComment 메소드를 콜하여 리사이클러뷰를 업데이트 한다.

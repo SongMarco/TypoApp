@@ -9,8 +9,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,6 +44,7 @@ public class SearchActivity extends AppCompatActivity implements  SearchWordFrag
     @BindView(R.id.editTextSearch)
     EditText editTextSearch;
 
+    String searchWord;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,11 +58,21 @@ public class SearchActivity extends AppCompatActivity implements  SearchWordFrag
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
+
+        //검색을 수행한다.
         editTextSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    String searchWord = v.getText().toString();
+                    searchWord = v.getText().toString();
+
+
+                    //입력을 완료하면 에딧텍스트의 포커스를 해제하고, 키보드를 닫는다.
+                    editTextSearch.clearFocus();
+
+                    InputMethodManager keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    keyboard.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+
 
                     SearchTask searchTask = new SearchTask();
                     searchTask.execute( searchWord );
@@ -221,7 +234,13 @@ public class SearchActivity extends AppCompatActivity implements  SearchWordFrag
 //            asyncDialog.dismiss();
 
 
-            // 댓글 프래그먼트를 가져와서, updateRecyclerViewComment 메소드를 콜하여 리사이클러뷰를 업데이트 한다.
+            //검색된 단어가 없다면 메시지를 띄워준다.
+            if(SearchFeedContent.ITEMS_SEARCH.size()<1){
+                Toast.makeText(context, searchWord+"의 검색 결과가 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
+            }
+
+
+            // 댓글 프래그먼트를 가져와서, updateRecylerViewComment 메소드를 콜하여 리사이클러뷰를 업데이트 한다.
             SearchWordFragment searchWordFragment = (SearchWordFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentSearchWord);
 
             if (searchWordFragment != null) {
@@ -257,11 +276,16 @@ public class SearchActivity extends AppCompatActivity implements  SearchWordFrag
 
 //        Toast.makeText(this, "검색 저장", Toast.LENGTH_SHORT).show();
 
-        // 검색어를 저장한다
-        mBundleSavedWord = new Bundle();
 
-        String searchWord = editTextSearch.getText().toString();
-        mBundleSavedWord.putString("searchWord", searchWord);
+        if(!Objects.equals(editTextSearch.getText().toString(), "")){
+            // 검색어를 저장한다
+            mBundleSavedWord = new Bundle();
+
+            String searchWord = editTextSearch.getText().toString();
+            mBundleSavedWord.putString("searchWord", searchWord);
+
+
+        }
 
 
 
