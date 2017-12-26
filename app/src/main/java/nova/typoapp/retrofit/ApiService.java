@@ -68,6 +68,13 @@ public interface ApiService {
     Call<ResponseBody> getLikeList(@Field("feedID") int feedID);
 
 
+    //FCM 토큰을 서버에 보내기 위한 메소드
+    @FormUrlEncoded
+    @POST("fcm/registerToken.php")
+    Call<ResponseBody> registerToken (@Field("Token") String token  );
+//    @Field ("email") String email
+
+
 
 
     //포스트 방식으로 글쓰기 해주기. formurlEncoded 와 필드 골뱅이를 주목할 것.

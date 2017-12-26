@@ -11,11 +11,13 @@ import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import nova.typoapp.firebase.MyFireBaseInstanceIDService;
 import nova.typoapp.retrofit.AddCookiesInterceptor;
 import nova.typoapp.retrofit.ApiService;
 import nova.typoapp.retrofit.LoginInfo;
@@ -68,6 +70,10 @@ public class LauncherActivity extends AppCompatActivity {
 
             intent = new Intent(LauncherActivity.this, MainActivity.class);
             startActivity(intent);
+
+
+
+
 
             finish();
 
@@ -150,12 +156,16 @@ public class LauncherActivity extends AppCompatActivity {
             super.onPostExecute(voids);
 
 
+            // 파이어베이스 토큰을 가져온다. 토큰은 기기마다 정해지며, 앱을 삭제 후 재설치시 새 토큰이 발급된다.
+            MyFireBaseInstanceIDService myFireBaseInstanceIDService = new MyFireBaseInstanceIDService();
+            myFireBaseInstanceIDService.onTokenRefresh();
+            String token = FirebaseInstanceId.getInstance().getToken() ;
+            Log.e("abc", "onCreate: "+token );
+
+
             if ( email!=null ) {
                 Toast.makeText(LauncherActivity.this, email+"계정으로 자동 로그인되었습니다.", Toast.LENGTH_SHORT).show();
-
             }
-
-
             //아이디 중복으로 가입이 실패하였다.
             //에러메시지를 확인하고, 해당 에러를 텍스트뷰에 세팅한다.
             else {

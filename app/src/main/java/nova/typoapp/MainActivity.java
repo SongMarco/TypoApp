@@ -37,7 +37,7 @@ import nova.typoapp.newsfeed.NewsFeedContent;
 
 페이지는 총 3페이지로 되어 있다.
 1페이지는 뉴스피드 페이지이다. 사용자가 단어를 등록하고, 댓글과 좋아요로 소통할 수 있다.
-2페이지, 3페이지는 미구현이다. 2페이지는 소모임 컨텐츠, 3페이지는 게임을 구현할 예정이다.(변경 가능)
+2페이지, 3페이지는 미구현이다. 2페이지는 단어장 컨텐츠, 3페이지는 게임을 구현할 예정이다.(변경 가능)
 
 페이지 이동으로 프래그먼트를 가져올 때에는, getItem으로 호출한다.
 이 때 액티비티에 인터페이스(OnListFragmentInteractionListener)를 적용하는 것을 잊지말라.
@@ -189,8 +189,7 @@ public class MainActivity extends AppCompatActivity
 
                     Toast.makeText(MainActivity.this, "로그아웃되었습니다.", Toast.LENGTH_SHORT).show();
 
-//                    LoginToken = false;
-
+                    //                    LoginToken = false;
 
                   /*  로그아웃 처리를 위해, 로그인 정보를 담은
                     prefLogin을 가져오고, 로그인 정보를 클리어한다.*/

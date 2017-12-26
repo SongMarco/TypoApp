@@ -40,6 +40,7 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -718,13 +719,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     .addNetworkInterceptor(new StethoInterceptor())
                     .build();
 
-
             //레트로핏 객체 세팅
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(ApiService.API_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(okHttpClient)
                     .build();
+
 
 //            Log.e(TAG, "shared-before call: "+getSharedPreferences(getString(R.string.key_pref_Login) , MODE_PRIVATE ).getAll()  ) ;
 
@@ -799,6 +800,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             if (result.contains("success")) {
 
                 Toast.makeText(LoginActivity.this, "계정 " + email + " (으)로 로그인하셨습니다.", Toast.LENGTH_SHORT).show();
+
+                // 파이어베이스 토큰을 가져온다. 토큰은 기기마다 정해지며, 앱을 삭제 후 재설치시 새 토큰이 발급된다.
+                String token = FirebaseInstanceId.getInstance().getToken() ;
+                Log.e("abc", "onCreate at Login: "+token );
+                
 
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);

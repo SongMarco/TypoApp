@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "617889931755",
+    "firebase_url": "https://typoapp-456e7.firebaseio.com",
+    "project_id": "typoapp-456e7",
+    "storage_bucket": "typoapp-456e7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:617889931755:android:d933d5e69f205249",
+        "android_client_info": {
+          "package_name": "nova.typoapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "617889931755-gv3bbskuaq12cpbnv4i1cihql1et8gum.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB90mR2XOQ1aEhdW9vNjtP-exhO1J5SvEM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
