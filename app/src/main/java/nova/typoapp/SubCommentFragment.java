@@ -23,9 +23,7 @@ import nova.typoapp.subcoment.SubCommentContent.SubCommentItem;
  */
 public class SubCommentFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
 
@@ -40,7 +38,6 @@ public class SubCommentFragment extends Fragment {
 
 
 
-    // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
     public static SubCommentFragment newInstance(int columnCount) {
         SubCommentFragment fragment = new SubCommentFragment();
@@ -53,7 +50,7 @@ public class SubCommentFragment extends Fragment {
     // SubCommentActivity에서 콜하는 리사이클러뷰 업데이트. 이를 통해 대댓글 리스트가 갱신된다.
     public void updateRecyclerView() {
 
-        recyclerViewSubComment.setLayoutManager(new LinearLayoutManager(getContext()));
+//        recyclerViewSubComment.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewSubComment.setAdapter(subCommentRecyclerViewAdapter);
         subCommentRecyclerViewAdapter.notifyDataSetChanged();
 
@@ -121,7 +118,6 @@ public class SubCommentFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onListFragmentInteraction(SubCommentItem item);
     }
 }

@@ -52,7 +52,7 @@ import static nova.typoapp.retrofit.ApiService.API_URL;
 /**
  * {@link RecyclerView.Adapter} that can display a {@link SubCommentItem} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
+ *
  */
 
 public class MySubCommentRecyclerViewAdapter extends RecyclerView.Adapter<MySubCommentRecyclerViewAdapter.ViewHolder> {
@@ -101,7 +101,7 @@ public class MySubCommentRecyclerViewAdapter extends RecyclerView.Adapter<MySubC
             RequestOptions requestOptions = new RequestOptions()
                     .error(R.drawable.com_facebook_profile_picture_blank_square);
 
-            Glide.with(itemHolder.mView).load(mValues.get(position).subCommentimgProfileUrl)
+            Glide.with(itemHolder.mView).load(item.subCommentimgProfileUrl)
                     .apply(requestOptions)
                     .into(itemHolder.mSubCommentProfileImageView);
         }

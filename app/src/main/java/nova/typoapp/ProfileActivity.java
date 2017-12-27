@@ -386,8 +386,6 @@ public class ProfileActivity extends AppCompatActivity {
                             photoURI = data.getData();
                             albumURI = Uri.fromFile(albumFile);
 
-                            //todo 수정할 때 cropimage를 호출하도록 수정할 예정이다.
-                            //todo write 하러 갈 때 액티비티를 정리하는 것이 필요함.
 //                            cropImage();
 
                             //그냥 getPath하면 작동하지 않으나 해당 함수를 사용 하면 작동한다@@@

@@ -128,8 +128,6 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 
 
 
-        RefreshSubCommentTask refreshSubCommentTask = new RefreshSubCommentTask();
-        refreshSubCommentTask.execute();
     }
 
     @OnClick(R.id.buttonSendSubComment)
@@ -142,8 +140,13 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 
 
     }
-    // 댓글 작성에 필요한 태스크
+    // 답글 작성에 필요한 태스크
 
+    /*
+    서버로 답글 데이터를 보내고,
+    답글이 서버에 등록되면 리사이클러뷰를 리프레쉬 하여 답글을 보여주게 된다.
+
+     */
 
     public class WriteSubCommentTask extends AsyncTask<Void, String, Void> {
 
@@ -194,6 +197,8 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 
 
             //이전 액티비티에서 commentID를 인텐트로 보내줘야 한다.
+
+            //콜 객체를 만든다. 메소드에는 댓글의 ID값, 답글의 내용이 들어간다.
             retrofitCall = apiService.writeSubComment(commentID, textSubCommentContent);
 
             Log.e(TAG, "commentID = " + commentID + ", content = " + textSubCommentContent);
@@ -210,7 +215,8 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
         }
 
 
-        //작성 완료. 다이얼로그 닫아주고 댓글창 리프레시하고 종료
+        //작성 완료. 댓글창을 리프레시하고, 로딩 창을 닫아준다.
+        //마지막에 댓글 작성자에게 fcm 메시지를 전송한다.
         @Override
 
 
@@ -221,9 +227,6 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 
             //리프레시 태스크 돌릴 것
 
-
-
-
             //입력을 완료하면 에딧텍스트의 포커스를 해제하고, 키보드를 닫는다.
             editTextSubComment.setText("");
             editTextSubComment.clearFocus();
@@ -233,15 +236,93 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 
             Toast.makeText(context, "답글이 등록되었습니다.", Toast.LENGTH_SHORT).show();
 
-
-
             RefreshSubCommentTask refreshSubCommentTask = new RefreshSubCommentTask();
             refreshSubCommentTask.execute();
 
 
             asyncDialog.dismiss();
+
+
+            //댓글 작성자에게 fcm 메시지를 전송한다.
+
+
+            SendFcmWhenSubCommentToCommentTask subCommentToCommentTask = new SendFcmWhenSubCommentToCommentTask(SubCommentActivity.this);
+
+            subCommentToCommentTask.execute(commentID);
+
+
         }
     }
+
+    public class SendFcmWhenSubCommentToCommentTask extends AsyncTask<Integer, String, String> {
+
+        String json_result;
+        private Context mContext;
+
+        // context를 가져오는 생성자. 이를 통해 메인 액티비티의 함수에 접근할 수 있다.
+
+        public SendFcmWhenSubCommentToCommentTask (Context context) {
+            mContext = context;
+        }
+
+        @Override
+        protected String doInBackground(Integer... integers) {
+
+            //region//글 삭제하기 - DB상에서 뉴스피드 글을 삭제한다.
+            //레트로핏 기초 컴포넌트 만드는 과정. 자주 복붙할 것.
+            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(new ReceivedCookiesInterceptor(mContext))
+                    .addInterceptor(new AddCookiesInterceptor(mContext))
+                    .addInterceptor(httpLoggingInterceptor)
+                    .build();
+
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(API_URL)
+                    .client(okHttpClient)
+                    .build();
+
+            ApiService apiService = retrofit.create(ApiService.class);
+//            Log.e("myimg", "doInBackground: " + uploadImagePath);
+
+
+            //좋아요를 한 대상의 타입이다. 여기서는 게시물이므로 feed 라 하였다.
+            String type = "feed";
+
+            // 태스크를 만들 때 파라미터로 전송한 feed ID 값이다.
+            int feed_ID = integers[0];
+
+            // 레트로핏 콜 객체를 만든다. 파라미터로 게시물의 ID값, 게시물의 타입을 전송한다.
+            //todo 좋아요를 자꾸 하면서 장난을 치면 알림을 막는 로직이 필요하다.
+            Call<ResponseBody> comment = apiService.likeFeed(feed_ID, type );
+
+            try {
+
+                json_result = comment.execute().body().string();
+                return json_result;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            return null;
+        }
+
+        @Override
+
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+
+            //게시물에 좋아요를 적용/취소하였다.
+
+        }
+
+    }
+
 
     /*
        댓글창 새로고침 태스크
@@ -259,7 +340,8 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
+            //리스트 세팅을 시작할 때 리스트 중복을 막기 위해 댓글 리스트를 클리어한다.
+            SubCommentContent.ITEMS.clear();
 //            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 //            asyncDialog.setMessage("덧글을 불러오는 중입니다...");
 
@@ -320,8 +402,7 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
                 //받아온 결과값을 jsonArray 로 만든다.
                 jsonRes = new JSONArray(json_result);
 
-                //리스트 세팅을 시작할 때 리스트 중복을 막기 위해 댓글 리스트를 클리어한다.
-                SubCommentContent.clearList();
+
 
 
                 //jsonArray 에 담긴 아이템 정보들을 빼내어, 댓글 아이템으로 만들고, 리스트에 추가한다.
@@ -410,12 +491,11 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
     }
 
     @Override
-    protected void onPostResume() {
-        super.onPostResume();
+    protected void onResume() {
+        super.onResume();
 
         RefreshSubCommentTask refreshSubCommentTask = new RefreshSubCommentTask();
         refreshSubCommentTask.execute();
-
 
     }
 

@@ -44,9 +44,7 @@ import static nova.typoapp.retrofit.ApiService.API_URL;
  */
 public class NewsFeedFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
 
@@ -68,7 +66,6 @@ public class NewsFeedFragment extends Fragment {
     public NewsFeedFragment() {
     }
 
-    // TODO: Customize parameter initialization
 
     public static NewsFeedFragment newInstance(int columnCount) {
         NewsFeedFragment fragment = new NewsFeedFragment();
@@ -207,7 +204,6 @@ public class NewsFeedFragment extends Fragment {
     }
 
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onListFragmentInteraction(FeedItem item);
     }
 
@@ -407,6 +403,12 @@ public class NewsFeedFragment extends Fragment {
     public class RefreshTask extends AsyncTask<Void, String, String> {
 
 
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            NewsFeedContent.ITEMS.clear();
+
+        }
 
         @Override
         protected String doInBackground(Void... voids) {
@@ -429,7 +431,7 @@ public class NewsFeedFragment extends Fragment {
                     .client(okHttpClient)
                     .build();
 
-            NewsFeedContent.ITEMS.clear();
+
 
             ApiService apiService = retrofit.create(ApiService.class);
 //            Log.e("myimg", "doInBackground: " + uploadImagePath);

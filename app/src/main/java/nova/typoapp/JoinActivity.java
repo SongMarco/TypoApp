@@ -828,9 +828,6 @@ public class JoinActivity extends AppCompatActivity /* implements LoaderCallback
         }
     }
 
-
-    //todo 회원가입 레트로핏으로 구현하기ㅇ
-
     String json_result = "";
     public class JoinRetrofitTask extends AsyncTask<Void, String, String> {
 

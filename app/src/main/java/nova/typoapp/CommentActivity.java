@@ -404,6 +404,14 @@ implements CommentFragment.OnListFragmentInteractionListener {
     댓글창 새로고침 태스크
 
     서버에서 댓글을 불러오고, 댓글 프레그먼트의 리사이클러뷰에 세팅한다.
+
+    //todo 새로고침 태스크 주의사항 -- 프래그먼트 상에서의 새로고침 태스크는
+    당겨서 새로고침 할때 돌아가는 것이고,
+
+    지금 있는 것은 액티비티가 resume 될 때 콜 된다.
+
+    프래그먼트의 새로고침을 잘못 건드려서 망치지 말 것 @@@@@
+
      */
     public class RefreshCommentTask extends AsyncTask<Void, String, Void> {
 
@@ -613,6 +621,7 @@ feedID를 파라미터로 받아, 서버로 전송하게 된다.
             int feed_ID = integers[0];
 
             // 레트로핏 콜 객체를 만든다. 파라미터로 게시물의 ID값, 게시물의 타입을 전송한다.
+            //todo 좋아요를 자꾸 하면서 장난을 치면 알림을 막는 로직이 필요하다.
             Call<ResponseBody> comment = apiService.likeFeed(feed_ID, type );
 
 
