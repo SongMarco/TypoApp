@@ -54,10 +54,31 @@ public class MyFireBaseMessagingService extends com.google.firebase.messaging.Fi
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
+
+//        //이미지 추가를 위한 파트. 글자수로 인해 줄이 바뀌므로 주석처리해둔다.
+//        String url = "http://115.68.231.13/project/android/profileimage/jamsya@naver.commVgcI6yAbH.png";
+//        Bitmap theBitmap = null; // Width and height
+//        try {
+//            theBitmap = Glide.with(this)
+//                    .asBitmap()
+//                    .load(url)
+//                    .into(50, 50)
+//                    . get();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        } catch (ExecutionException e) {
+//            e.printStackTrace();
+//        }
+
+
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_stat_name)
-                .setContentTitle("타이포셔너리")
+//                .setLargeIcon(theBitmap)
+
+
+
+//                .setContentTitle(messageBody)
                 .setContentText(messageBody)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)

@@ -558,6 +558,19 @@ implements CommentFragment.OnListFragmentInteractionListener {
     }
 
 
+
+/*
+게시물에 좋아요를 적용하는 태스크
+
+feedID를 파라미터로 받아, 서버로 전송하게 된다.
+
+서버에서는 이 feedID를 이용, 좋아요 DB 상에 적용하게 된다.
+
+좋아요를 안 한 게시물이면 좋아요를 적용하며,
+좋아요를 한 게시물이라면 좋아요를 취소시킨다.
+
+
+ */
     String json_result = "";
     public class LikeFeedTaskInComment extends AsyncTask<Integer, String, String> {
 
@@ -592,8 +605,15 @@ implements CommentFragment.OnListFragmentInteractionListener {
             ApiService apiService = retrofit.create(ApiService.class);
 //            Log.e("myimg", "doInBackground: " + uploadImagePath);
 
+
+            //좋아요를 한 대상의 타입이다. 여기서는 게시물이므로 feed 라 하였다.
             String type = "feed";
-            Call<ResponseBody> comment = apiService.likeFeed(integers[0], type );
+
+            // 태스크를 만들 때 파라미터로 전송한 feed ID 값이다.
+            int feed_ID = integers[0];
+
+            // 레트로핏 콜 객체를 만든다. 파라미터로 게시물의 ID값, 게시물의 타입을 전송한다.
+            Call<ResponseBody> comment = apiService.likeFeed(feed_ID, type );
 
 
             try {
@@ -614,11 +634,15 @@ implements CommentFragment.OnListFragmentInteractionListener {
 
             super.onPostExecute(result);
 
+            //게시물에 좋아요를 적용/취소하였다.
+
 
 
         }
 
     }
+
+
 
 
 
@@ -635,4 +659,11 @@ implements CommentFragment.OnListFragmentInteractionListener {
         RefreshCommentTask refreshCommentTask = new RefreshCommentTask();
         refreshCommentTask.execute();
     }
+
+
+
+
+
+
+
 }
