@@ -97,6 +97,9 @@ implements CommentFragment.OnListFragmentInteractionListener {
 
     int likeNum;
 
+    String wordName;
+    String emailFeedWriter;
+
     Boolean isLiked;
     /*
     댓글 화면 초기화
@@ -110,6 +113,9 @@ implements CommentFragment.OnListFragmentInteractionListener {
 
 
         likeNum = getIntent().getIntExtra("likeNum", 0);
+        wordName = getIntent().getStringExtra("wordName");
+        emailFeedWriter = getIntent().getStringExtra("emailFeedWriter");
+
         textViewLikeInComment.setText("좋아요 "+likeNum+"개");
         /*
         새로고침 태스크를 실행한다.
@@ -280,7 +286,10 @@ implements CommentFragment.OnListFragmentInteractionListener {
         }
 
 
-        //작성 완료. 다이얼로그 닫아주고 댓글창 리프레시하고 종료
+        // 댓글 등록이 완료되었다.
+        // 댓글창을 리프레시하고
+        // 다이얼로그를 닫아준 뒤 종료한다.
+        // 추가 사항 : FCM 메시징으로 좋아요 태스크를 돌린다.
         @Override
 
 
@@ -292,14 +301,103 @@ implements CommentFragment.OnListFragmentInteractionListener {
 
             //리프레시 태스크 돌릴 것
 
-
             RefreshCommentTask refreshCommentTask = new RefreshCommentTask();
             refreshCommentTask.execute();
 
-
             asyncDialog.dismiss();
+
+//             뉴스피드 작성자에게 댓글이 작성되었다는 메시지를 전송한다.
+
+            SendFcmWhenCommentFeedTask fcmWhenCommentFeedTask = new SendFcmWhenCommentFeedTask(CommentActivity.this);
+            fcmWhenCommentFeedTask.execute();
+
+
         }
     }
+
+
+    /*
+    뉴스피드에 댓글을 등록할 때
+    Fcm 푸시 알림을 전송하는 태스크다.
+
+    댓글을 등록한 뒤 실행된다.
+
+     */
+    public class SendFcmWhenCommentFeedTask extends AsyncTask<Void, String, String> {
+
+        private Context mContext;
+
+        // context를 가져오는 생성자. 이를 통해 메인 액티비티의 함수에 접근할 수 있다.
+
+        public SendFcmWhenCommentFeedTask (Context context) {
+            mContext = context;
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            //region//글 삭제하기 - DB상에서 뉴스피드 글을 삭제한다.
+            //레트로핏 기초 컴포넌트 만드는 과정. 자주 복붙할 것.
+            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    //php 세션ID를 보내기 위한 인터셉터들.
+                    .addInterceptor(new ReceivedCookiesInterceptor(mContext))
+                    .addInterceptor(new AddCookiesInterceptor(mContext))
+                    .addInterceptor(httpLoggingInterceptor)
+                    .build();
+
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(API_URL)
+                    .client(okHttpClient)
+                    .build();
+
+            ApiService apiService = retrofit.create(ApiService.class);
+
+
+
+
+            // 서버로 fcm 요청을 보낸다. 세션 ID를 세팅해서 보내므로
+            // 세션에서 로그인 정보를 꺼내어 보낼 수 있다.
+            Call<ResponseBody> comment = apiService.fcmSendMessageWhenCommentFeed(wordName, emailFeedWriter);
+
+
+            try {
+
+                json_result = comment.execute().body().string();
+                return json_result;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            return null;
+        }
+
+        @Override
+
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+
+
+
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
 
 
     /*

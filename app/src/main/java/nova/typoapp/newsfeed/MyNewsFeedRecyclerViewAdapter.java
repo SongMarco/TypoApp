@@ -312,6 +312,9 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
                         intent.putExtra("likeNum", item.likeFeedNum);
 
+                        intent.putExtra("wordName", item.title );
+                        intent.putExtra("emailFeedWriter", item.writerEmail);
+
                         v.getContext().startActivity(intent);
                     }
 
