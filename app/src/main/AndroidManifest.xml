@@ -49,9 +49,19 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <!-- <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> -->
+
+    <!--application 태그 참고사항
+
+    allowBackup을 false로 해두어야, 앱을 삭제할 때 쉐어드도 같이 삭제된다.-->
+
     <application
         android:name=".MyApplication"
-        android:allowBackup="true"
+
+
+        android:allowBackup="false"
+
+
+
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"

@@ -736,8 +736,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
             //레트로핏 call 객체를 만든다. 이 call이 execute 되면 http 통신이 이루어진다.
+            String token = FirebaseInstanceId.getInstance().getToken();
 
-            Call<LoginResult> call = apiService.loginMember(email, passwordEnc);
+            Call<LoginResult> call = apiService.loginMember(email, passwordEnc, token);
 
 
             // http 통신을 수행한다.
@@ -802,8 +803,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 Toast.makeText(LoginActivity.this, "계정 " + email + " (으)로 로그인하셨습니다.", Toast.LENGTH_SHORT).show();
 
                 // 파이어베이스 토큰을 가져온다. 토큰은 기기마다 정해지며, 앱을 삭제 후 재설치시 새 토큰이 발급된다.
-                String token = FirebaseInstanceId.getInstance().getToken() ;
-                Log.e("abc", "onCreate at Login: "+token );
+
+
+//                MyFireBaseInstanceIDService myFireBaseInstanceIDService = new MyFireBaseInstanceIDService();
+//                myFireBaseInstanceIDService.onTokenRefresh();
+//                Log.e("abc", "onCreate at Login: "+token );
                 
 
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);

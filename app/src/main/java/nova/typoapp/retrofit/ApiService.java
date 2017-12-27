@@ -114,9 +114,10 @@ public interface ApiService {
     Call<ResponseBody> joinMember(@Field("u_email") String email, @Field("u_pw") String pw, @Field("u_name") String name, @Field("u_birthday") String birthday);
 
     //로그인
+    // 이메일과 암호화된 비밀번호, 기기 토큰을 전송한다.
     @FormUrlEncoded
     @POST("login.php")
-    Call<LoginResult> loginMember(@Field("u_email") String email, @Field("u_pw") String pw);
+    Call<LoginResult> loginMember(@Field("u_email") String email, @Field("u_pw") String pw, @Field("Token") String Token );
 
     //회원 정보 확인(세션 정보 가져오기)
     //메소드상으로는 아무것도 넣지 않는다. 인터셉터 객체가 콜 날릴 때 세션ID를 추가해준다.

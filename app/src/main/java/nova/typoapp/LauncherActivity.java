@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import nova.typoapp.firebase.MyFireBaseInstanceIDService;
 import nova.typoapp.retrofit.AddCookiesInterceptor;
 import nova.typoapp.retrofit.ApiService;
 import nova.typoapp.retrofit.LoginInfo;
@@ -156,9 +155,9 @@ public class LauncherActivity extends AppCompatActivity {
             super.onPostExecute(voids);
 
 
-            // 파이어베이스 토큰을 가져온다. 토큰은 기기마다 정해지며, 앱을 삭제 후 재설치시 새 토큰이 발급된다.
-            MyFireBaseInstanceIDService myFireBaseInstanceIDService = new MyFireBaseInstanceIDService();
-            myFireBaseInstanceIDService.onTokenRefresh();
+//            // 파이어베이스 토큰을 가져온다. 토큰은 기기마다 정해지며, 앱을 삭제 후 재설치시 새 토큰이 발급된다.
+//            MyFireBaseInstanceIDService myFireBaseInstanceIDService = new MyFireBaseInstanceIDService();
+//            myFireBaseInstanceIDService.onTokenRefresh();
             String token = FirebaseInstanceId.getInstance().getToken() ;
             Log.e("abc", "onCreate: "+token );
 
