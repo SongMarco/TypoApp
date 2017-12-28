@@ -63,6 +63,8 @@ public class MainActivity extends AppCompatActivity
     //페이저 어댑터는 뷰페이저에 사용되는 어댑터이다. 각 프래그먼트 객체를 불러올 때 사용한다.
     private SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());;
 
+    public static int feedIDFromFcm = -1;
+
     /*
     메인액티비티 초기화.
 
@@ -94,6 +96,16 @@ public class MainActivity extends AppCompatActivity
 
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
+
+
+        //만약 인텐트에서 feedID 값이 세팅된다면 알림을 통해 / 혹은 외부에서 접근한 것이다.
+        //feedIDFromFcm 값이 -1이 아니게 될 것이고, 그렇게 되면 프래그먼트에서 해당 게시물부터 페이징이 가능해진다.
+        //newFeedFragment 의 refresh Task 참고
+        if(getIntent().getIntExtra("feedIDFromFcm", -1 ) != -1){
+
+            feedIDFromFcm = getIntent().getIntExtra("feedIDFromFcm", -1 );
+        }
+
 
     }
 

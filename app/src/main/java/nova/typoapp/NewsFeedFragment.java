@@ -37,6 +37,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 
+import static nova.typoapp.MainActivity.feedIDFromFcm;
 import static nova.typoapp.retrofit.ApiService.API_URL;
 
 /**
@@ -141,6 +142,9 @@ public class NewsFeedFragment extends Fragment {
         mSwipeViewNewsFeed.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+
+
+                MainActivity.feedIDFromFcm = -1;
 
                 RefreshFeedTask refreshFeedTask = new RefreshFeedTask();
                 refreshFeedTask.execute();
@@ -250,8 +254,40 @@ public class NewsFeedFragment extends Fragment {
 //            Log.e("myimg", "doInBackground: " + uploadImagePath);
             Call<ResponseBody> retrofitCall;
 
-            retrofitCall = apiService.getFeedList();
+            //자 여기선 가장 최근의 게시물부터 가져올거니까
+            // 마지막 피드 넘버를 -1로 세팅해서 보낸다.
+            //서버에선 -1을 감지하여,
 
+            //메인 액티비티의 스태틱 변수로 파라미터를 집어넣는다.
+
+            //feedIDFromFcm 값은 알림이 올 떄를 제외하고는 -1이다.
+            // 서버에선 -1을 감지할 경우 가장 최근의 10개 게시물을 불러오게 된다.(정상 상황)
+            // 알림을 통해 feedIDFromFcm 값이 바뀔 경우 해당 게시물부터 페이징을 하게 된다.(알림 상황)
+
+            //문제점 : 당사자 피드가 나오지 않는다.
+
+            // 새로운 메소드를 만들어  id <= feedNum 으로 적용한다면?
+            //구현이 복잡함
+
+            // 보낼 때 feedIDFromFcm + 1로 세팅해서 보낸다면?
+            //이게 간단히 구현되고 좋군!
+            int feedIDFromFcmPlusOne;
+            if(feedIDFromFcm != -1){
+                feedIDFromFcmPlusOne = feedIDFromFcm+1;
+            }
+            else{
+                feedIDFromFcmPlusOne = feedIDFromFcm;
+            }
+
+            retrofitCall = apiService.getMoreFeed(feedIDFromFcmPlusOne);
+
+
+
+            //여기서 새로고침 하지 않고,
+            // 당겨서 새로고침시 feedFromFcm을 -1로 리셋한다. 다시 최신 글들을 불러오게 된다.
+
+//            if(MainActivity)
+//            feedIDFromFcm = -1;
             // show dialog
 
 

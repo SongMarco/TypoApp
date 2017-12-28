@@ -135,6 +135,15 @@ implements CommentFragment.OnListFragmentInteractionListener {
 
         //댓글 쓰려는 글의 ID를 겟인텐트로 가져온다.
         feedID = getIntent().getIntExtra("feedID", 0);
+
+        // fcm 알림을 통해 댓글로 들어왔을 수 있다. 이 때에는 다른 방법으로 feedID를 세팅한다.
+
+        //feedIDFromFcm 세팅 -> 알림을 통해 들어온 것임 -> feedID 새로 세팅
+        if( getIntent().getIntExtra("feedIDFromFcm", -1) != -1  ){
+
+            feedID = getIntent().getIntExtra("feedIDFromFcm", -1);
+        }
+
         Log.e(TAG, "onCreate: "+feedID);
 
 
@@ -195,6 +204,26 @@ implements CommentFragment.OnListFragmentInteractionListener {
 
 
 
+
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        // 인텐트에서 feedIDFromFcm 값이 건져진다면 알림에서 접근한 것이다.
+        // 현재 단일 액티비티 상태이므로, 뒤로가기를 누르면 메인 액티비티로 가도록 해주어야 한다.
+        if( getIntent().getIntExtra("feedIDFromFcm", -1) != -1 ){
+
+            Intent intent = new Intent(this, MainActivity.class);
+
+            intent.putExtra("feedIDFromFcm", feedID);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+            startActivity(intent);
+            finish();
+        }
 
 
     }
@@ -363,7 +392,7 @@ implements CommentFragment.OnListFragmentInteractionListener {
 
             // 서버로 fcm 요청을 보낸다. 세션 ID를 세팅해서 보내므로
             // 세션에서 로그인 정보를 꺼내어 보낼 수 있다.
-            Call<ResponseBody> comment = apiService.fcmSendMessageWhenCommentFeed(wordName, emailFeedWriter);
+            Call<ResponseBody> comment = apiService.fcmSendMessageWhenCommentFeed(wordName, emailFeedWriter, feedID);
 
 
             try {

@@ -51,6 +51,9 @@ public interface ApiService {
     Call<ResponseBody> getMoreFeed(@Field("lastFeedNum") int lastFeedNum);
 
 
+
+
+
     //댓글 리스트를 불러오는 메소드
     @FormUrlEncoded
     @POST("getCommentList.php")
@@ -166,7 +169,7 @@ public interface ApiService {
     // 세션에서 계정 정보를 꺼내어 메시지에 담는다.
     @FormUrlEncoded
     @POST("fcm/fcmSendMessageWhenCommentFeed.php")
-    Call<ResponseBody> fcmSendMessageWhenCommentFeed(@Field("wordName") String wordName, @Field("emailFeedWriter") String emailFeedWriter);
+    Call<ResponseBody> fcmSendMessageWhenCommentFeed(@Field("wordName") String wordName, @Field("emailFeedWriter") String emailFeedWriter, @Field("feedID") int feedID);
 
 
 }
