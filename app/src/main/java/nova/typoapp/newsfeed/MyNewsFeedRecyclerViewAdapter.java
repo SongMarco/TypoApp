@@ -63,7 +63,57 @@ import static nova.typoapp.retrofit.ApiService.API_URL;
  https://stackoverflow.com/questions/30284067/handle-button-click-inside-a-row-in-recyclerview
  */
 
-public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+
+
+public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
+
+
+    EndlessScrollListener endlessScrollListener;
+
+    public interface EndlessScrollListener {
+
+        /**
+         * Loads more data.
+         * @param position
+         * @return true loads data actually, false otherwise.
+         */
+        boolean onLoadMore(int position);
+
+
+    }
+//    /*
+//    데이터를 더 불러오는 메소드
+//     */
+//    @Override
+//    public boolean onLoadMore(int position) {
+//
+//
+//        FeedItem item = ITEMS.get(9);
+//
+//        for(int i = 0; i < 5; i++){
+//            ITEMS.add(item);
+//        }
+//
+//
+//
+//        return false;
+//
+//
+//    }
+
+
+
+
+
+    public EndlessScrollListener getEndlessScrollListener() {
+        return endlessScrollListener;
+    }
+
+    public void setEndlessScrollListener(EndlessScrollListener endlessScrollListener) {
+        this.endlessScrollListener = endlessScrollListener;
+    }
+
 
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
@@ -186,7 +236,27 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
             }
 
+            // you can cache getItemCount() in a member variable for more performance tuning
+            final int VISIBLE_THRESHOLD = 5;
+            //일단 끝자락에 닿았을 때 아이템을 추가하도록 설정
 
+            int realCount = getItemCount()-1;
+            Log.e("position", "onBindViewHolder: position "+position );
+            Log.e("position", "onBindViewHolder: count "+getItemCount() );
+            if(position == getItemCount()- 1) {
+
+
+
+//                    Toast.makeText(context, "load more", Toast.LENGTH_SHORT).show();
+
+                    endlessScrollListener.onLoadMore(position);
+
+
+
+
+
+
+            }
 
 
             SharedPreferences pref_login =  context.getSharedPreferences(context.getString(R.string.key_pref_Login), Context.MODE_PRIVATE );

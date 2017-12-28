@@ -18,6 +18,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -139,13 +141,15 @@ public class NewsFeedFragment extends Fragment {
             @Override
             public void onRefresh() {
 
-
                 RefreshTask refreshTask = new RefreshTask();
                 refreshTask.execute();
 
             }
         });
 
+
+        RefreshTask refreshTask = new RefreshTask();
+        refreshTask.execute();
 //        Toast.makeText(getActivity(), "onCreateViewCalled", Toast.LENGTH_SHORT).show();
 
 //
@@ -184,6 +188,7 @@ public class NewsFeedFragment extends Fragment {
 //        Toast.makeText(getActivity(), "onPause", Toast.LENGTH_SHORT).show();
         super.onPause();
 
+        Log.e("refresh", "onPause called" );
 //        // save RecyclerView state
 //        mBundleRecyclerViewState = new Bundle();
 //        Parcelable listState = recyclerViewNewsFeed.getLayoutManager().onSaveInstanceState();
@@ -197,9 +202,7 @@ public class NewsFeedFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-//        Toast.makeText(getContext(), "onResume", Toast.LENGTH_SHORT).show();
-        RefreshTask refreshTask = new RefreshTask();
-        refreshTask.execute();
+
 
     }
 
@@ -402,11 +405,11 @@ public class NewsFeedFragment extends Fragment {
 
     public class RefreshTask extends AsyncTask<Void, String, String> {
 
-
+        List<FeedItem> productItems = new ArrayList<FeedItem>();
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            NewsFeedContent.ITEMS.clear();
+
 
         }
 
@@ -430,7 +433,6 @@ public class NewsFeedFragment extends Fragment {
                     .baseUrl(API_URL)
                     .client(okHttpClient)
                     .build();
-
 
 
             ApiService apiService = retrofit.create(ApiService.class);
@@ -483,8 +485,13 @@ public class NewsFeedFragment extends Fragment {
 
 //                            FeedItem productFeed = NewsFeedContent.createFeed4(writer, title, content, imgUrl);
 //                                FeedItem productFeed = NewsFeedContent.createFeed7(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate);
+
+
                     FeedItem productFeed = new FeedItem(feedNum, likeFeed, isLiked, writer, title, content, imgUrl, profileUrl, writtenDate, commentNum, writerEmail);
-                    NewsFeedContent.addItem(productFeed);
+
+                    //새로운 아이템 어레이를 만들고, post 에서 카피한다.
+                    productItems.add(productFeed);
+//                    NewsFeedContent.addItem(productFeed);
 
 
                 }
@@ -508,6 +515,13 @@ public class NewsFeedFragment extends Fragment {
 
             super.onPostExecute(result);
 
+
+            //게시물 데이터를 서버에서 모두 불러왔다.
+
+            //기존의 게시물 리스트를 비우고, 불러왔던 리스트를 담는다.
+            //이렇게 하면 inconsistency 문제를 해결할 수 있다.
+            NewsFeedContent.ITEMS.clear();
+            NewsFeedContent.ITEMS.addAll(productItems);
 
 // Set the adapter
             if (recyclerViewNewsFeed != null) {
@@ -535,6 +549,28 @@ public class NewsFeedFragment extends Fragment {
 //                        });
 //                    }
 //                }).start();
+
+                if(myNewsFeedRecyclerViewAdapter.getEndlessScrollListener() == null){
+                    myNewsFeedRecyclerViewAdapter.setEndlessScrollListener(new MyNewsFeedRecyclerViewAdapter.EndlessScrollListener() {
+                        @Override
+                        public boolean onLoadMore(int position) {
+
+
+
+                            FeedItem item = NewsFeedContent.ITEMS.get(9);
+                            Log.e("position", "onBindViewHolder: loadMore" );
+                            for (int i = 0; i < 5; i++) {
+                                NewsFeedContent.ITEMS.add(item);
+                            }
+
+
+                            return false;
+
+                        }
+                    });
+                }
+
+
                 recyclerViewNewsFeed.setAdapter(myNewsFeedRecyclerViewAdapter);
             }
 

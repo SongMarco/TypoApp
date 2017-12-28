@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
@@ -318,6 +319,7 @@ public class MainActivity extends AppCompatActivity
         public int getItemPosition(Object object) {
 
 //            Toast.makeText(MainActivity.this, "getItemPos Called", Toast.LENGTH_SHORT).show();
+            Log.e("refresh", "getItemPosition: getItemPos called" );
 
             //리프레시 하는 경우 : 댓글 달고 올때, 프로필 고쳤을 때, 수정삭제했을때
 
@@ -363,6 +365,7 @@ public class MainActivity extends AppCompatActivity
                 case 0:
 
 
+                    Log.e("refresh", "getItem: called" );
                     return new NewsFeedFragment();
 
 
@@ -399,7 +402,26 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
 
 ////        Toast.makeText(this, "MainonResume called", Toast.LENGTH_SHORT).show();
+//        mSectionsPagerAdapter.notifyDataSetChanged();
+    }
+
+    //onResume 에서 페이저 어댑터를 notify 할 경우,
+    //새로고침이 두번 되는 문제가 발생한다.
+    /*
+    액티비티가 안보였다가 다시 이어지는 과정에서는
+    onRestart 가 타이밍이 맞는다.
+
+    이렇게 하면 처음 생성될 때는 콜이 안 되고,
+    나중에 다시 생길 때 콜이 된다.
+
+     */
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+
         mSectionsPagerAdapter.notifyDataSetChanged();
+
     }
 
     public SectionsPagerAdapter  getPagerAdapter(){
