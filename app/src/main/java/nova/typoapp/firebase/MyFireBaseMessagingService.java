@@ -13,7 +13,7 @@ import android.util.Log;
 
 import com.google.firebase.messaging.RemoteMessage;
 
-import nova.typoapp.MainActivity;
+import nova.typoapp.ProfileActivity;
 import nova.typoapp.R;
 
 
@@ -49,7 +49,9 @@ public class MyFireBaseMessagingService extends com.google.firebase.messaging.Fi
     private void sendNotification(String messageBody) {
         Log.d("MyFirebaseIIDService", "received messasge : " + messageBody);
 
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, ProfileActivity.class);
+
+
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);

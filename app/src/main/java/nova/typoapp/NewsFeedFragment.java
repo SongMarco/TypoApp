@@ -1,5 +1,6 @@
 package nova.typoapp;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -141,15 +142,15 @@ public class NewsFeedFragment extends Fragment {
             @Override
             public void onRefresh() {
 
-                RefreshTask refreshTask = new RefreshTask();
-                refreshTask.execute();
+                RefreshFeedTask refreshFeedTask = new RefreshFeedTask();
+                refreshFeedTask.execute();
 
             }
         });
 
 
-        RefreshTask refreshTask = new RefreshTask();
-        refreshTask.execute();
+        RefreshFeedTask refreshFeedTask = new RefreshFeedTask();
+        refreshFeedTask.execute();
 //        Toast.makeText(getActivity(), "onCreateViewCalled", Toast.LENGTH_SHORT).show();
 
 //
@@ -211,199 +212,9 @@ public class NewsFeedFragment extends Fragment {
     }
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
 
 
-    /**
-     * This is a method for Fragment.
-     * You can do the same in onCreate or onRestoreInstanceState
-     */
-
-
-    //    @Override
-//    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-//        super.onViewStateRestored(savedInstanceState);
-//        Toast.makeText(getActivity(), "reload state called", Toast.LENGTH_SHORT).show();
-//        if(savedInstanceState != null)
-//        {
-////            Toast.makeText(getActivity(), "reload state called", Toast.LENGTH_SHORT).show();
-//            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
-//            recyclerViewNewsFeed.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
-//        }
-//    }
-
-//    @Override
-//    public void onSaveInstanceState(Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//        Toast.makeText(getActivity(), "save state called", Toast.LENGTH_SHORT).show();
-//        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerViewNewsFeed.getLayoutManager().onSaveInstanceState());
-//    }
-//
-//    public class OpenTask extends AsyncTask<Void, String, String> {
-//
-//        final ProgressDialog asyncDialog = new ProgressDialog(
-//                getActivity());
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//
-//
-//            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-//            asyncDialog.setMessage("글을 불러오는 중입니다...");
-//            // show dialog
-//            asyncDialog.show();
-//        }
-//
-//        @Override
-//        protected String doInBackground(Void... voids) {
-//
-//            //region 게시물 리스트 불러오기. 주의사항 - 불러오기 이후 어댑터를 세팅해주어야, 제때 뷰를 반환해준다.
-//            // 게시물 리스트 불러오기
-//            //댓글을 달러 간 것이 아니라면 새로 불러와라.
-//
-//            //레트로핏 기초 컴포넌트 만드는 과정. 자주 복붙할 것.
-//            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
-//            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-//
-//            OkHttpClient okHttpClient = new OkHttpClient.Builder()
-//                    .addInterceptor(new ReceivedCookiesInterceptor(getContext()))
-//                    .addInterceptor(new AddCookiesInterceptor(getContext()))
-//                    .addInterceptor(httpLoggingInterceptor)
-//                    .build();
-//
-//
-//            Retrofit retrofit = new Retrofit.Builder()
-//                    .baseUrl(API_URL)
-//                    .client(okHttpClient)
-//                    .build();
-//
-//            NewsFeedContent.ITEMS.clear();
-//
-//            ApiService apiService = retrofit.create(ApiService.class);
-////            Log.e("myimg", "doInBackground: " + uploadImagePath);
-//            final Call<ResponseBody> retrofitCall;
-//
-//            retrofitCall = apiService.getFeedList();
-//
-//
-//            try {
-//                json_result = retrofitCall.execute().body().string();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//
-//            //                                       Log.v("Test", response.body().string());
-//
-//
-////                    Log.v("RECV DATA", json_result);
-//
-//            JSONArray jsonRes = null;
-//            try {
-//                jsonRes = new JSONArray(json_result);
-//
-//                for (int i = 0; i < jsonRes.length(); i++) {
-//                    JSONObject jObject = jsonRes.getJSONObject(i);  // JSONObject 추출
-//
-//                    int feedNum = jObject.getInt("feedNum");
-//                    String writer = jObject.getString("writer");
-//                    String title = jObject.getString("title");
-//                    String content = jObject.getString("text_content");
-//                    String writtenDate = jObject.getString("written_time");
-//
-//                    String writerEmail = jObject.getString("writer_email");
-////                            Log.e("hoss", "onResponse: 작성자 email = "+writerEmail );
-//
-//
-//                    String imgUrl = "";
-//                    String profileUrl = "";
-//
-//                    int commentNum = jObject.getInt("comment_num");
-//
-//                    int likeFeed = jObject.getInt("feed_like");
-//
-//                    if (!Objects.equals(jObject.getString("imgUrl"), "")) {
-//                        imgUrl = jObject.getString("imgUrl");
-//                    }
-//                    if (!jObject.getString("writer_profile").equals("")) {
-//
-//                        profileUrl = jObject.getString("writer_profile");
-//                    }
-//
-//                    String isLiked = jObject.getString("is_liked");
-//
-//                    FeedItem productFeed = new FeedItem(feedNum, likeFeed, isLiked, writer, title, content, imgUrl, profileUrl, writtenDate, commentNum, writerEmail);
-//                    NewsFeedContent.addItem(productFeed);
-//
-//
-//                }
-//                for (int i = 0; i < NewsFeedContent.ITEMS.size(); i++) {
-//                    Log.v("hey", "" + NewsFeedContent.ITEMS.get(i).isLiked);
-//                }
-//
-//
-//                if (recyclerViewNewsFeed.getLayoutManager() == null) {
-//                    recyclerViewNewsFeed.setLayoutManager(new LinearLayoutManager(getContext()));
-//                }
-//
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        getActivity().runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                updateRecyclerView();
-//                                // 해당 작업을 처리함
-//                            }
-//                        });
-//                    }
-//                }).start();
-//
-//
-////                        for (int i = 0; i < NewsFeedContent.ITEMS.size(); i++) {
-////
-//////                            Log.e("wow", (i + " : " + NewsFeedContent.ITEMS.get(i).getClass() ) );
-//////                            Log.e("wow", (i + " : " + NewsFeedContent.ITEMS.get(i).getInfo() ) );
-////
-////                        }
-////
-//
-//
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//
-//
-//            //endregion
-//
-//            return null;
-//        }
-//
-//
-//        @Override
-//
-//        protected void onPostExecute(String result) {
-//
-//            super.onPostExecute(result);
-//            asyncDialog.dismiss();
-//            mSwipeViewNewsFeed.setRefreshing(false);
-////            Log.e("wow", result);
-//
-//        }
-//
-//    }
-
-    public class RefreshTask extends AsyncTask<Void, String, String> {
+    public class RefreshFeedTask extends AsyncTask<Void, String, String> {
 
         List<FeedItem> productItems = new ArrayList<FeedItem>();
         @Override
@@ -556,13 +367,12 @@ public class NewsFeedFragment extends Fragment {
                         public boolean onLoadMore(int position) {
 
 
+                            // 아래의 태스크에서 리사이클러뷰를 이어붙이게 된다. notify를 post에서 해주어야 리사이클러뷰가 이어짐에 유의하라.
 
-                            FeedItem item = NewsFeedContent.ITEMS.get(9);
-                            Log.e("position", "onBindViewHolder: loadMore" );
-                            for (int i = 0; i < 5; i++) {
-                                NewsFeedContent.ITEMS.add(item);
-                            }
+                            LoadMoreFeedTask loadMoreFeedTask = new LoadMoreFeedTask();
 
+                            Log.e("paging", "onLoadMore: "+NewsFeedContent.ITEMS.get(position-1).getFeedID() );
+                            loadMoreFeedTask.execute( NewsFeedContent.ITEMS.get(position-1).getFeedID() );
 
                             return false;
 
@@ -577,6 +387,172 @@ public class NewsFeedFragment extends Fragment {
 
             mSwipeViewNewsFeed.setRefreshing(false);
 //            Log.e("wow", result);
+
+        }
+
+    }
+
+
+    /*
+
+    리사이클러뷰의 특정 위치에 닿으면(예를 들면 맨 밑)
+
+    게시물을 서버에서 더 불러오는 태스크.
+
+    post 에서 notify 를 해주지 않으면 더 이어지지 않는다.
+
+
+     */
+    public class LoadMoreFeedTask extends AsyncTask<Integer, String, String> {
+
+        String json_result;
+
+        private Context context = getContext();
+
+        List<FeedItem> productItems = new ArrayList<FeedItem>();
+
+        // context를 가져오는 생성자. 이를 통해 메인 액티비티의 함수에 접근할 수 있다.
+
+
+
+        ProgressDialog asyncDialog = new ProgressDialog(context);
+
+
+        /*
+        onPre 에서 로딩 중임을 다이얼로그로 표시해준다.
+         */
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+//            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+//            asyncDialog.setMessage("단어를 더 불러오는 중입니다...");
+//
+//            // show dialog
+//            asyncDialog.show();
+
+        }
+
+        /*
+        서버에서 필요한 아이템들을 가져온다.
+         */
+        @Override
+        protected String doInBackground(Integer... integers) {
+
+
+
+            Log.e("refresh", "doInBackground: refresh called");
+
+            //레트로핏 기초 컴포넌트 만드는 과정. 자주 복붙할 것.
+            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(new ReceivedCookiesInterceptor(getContext()))
+                    .addInterceptor(new AddCookiesInterceptor(getContext()))
+                    .addInterceptor(httpLoggingInterceptor)
+                    .build();
+
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(API_URL)
+                    .client(okHttpClient)
+                    .build();
+
+
+            ApiService apiService = retrofit.create(ApiService.class);
+//            Log.e("myimg", "doInBackground: " + uploadImagePath);
+            Call<ResponseBody> retrofitCall;
+
+            retrofitCall = apiService.getMoreFeed(integers[0]);
+
+            // show dialog
+
+
+            try {
+                json_result = retrofitCall.execute().body().string();
+                JSONArray jsonRes = null;
+
+                jsonRes = new JSONArray(json_result);
+
+                for (int i = 0; i < jsonRes.length(); i++) {
+                    JSONObject jObject = jsonRes.getJSONObject(i);  // JSONObject 추출
+                    int feedNum = jObject.getInt("feedNum");
+                    String writer = jObject.getString("writer");
+                    String title = jObject.getString("title");
+                    String content = jObject.getString("text_content");
+                    String writtenDate = jObject.getString("written_time");
+
+                    String writerEmail = jObject.getString("writer_email");
+//                            Log.e("hoss", "onResponse: 작성자 email = "+writerEmail );
+
+
+                    String imgUrl = "";
+                    String profileUrl = "";
+
+                    int commentNum = jObject.getInt("comment_num");
+
+                    int likeFeed = jObject.getInt("feed_like");
+
+                    if (!Objects.equals(jObject.getString("imgUrl"), "")) {
+                        imgUrl = jObject.getString("imgUrl");
+                    }
+                    if (!jObject.getString("writer_profile").equals("")) {
+
+                        profileUrl = jObject.getString("writer_profile");
+                    }
+
+                    String isLiked = jObject.getString("is_liked");
+
+//                    Log.e("hoss", "onResponse: 작성자 email = "+writerEmail );
+//                    Log.e("myCommentNum", "onResponse: " + commentNum);
+//                            Log.v("hey", writer+title+content);
+
+//                            FeedItem productFeed = NewsFeedContent.createFeed4(writer, title, content, imgUrl);
+//                                FeedItem productFeed = NewsFeedContent.createFeed7(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate);
+
+
+                    FeedItem productFeed = new FeedItem(feedNum, likeFeed, isLiked, writer, title, content, imgUrl, profileUrl, writtenDate, commentNum, writerEmail);
+
+                    //새로운 아이템 어레이를 만들고, post 에서 카피한다.
+                    productItems.add(productFeed);
+//                    NewsFeedContent.addItem(productFeed);
+
+
+                }
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            //endregion
+
+            return null;
+        }
+
+
+        /*
+        필요한 아이템을 가져왔고, 어댑터에 notify 하여 적용한다.
+         */
+
+        @Override
+
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+
+
+            NewsFeedContent.ITEMS.addAll(productItems);
+
+
+//            asyncDialog.dismiss();
+
+            myNewsFeedRecyclerViewAdapter.notifyDataSetChanged();
+
+
 
         }
 

@@ -44,6 +44,13 @@ public interface ApiService {
     Call<ResponseBody> getFeedList();
 
 
+    //  무한 스크롤을 할 때, 아이템을 더 가져오는 메소드
+    // 마지막 리스트에서 보인 아이템의 피드번호를 서버로 보낸다.
+    @FormUrlEncoded
+    @POST("getMoreFeed.php")
+    Call<ResponseBody> getMoreFeed(@Field("lastFeedNum") int lastFeedNum);
+
+
     //댓글 리스트를 불러오는 메소드
     @FormUrlEncoded
     @POST("getCommentList.php")
@@ -57,18 +64,13 @@ public interface ApiService {
     //게시물을 검색하는 메소드
     @FormUrlEncoded
     @POST("searchFeed.php")
-    Call<ResponseBody> searchFeed(@Field("searchWord") String  searchWord);
-
-
+    Call<ResponseBody> searchFeed(@Field("searchWord") String searchWord);
 
 
     //게시물에 좋아요를 한 사람의 리스트를 불러오는 메소드
     @FormUrlEncoded
     @POST("getLikeList.php")
     Call<ResponseBody> getLikeList(@Field("feedID") int feedID);
-
-
-
 
 
     //포스트 방식으로 글쓰기 해주기. formurlEncoded 와 필드 골뱅이를 주목할 것.
@@ -89,18 +91,18 @@ public interface ApiService {
     //포스트 방식으로 댓 수정
     @FormUrlEncoded
     @POST("editComment.php")
-    Call<ResponseBody> editComment(@Field("commentID") int commentID, @Field("content") String content );
+    Call<ResponseBody> editComment(@Field("commentID") int commentID, @Field("content") String content);
 
 
     //포스트 방식으로 댓글 작성
     @FormUrlEncoded
     @POST("writeComment.php")
-    Call<ResponseBody> writeComment( @Field("feedID") int feedID, @Field("content") String content);
+    Call<ResponseBody> writeComment(@Field("feedID") int feedID, @Field("content") String content);
 
     //포스트 방식으로 대댓글 작성
     @FormUrlEncoded
     @POST("writeSubComment.php")
-    Call<ResponseBody> writeSubComment ( @Field("commentID") int commentID, @Field("content") String content);
+    Call<ResponseBody> writeSubComment(@Field("commentID") int commentID, @Field("content") String content);
 
     //회원가입
     @FormUrlEncoded
@@ -111,7 +113,7 @@ public interface ApiService {
     // 이메일과 암호화된 비밀번호, 기기 토큰을 전송한다.
     @FormUrlEncoded
     @POST("login.php")
-    Call<LoginResult> loginMember(@Field("u_email") String email, @Field("u_pw") String pw, @Field("Token") String Token );
+    Call<LoginResult> loginMember(@Field("u_email") String email, @Field("u_pw") String pw, @Field("Token") String Token);
 
     //회원 정보 확인(세션 정보 가져오기)
     //메소드상으로는 아무것도 넣지 않는다. 인터셉터 객체가 콜 날릴 때 세션ID를 추가해준다.
@@ -146,26 +148,25 @@ public interface ApiService {
     //대댓글은 depth 와, subcomment_ comment_ id 변수를 가진다. (댓글 DB(table_comment) 참조)
     @FormUrlEncoded
     @POST("deleteSubComment.php")
-    Call<ResponseBody> deleteSubComment( @Field("commentID") int commentID );
+    Call<ResponseBody> deleteSubComment(@Field("commentID") int commentID);
 
     //게시글에 좋아요 적용하기(이미 좋아요 적용되있으면 좋아요 해제, 좋아하지 않으면 좋아요 적용)
     @FormUrlEncoded
     @POST("likeFeed.php")
-    Call<ResponseBody> likeFeed(@Field("feedID") int feedID, @Field("type") String type );
+    Call<ResponseBody> likeFeed(@Field("feedID") int feedID, @Field("type") String type);
 
 
     ////////////////////// fcm 관련 코드
     //FCM 토큰을 서버에 보내기 위한 메소드
     @FormUrlEncoded
     @POST("fcm/registerToken.php")
-    Call<ResponseBody> registerToken (@Field("Token") String token  );
+    Call<ResponseBody> registerToken(@Field("Token") String token);
 
     // 게시물(Feed)에 댓글이 달릴 때(Comment) fcm 메세지를 보내는 메소드
     // 세션에서 계정 정보를 꺼내어 메시지에 담는다.
     @FormUrlEncoded
     @POST("fcm/fcmSendMessageWhenCommentFeed.php")
-    Call<ResponseBody> fcmSendMessageWhenCommentFeed (@Field("wordName") String wordName , @Field("emailFeedWriter") String emailFeedWriter );
-
+    Call<ResponseBody> fcmSendMessageWhenCommentFeed(@Field("wordName") String wordName, @Field("emailFeedWriter") String emailFeedWriter);
 
 
 }

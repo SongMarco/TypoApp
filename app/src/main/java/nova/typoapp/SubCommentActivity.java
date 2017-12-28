@@ -26,6 +26,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -334,14 +336,14 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 
         Context context = SubCommentActivity.this;
 
+        List<SubCommentContent.SubCommentItem> productItems = new ArrayList<SubCommentContent.SubCommentItem>();
 
         //본래 온프리에서 로딩 표시를 했으나, 충분히 속도가 빠르므로 그냥 두었다.
         //데이터를 더 추가하여 테스트 후 주석된 부분의 삭제 여부를 결정하라
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            //리스트 세팅을 시작할 때 리스트 중복을 막기 위해 댓글 리스트를 클리어한다.
-            SubCommentContent.ITEMS.clear();
+
 //            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 //            asyncDialog.setMessage("덧글을 불러오는 중입니다...");
 
@@ -435,8 +437,11 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 
 
                     //아이템 객체에 데이터를 다 담은 후, 아이템을 리스트에 추가한다.
+
+
                     SubCommentContent.SubCommentItem productSubComment = new SubCommentContent.SubCommentItem(commentID, subCommentID, depth, writer, writerEmail, content, writtenDate, profileUrl);
-                    SubCommentContent.addItem(productSubComment);
+                    productItems.add(productSubComment);
+
 
                 }
 
@@ -457,7 +462,11 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
+            SubCommentContent.ITEMS.clear();
+            SubCommentContent.ITEMS.addAll(productItems);
+
 //            asyncDialog.dismiss();
+
 
 
 

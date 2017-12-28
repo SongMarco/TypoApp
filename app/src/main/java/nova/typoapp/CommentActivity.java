@@ -19,6 +19,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -416,21 +418,13 @@ implements CommentFragment.OnListFragmentInteractionListener {
     public class RefreshCommentTask extends AsyncTask<Void, String, Void> {
 
 
+        List<CommentContent.CommentItem> productItems = new ArrayList<CommentContent.CommentItem>();
 //        Context context = CommentActivity.this;
 
-
-
-        //본래 온프리에서 로딩 표시를 했으나, 충분히 속도가 빠르므로 그냥 두었다.
-        //데이터를 더 추가하여 테스트 후 주석된 부분의 삭제 여부를 결정하라
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
 
-//            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-//            asyncDialog.setMessage("덧글을 불러오는 중입니다...");
-
-            // show dialog
-//            asyncDialog.show();
         }
 
 
@@ -486,8 +480,6 @@ implements CommentFragment.OnListFragmentInteractionListener {
                 //받아온 결과값을 jsonArray 로 만든다.
                 jsonRes = new JSONArray(json_result);
 
-                //리스트 세팅을 시작할 때 리스트 중복을 막기 위해 댓글 리스트를 클리어한다.
-                CommentContent.clearList();
 
 
                 //jsonArray 에 담긴 아이템 정보들을 빼내어, 댓글 아이템으로 만들고, 리스트에 추가한다.
@@ -524,8 +516,7 @@ implements CommentFragment.OnListFragmentInteractionListener {
                     //아래 생성자를 고칠 경우, 프래그먼트의 생성자 또한 고쳐야 한다.
                     // 더 좋은 방법은 새로고침 태스크를 스태틱하게 만들어서 어디서든 콜 할 수 있게 만드는 것인데, 아직 적용하지 못했다.
                     CommentContent.CommentItem productComment = new CommentContent.CommentItem(commentID, feedID, depth, subCommentNum, writer, writerEmail , content, writtenDate, profileUrl);
-                    CommentContent.addItem(productComment);
-
+                    productItems.add(productComment);
                 }
 
             } catch (JSONException e) {
@@ -544,6 +535,11 @@ implements CommentFragment.OnListFragmentInteractionListener {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
+
+            //리스트 세팅을 시작할 때 리스트 중복을 막기 위해 댓글 리스트를 클리어한다.
+            CommentContent.clearList();
+            CommentContent.ITEMS.addAll(productItems);
 
 //            asyncDialog.dismiss();
 

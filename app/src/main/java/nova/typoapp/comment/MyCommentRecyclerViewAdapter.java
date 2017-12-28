@@ -84,9 +84,13 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
         if (item.subCommentNum == 0) {
             itemHolder.mSubCommentNum.setVisibility(View.GONE);
         }
-        itemHolder.mSubCommentNum.setText("이전 답글" + item.subCommentNum + "개 보기");
-
-        Log.e("onBindTag", "onBindViewHolder: writer= " + item.commentWriter + "content = " + item.commentContent);
+        else{
+            itemHolder.mSubCommentNum.setVisibility(View.VISIBLE);
+            itemHolder.mSubCommentNum.setText("이전 답글" + item.subCommentNum + "개 보기");
+        }
+//        Log.e("onBindTag", "onBindViewHolder: writer=이전 답글 " + item.subCommentNum + "개 보기");
+//
+//        Log.e("onBindTag", "onBindViewHolder: writer= " + item.commentWriter + "content = " + item.commentContent);
 
 
 // 프로필 이미지의 유무에 따라 이미지뷰 세팅. 없으면 -> 기본 세팅

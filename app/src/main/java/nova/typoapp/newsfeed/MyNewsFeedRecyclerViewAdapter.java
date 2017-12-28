@@ -242,17 +242,12 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
             int realCount = getItemCount()-1;
             Log.e("position", "onBindViewHolder: position "+position );
-            Log.e("position", "onBindViewHolder: count "+getItemCount() );
+            Log.e("position", "onBindViewHolder: count "+(getItemCount()-1) );
             if(position == getItemCount()- 1) {
-
-
 
 //                    Toast.makeText(context, "load more", Toast.LENGTH_SHORT).show();
 
                     endlessScrollListener.onLoadMore(position);
-
-
-
 
 
 

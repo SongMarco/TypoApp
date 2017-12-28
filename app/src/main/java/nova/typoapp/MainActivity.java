@@ -355,6 +355,10 @@ public class MainActivity extends AppCompatActivity
         (화면 요소는 댓글 수, 프로필 이미지, 게시물 등이 있다.)
 
          */
+
+        NewsFeedFragment newsFeedFragment = new NewsFeedFragment();
+        WebFragment webFragment = new WebFragment();
+
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
@@ -366,11 +370,12 @@ public class MainActivity extends AppCompatActivity
 
 
                     Log.e("refresh", "getItem: called" );
-                    return new NewsFeedFragment();
+//                    return ListFragment.newInstance(position);
+                    return newsFeedFragment;
 
 
                 case 1:
-                    return new WebFragment();
+                    return webFragment;
 
 
                 case 2:
