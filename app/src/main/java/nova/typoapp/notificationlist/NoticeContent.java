@@ -43,14 +43,15 @@ public class NoticeContent {
      * A dummy item representing a piece of content.
      */
     public static class NoticeItem {
-        public  String id;
-        public  String content;
-        public  String details;
-
 
         // 알림의 기본 내용
 
         int noticeID;
+
+        int feedID;
+
+
+        int commentID;
 
         String ownerEmail;
 
@@ -78,9 +79,17 @@ public class NoticeContent {
             this.profileUrl = profileUrl;
         }
 
-        @Override
-        public String toString() {
-            return content;
+        public NoticeItem(int noticeID, int feedID, int commentID, String ownerEmail, String noticeContent, String noticeDate, String toActivity, String profileUrl) {
+            this.noticeID = noticeID;
+            this.feedID = feedID;
+            this.commentID = commentID;
+            this.ownerEmail = ownerEmail;
+            this.noticeContent = noticeContent;
+            this.noticeDate = noticeDate;
+            this.toActivity = toActivity;
+            this.profileUrl = profileUrl;
         }
+
+
     }
 }

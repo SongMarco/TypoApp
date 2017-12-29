@@ -4,12 +4,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
 
 
+
+    android:background="?android:attr/selectableItemBackground"
     android:layout_width="wrap_content"
 
     android:layout_height="wrap_content"
 
-    android:orientation="vertical">
-
+    android:orientation="vertical"
+   >
+<!-- android:background="?android:attr/selectableItemBackground" 이걸 넣으면 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -30,14 +33,13 @@
             app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
 
         <LinearLayout
-            android:id="@+id/layoutSubCommentBody"
+            android:id="@+id/layoutNoticeBody"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="?android:attr/selectableItemBackground"
 
-            android:clickable="true"
-            android:focusable="true"
+
+
             android:orientation="vertical"
 
 

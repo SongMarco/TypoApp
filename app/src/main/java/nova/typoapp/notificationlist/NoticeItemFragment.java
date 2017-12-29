@@ -181,8 +181,27 @@ public class NoticeItemFragment extends Fragment {
                     JSONObject jObject = jsonRes.getJSONObject(i);  // JSONObject 추출
 
 
-
                     int noticeID = jObject.getInt("notice_id");
+
+
+
+                    //feedID와 commentID가 ""로 도착했을 때를 걸러내고,
+                    //원하는 int 값이 세팅되게 한다.
+                    int feedID = -1;
+                    if( !jObject.getString("feed_id").equals("")  ){
+                        feedID = jObject.getInt("feed_id");
+                    }
+
+                    int commentID = -1;
+                    if( !jObject.getString("comment_id").equals("")   ){
+                        commentID = jObject.getInt("comment_id");
+                    }
+
+
+
+
+
+
                     String ownerEmail = jObject.getString("notice_owner_email");
                     String content = jObject.getString("notice_content");
 
@@ -197,7 +216,11 @@ public class NoticeItemFragment extends Fragment {
                     }
 
 
-                    NoticeItem productNotice = new NoticeItem(noticeID, ownerEmail, content, noticeDate, toWhereActivity, profileUrl );
+
+
+
+
+                    NoticeItem productNotice = new NoticeItem(noticeID, feedID, commentID, ownerEmail, content, noticeDate, toWhereActivity, profileUrl );
 
                     //새로운 아이템 어레이를 만들고, post 에서 카피한다.
                     productItems.add(productNotice);

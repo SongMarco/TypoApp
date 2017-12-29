@@ -1,5 +1,7 @@
 package nova.typoapp.notificationlist;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.support.v7.widget.RecyclerView;
@@ -8,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -16,7 +19,10 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import nova.typoapp.CommentActivity;
+import nova.typoapp.MainActivity;
 import nova.typoapp.R;
+import nova.typoapp.SubCommentActivity;
 import nova.typoapp.notificationlist.NoticeContent.NoticeItem;
 import nova.typoapp.notificationlist.NoticeItemFragment.OnListFragmentInteractionListener;
 
@@ -53,7 +59,7 @@ public class MyNoticeItemRecyclerViewAdapter extends RecyclerView.Adapter<MyNoti
 
 
         holder.mItem = mValues.get(position);
-        NoticeItem item = holder.mItem;
+        final NoticeItem item = holder.mItem;
 
         holder.mNoticeContent.setText(item.noticeContent);
         holder.mNoticeDate.setText(item.noticeDate);
@@ -70,6 +76,55 @@ public class MyNoticeItemRecyclerViewAdapter extends RecyclerView.Adapter<MyNoti
                     .apply(requestOptions)
                     .into(holder.mNoticeProfileImage);
         }
+
+        View.OnClickListener mNoticeClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent;
+                Context context = holder.mView.getContext();
+                switch (item.toActivity){
+
+                    case "MainActivity":
+
+                        intent = new Intent(context, MainActivity.class);
+
+                        intent.putExtra("feedIDFromFcm", item.feedID);
+
+                        context.startActivity(intent);
+
+                        break;
+
+
+                    case "CommentActivity":
+
+                        intent = new Intent(context, CommentActivity.class);
+
+                        intent.putExtra("feedIDFromFcm", item.feedID);
+
+                        context.startActivity(intent);
+                        break;
+
+
+                    case "SubCommentActivity":
+
+                        intent = new Intent(context, SubCommentActivity.class);
+
+                        intent.putExtra("feedIDFromFcm", item.feedID);
+                        intent.putExtra("commentIDFromFcm", item.commentID);
+
+                        context.startActivity(intent);
+
+                        break;
+
+                }
+
+
+
+            }
+        };
+
+        holder.mView.setOnClickListener(mNoticeClickListener);
 
 
 
