@@ -412,7 +412,7 @@ public class NewsFeedFragment extends Fragment {
                             LoadMoreFeedTask loadMoreFeedTask = new LoadMoreFeedTask();
 
                             Toast.makeText(getContext(), "페이징 작동", Toast.LENGTH_SHORT).show();
-                            Log.e("paging", "onLoadMore: "+NewsFeedContent.ITEMS.get(position-1).getFeedID() );
+//                            Log.e("paging", "onLoadMore: "+NewsFeedContent.ITEMS.get(position-1).getFeedID() );
                             loadMoreFeedTask.execute( NewsFeedContent.ITEMS.get(position-1).getFeedID() );
 
                             return false;

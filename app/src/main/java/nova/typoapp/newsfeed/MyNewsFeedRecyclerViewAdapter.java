@@ -232,13 +232,14 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             }
             //1개 이상이다. 댓글 개수를 표시한다.
             else{
+                itemHolder.mCommentNum.setVisibility(View.VISIBLE);
                 itemHolder.mCommentNum.setText("댓글 " + item.commentNum + "개");
 
             }
 
             // you can cache getItemCount() in a member variable for more performance tuning
             final int VISIBLE_THRESHOLD = 5;
-            //일단 끝자락에 닿았을 때 아이템을 추가하도록 설정
+            //일단 뒤에서 3번째 아이템에 닿았을 때 아이템을 추가하도록 설정
 
             int realCount = getItemCount()-1;
             Log.e("position", "onBindViewHolder: position "+position );
@@ -303,6 +304,10 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             }
             //좋아요 안한 버튼임
             else{
+
+
+                itemHolder.buttonLikeFeed.setCompoundDrawablesWithIntrinsicBounds(R.drawable.likewhite, 0, 0, 0);
+                itemHolder.buttonLikeFeed.setChecked(false);
 
             }
 
