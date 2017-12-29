@@ -28,11 +28,13 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import nova.typoapp.comment.CommentContent;
+import nova.typoapp.newsfeed.NewsFeedContent;
 import nova.typoapp.retrofit.AddCookiesInterceptor;
 import nova.typoapp.retrofit.ApiService;
 import nova.typoapp.retrofit.ReceivedCookiesInterceptor;
@@ -71,11 +73,63 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 
     int commentID;
 
+    int feedID;
+    String emailCommentWriter;
+
+    String imgProfileUrl, commentWriter, commentContent, commentDate;
+
+    // isLiked, likeNum, wordName, emailFeedWriter
+    boolean isLiked;
+    int likeNum;
+    String wordName, emailFeedWriter;
+
 
     public void updateSubCommentList() {
 
         RefreshSubCommentTask refreshSubCommentTask = new RefreshSubCommentTask();
         refreshSubCommentTask.execute();
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        // 인텐트에서 commentIDFromFcm 값이 건져진다면 알림에서 접근한 것이다.
+        // 현재 단일 액티비티 상태이므로, 뒤로가기를 누르면 답글 액티비티로 가도록 해주어야 한다.
+
+        // 주의 ::: 답글 액티비티에서 또 뒤로가면 액티비티가 없으므로, 메인으로 가도록 댓글액티비티도 처리해야함 @@@@@@
+        if( getIntent().getIntExtra("commentIDFromFcm", -1) != -1 ){
+
+            Intent intent = new Intent(this, CommentActivity.class);
+
+            intent.putExtra("feedIDFromFcm", feedID);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+            //좋아요를 누른 상태라면 isLiked 를 true 로 세팅해 보내서, 댓글에서도 좋아요를 적용한다.
+            //좋아요를 위한 변수들 세팅하기
+
+
+
+            //이번엔 게시물에 대한 정보가 따로 필요해졌다.
+            //(답글 알림 -> 답글 화면 -> 댓글 화면에서 알림을 날려야할 때)
+            // 아래 변수들은 getFeedInfo 를 통해 세팅된다.
+
+            intent.putExtra("isLiked", isLiked);
+
+            intent.putExtra("likeNum", likeNum);
+
+            //댓글 알림 메시지를 세팅하기 위한 변수들
+            intent.putExtra("wordName", wordName);
+            intent.putExtra("emailFeedWriter", emailFeedWriter);
+
+
+
+
+            startActivity(intent);
+            finish();
+        }
+
 
     }
 
@@ -91,17 +145,28 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
+        //댓글의 ID를 인텐트에서 가져온다. 맨 위에 답글이 달린 댓글이 세팅되고 그 아래에 답글 목록이 세팅된다.
+
         commentID = getIntent().getIntExtra("commentID", -1);
 
+        feedID = getIntent().getIntExtra("feedID", -1);
 
+        // commentIDFromFcm 이 인텐트에 들어있다면, 알림을 통해 답글 화면에 접근한 것이다.
+        if (getIntent().getIntExtra("commentIDFromFcm", -1) != -1) {
+
+            commentID = getIntent().getIntExtra("commentIDFromFcm", -1);
+            feedID = getIntent().getIntExtra("feedIDFromFcm", -1);
+        }
+
+        emailCommentWriter = getIntent().getStringExtra("emailCommentWriter");
 
         //댓글의 데이터를 인텐트에서 가져온다
         Intent gotIntent = getIntent();
 
-        String imgProfileUrl = gotIntent.getStringExtra("imgProfileUrl");
-        String commentWriter = gotIntent.getStringExtra("commentWriter");
-        String commentContent = gotIntent.getStringExtra("commentContent");
-        String commentDate = gotIntent.getStringExtra("commentDate");
+        imgProfileUrl = gotIntent.getStringExtra("imgProfileUrl");
+        commentWriter = gotIntent.getStringExtra("commentWriter");
+        commentContent = gotIntent.getStringExtra("commentContent");
+        commentDate = gotIntent.getStringExtra("commentDate");
 
 //        intent.putExtra("imgProfileUrl", item.imgProfileUrl);
 //        intent.putExtra("commentWriter", item.commentWriter);
@@ -114,20 +179,34 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 
         //답글을 달 댓글의 뷰를 세팅한다.
 
-        //프로필 이미지 세팅하기
-        RequestOptions requestOptions = new RequestOptions()
-                .error(R.drawable.com_facebook_profile_picture_blank_square);
+        //댓글의 프로필 이미지와 텍스트뷰를 세팅한다.
+        // 문제점 : 알림에서 액티비티로 접근할 경우, 인텐트에 댓글의 정보가 들어있지 않다.
+        //따라서 비동기 태스크를 한 번 돌려서 서버로부터 가져와 세팅한다.
 
-        Glide.with(SubCommentActivity.this).load(imgProfileUrl)
-                .apply(requestOptions)
-                .into(mSubCommentCommentProfileImage);
 
-        mSubCommentCommentWriter.setText(commentWriter);
+        //알림을 통해 이 액티비티에 접근한 경우, 댓글에 대한 정보를 따로 불러오도록 한다.
+        if (getIntent().getIntExtra("commentIDFromFcm", -1) != -1) {
 
-        mSubCommentCommentContent.setText(commentContent);
+            GetCommentInfoTask getCommentInfoTask = new GetCommentInfoTask();
+            getCommentInfoTask.execute();
 
-        mSubCommentCommentDate.setText(commentDate);
+            GetFeedInfoTask getFeedInfoTask = new GetFeedInfoTask();
+            getFeedInfoTask.execute();
 
+        } else {
+            RequestOptions requestOptions = new RequestOptions()
+                    .error(R.drawable.com_facebook_profile_picture_blank_square);
+
+            Glide.with(SubCommentActivity.this).load(imgProfileUrl)
+                    .apply(requestOptions)
+                    .into(mSubCommentCommentProfileImage);
+
+            mSubCommentCommentWriter.setText(commentWriter);
+
+            mSubCommentCommentContent.setText(commentContent);
+
+            mSubCommentCommentDate.setText(commentDate);
+        }
 
 
     }
@@ -142,6 +221,224 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 
 
     }
+
+    //알림에서 답글 액티비티에 접근할 때,
+    //서버로부터 댓글의 정보를 가져오는 태스크
+    public class GetCommentInfoTask extends AsyncTask<Void, String, String> {
+
+        String json_result;
+        Context mContext = SubCommentActivity.this;
+
+        // context를 가져오는 생성자. 이를 통해 메인 액티비티의 함수에 접근할 수 있다.
+
+
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            //okHttp 클라이언트를 생성한다.
+            // 로그 생성을 위해 httpLoggingInterceptor 를 사용했다.
+            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+//                    .addInterceptor(new ReceivedCookiesInterceptor(context))
+//                    .addInterceptor(new AddCookiesInterceptor(context))
+                    .addInterceptor(httpLoggingInterceptor)
+                    .build();
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(API_URL)
+                    .client(okHttpClient)
+                    .build();
+
+
+            ApiService apiService = retrofit.create(ApiService.class);
+//            Log.e("myimg", "doInBackground: " + uploadImagePath);
+
+            //레트로핏 콜 객체를 만든다.
+            //feedID를 가져온다. (해당 글의 댓글을 가져오기 위함)
+            Call<ResponseBody> retrofitCall;
+            retrofitCall = apiService.getCommentInfo(commentID);
+
+            try {
+
+                //결과값을 json_result 에 담는다.
+                json_result = retrofitCall.execute().body().string();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            JSONArray jsonRes = null;
+            try {
+
+                //받아온 결과값을 jsonArray 로 만든다.
+                jsonRes = new JSONArray(json_result);
+
+                //jsonArray 에 담긴 아이템 정보들을 빼내어, 댓글 아이템으로 만들고, 리스트에 추가한다.
+                for (int i = 0; i < jsonRes.length(); i++) {
+
+                    //jsonArray 의 데이터를 댓글 아이템 객체에 담는다.
+                    JSONObject jObject = jsonRes.getJSONObject(i);  // JSONObject 추출
+
+                    commentWriter = jObject.getString("writer");
+
+                    commentContent = jObject.getString("text_content");
+
+                    commentDate = jObject.getString("written_time");
+
+                    if (!jObject.getString("writer_profile_url").equals("")) {
+                        imgProfileUrl =  jObject.getString("writer_profile_url");
+                    }
+
+
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+//            for (CommentContent.CommentItem item  : CommentContent.ITEMS){
+//                Log.i(TAG,"item writer: "+item.commentWriter+ "item content: "+item.commentContent);
+//            }
+
+            return null;
+        }
+
+        @Override
+
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+
+
+            // 댓글에 대한 정보가 세팅되었다. 댓글 뷰에 데이터를 배치한다.
+            RequestOptions requestOptions = new RequestOptions()
+                    .error(R.drawable.com_facebook_profile_picture_blank_square);
+
+            Glide.with(SubCommentActivity.this).load(imgProfileUrl)
+                    .apply(requestOptions)
+                    .into(mSubCommentCommentProfileImage);
+
+            mSubCommentCommentWriter.setText(commentWriter);
+
+            mSubCommentCommentContent.setText(commentContent);
+
+            mSubCommentCommentDate.setText(commentDate);
+
+
+        }
+
+    }
+
+
+
+    //알림에서 답글 액티비티에 접근할 때,
+    //서버로부터 댓글의 정보를 가져오는 태스크
+    public class GetFeedInfoTask extends AsyncTask<Void, String, String> {
+
+        String json_result;
+        Context mContext = SubCommentActivity.this;
+
+        // context를 가져오는 생성자. 이를 통해 메인 액티비티의 함수에 접근할 수 있다.
+
+
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            //okHttp 클라이언트를 생성한다.
+            // 로그 생성을 위해 httpLoggingInterceptor 를 사용했다.
+            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(new ReceivedCookiesInterceptor(mContext))
+                    .addInterceptor(new AddCookiesInterceptor(mContext))
+                    .addInterceptor(httpLoggingInterceptor)
+                    .build();
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(API_URL)
+                    .client(okHttpClient)
+                    .build();
+
+
+            ApiService apiService = retrofit.create(ApiService.class);
+//            Log.e("myimg", "doInBackground: " + uploadImagePath);
+
+            //레트로핏 콜 객체를 만든다.
+            //feedID를 가져온다. (해당 글의 댓글을 가져오기 위함)
+            Call<ResponseBody> retrofitCall;
+            retrofitCall = apiService.getFeedInfo(feedID);
+
+            try {
+                json_result = retrofitCall.execute().body().string();
+
+                JSONArray jsonRes = null;
+
+                jsonRes = new JSONArray(json_result);
+
+                for (int i = 0; i < jsonRes.length(); i++) {
+
+                    JSONObject jObject = jsonRes.getJSONObject(i);  // JSONObject 추출
+
+                    // isLiked, likeNum, wordName, emailFeedWriter
+
+                     wordName = jObject.getString("title");
+
+                    emailFeedWriter = jObject.getString("writer_email");
+
+                    likeNum = jObject.getInt("feed_like");
+
+                    String isLikedInString = jObject.getString("is_liked");
+
+                    isLiked = Boolean.parseBoolean(isLikedInString);
+
+                    Log.e(TAG, "doInBackground: islikedInString ="+isLikedInString );
+                    Log.e(TAG, "doInBackground: isliked ="+isLiked );
+
+
+                }
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            //endregion
+
+            return null;
+        }
+
+        @Override
+
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+
+
+            // 댓글에 대한 정보가 세팅되었다. 댓글 뷰에 데이터를 배치한다.
+            RequestOptions requestOptions = new RequestOptions()
+                    .error(R.drawable.com_facebook_profile_picture_blank_square);
+
+            Glide.with(SubCommentActivity.this).load(imgProfileUrl)
+                    .apply(requestOptions)
+                    .into(mSubCommentCommentProfileImage);
+
+            mSubCommentCommentWriter.setText(commentWriter);
+
+            mSubCommentCommentContent.setText(commentContent);
+
+            mSubCommentCommentDate.setText(commentDate);
+
+
+        }
+
+    }
+
+
     // 답글 작성에 필요한 태스크
 
     /*
@@ -245,12 +542,10 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
             asyncDialog.dismiss();
 
 
-            //댓글 작성자에게 fcm 메시지를 전송한다.
+            //댓글 작성자에게 fcm 메시지를 전송하는 태스크를 실행한다.
 
-
-            SendFcmWhenSubCommentToCommentTask subCommentToCommentTask = new SendFcmWhenSubCommentToCommentTask(SubCommentActivity.this);
-
-            subCommentToCommentTask.execute(commentID);
+            SendFcmWhenSubCommentToCommentTask sendFcmWhenSubCommentToCommentTask = new SendFcmWhenSubCommentToCommentTask(SubCommentActivity.this);
+            sendFcmWhenSubCommentToCommentTask.execute(commentID);
 
 
         }
@@ -263,7 +558,7 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 
         // context를 가져오는 생성자. 이를 통해 메인 액티비티의 함수에 접근할 수 있다.
 
-        public SendFcmWhenSubCommentToCommentTask (Context context) {
+        public SendFcmWhenSubCommentToCommentTask(Context context) {
             mContext = context;
         }
 
@@ -291,15 +586,9 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 //            Log.e("myimg", "doInBackground: " + uploadImagePath);
 
 
-            //좋아요를 한 대상의 타입이다. 여기서는 게시물이므로 feed 라 하였다.
-            String type = "feed";
-
-            // 태스크를 만들 때 파라미터로 전송한 feed ID 값이다.
-            int feed_ID = integers[0];
-
             // 레트로핏 콜 객체를 만든다. 파라미터로 게시물의 ID값, 게시물의 타입을 전송한다.
-            //todo 좋아요를 자꾸 하면서 장난을 치면 알림을 막는 로직이 필요하다.
-            Call<ResponseBody> comment = apiService.likeFeed(feed_ID, type );
+
+            Call<ResponseBody> comment = apiService.fcmSendMessageWhenReplyComment(emailCommentWriter, feedID, commentID);
 
             try {
 
@@ -319,7 +608,6 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 
             super.onPostExecute(result);
 
-            //게시물에 좋아요를 적용/취소하였다.
 
         }
 
@@ -405,8 +693,6 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
                 jsonRes = new JSONArray(json_result);
 
 
-
-
                 //jsonArray 에 담긴 아이템 정보들을 빼내어, 댓글 아이템으로 만들고, 리스트에 추가한다.
                 for (int i = 0; i < jsonRes.length(); i++) {
 
@@ -466,9 +752,6 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
             SubCommentContent.ITEMS.addAll(productItems);
 
 //            asyncDialog.dismiss();
-
-
-
 
 
             // 댓글 프래그먼트를 가져와서, updateRecyclerViewComment 메소드를 콜하여 리사이클러뷰를 업데이트 한다.

@@ -284,6 +284,10 @@ public class MyCommentRecyclerViewAdapter extends RecyclerView.Adapter<MyComment
                 Intent intent = new Intent(v.getContext(), SubCommentActivity.class);
                 intent.putExtra("commentID", item.commentID);
 
+                intent.putExtra("emailCommentWriter",item.commentWriterEmail);
+
+                intent.putExtra("feedID",item.feedID);
+
                 // 프로필 url 정보, 작성자, 댓글 내용, 댓글 날짜 전달해주고, 넘어가서 뷰에서 세팅하라
 
                 intent.putExtra("imgProfileUrl", item.imgProfileUrl);

@@ -159,6 +159,24 @@ public interface ApiService {
     Call<ResponseBody> likeFeed(@Field("feedID") int feedID, @Field("type") String type);
 
 
+    // 서버에서 댓글 하나에 대한 정보를 가져오는 메소드
+    // 알림에서 답글 액티비티로 접근시 사용
+    @FormUrlEncoded
+    @POST("getCommentInfo.php")
+    Call<ResponseBody> getCommentInfo (@Field("commentID") int commentID );
+
+
+    // 서버에서 게시물 하나에 대한 정보를 가져오는 메소드
+    // 알림에서 답글 액티비티로 접근시 사용
+    @FormUrlEncoded
+    @POST("getFeedInfo.php")
+    Call<ResponseBody> getFeedInfo (@Field("feedID") int feedID );
+
+
+
+
+
+
     ////////////////////// fcm 관련 코드
     //FCM 토큰을 서버에 보내기 위한 메소드
     @FormUrlEncoded
@@ -170,6 +188,13 @@ public interface ApiService {
     @FormUrlEncoded
     @POST("fcm/fcmSendMessageWhenCommentFeed.php")
     Call<ResponseBody> fcmSendMessageWhenCommentFeed(@Field("wordName") String wordName, @Field("emailFeedWriter") String emailFeedWriter, @Field("feedID") int feedID);
+
+
+    // 댓글(Comment)에 답글이 달릴 때(Reply) fcm 메세지를 보내는 메소드
+    // 세션에서 계정 정보를 꺼내어 메시지에 담는다.
+    @FormUrlEncoded
+    @POST("fcm/fcmSendMessageWhenReplyComment.php")
+    Call<ResponseBody> fcmSendMessageWhenReplyComment (@Field("emailCommentWriter") String emailCommentWriter, @Field("feedID") int feedID ,@Field("commentID") int commentID );
 
 
 }
