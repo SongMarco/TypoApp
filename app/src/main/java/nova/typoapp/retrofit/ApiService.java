@@ -174,6 +174,12 @@ public interface ApiService {
 
 
 
+    // 알림페이지에 표시하기 위한 알림 목록을 서버에서 가져오는 메소드
+    // 세션 id값만 인터셉터에서 보내주면 오케이. 파라미터 필요 없음
+
+    @POST("notice/getNoticeList.php")
+    Call<ResponseBody> getNoticeList();
+
 
 
 

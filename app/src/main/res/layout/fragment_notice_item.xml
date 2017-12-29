@@ -20,7 +20,7 @@
         >
 
         <ImageView
-            android:id="@+id/subCommentProfileImage"
+            android:id="@+id/noticeProfileImage"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="top"
@@ -54,8 +54,8 @@
                 android:padding="@dimen/margin_border">
 
                 <TextView
-                    android:id="@+id/subCommentContent"
-                    android:layout_width="250dp"
+                    android:id="@+id/noticeContent"
+                    android:layout_width="260dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
 
@@ -64,7 +64,7 @@
                     android:textSize="15sp" />
 
                 <TextView
-                    android:id="@+id/subCommentDate"
+                    android:id="@+id/noticeDate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
 

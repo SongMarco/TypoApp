@@ -25,7 +25,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import nova.typoapp.newsfeed.NewsFeedContent;
-
+import nova.typoapp.notificationlist.NoticeContent;
+import nova.typoapp.notificationlist.NoticeItemFragment;
 
 
 /*
@@ -49,7 +50,9 @@ public class MainActivity extends AppCompatActivity
         implements
         NewsFeedFragment.OnListFragmentInteractionListener,
         WebFragment.OnFragmentInteractionListener,
-        BlankFragment.OnFragmentInteractionListener {
+        BlankFragment.OnFragmentInteractionListener,
+        NoticeItemFragment.OnListFragmentInteractionListener
+        {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -238,7 +241,10 @@ public class MainActivity extends AppCompatActivity
     public void onListFragmentInteraction(NewsFeedContent.FeedItem item) {
 
     }
+    @Override
+    public void onListFragmentInteraction(NoticeContent.NoticeItem item) {
 
+    }
     @Override
     public void onFragmentInteraction(Uri uri) {
 
@@ -246,9 +252,11 @@ public class MainActivity extends AppCompatActivity
 
 
 
+
+
     /*
     PlaceHolderFragment 는 빈화면에서 사용되는 프래그먼트이다.
-    현재는 뷰페이저의 getItem을 통해 프레그먼트를 가져오므로,
+    현재는 뷰페이저의 getItem 을 통해 프레그먼트를 가져오므로,
 
     해당 코드들을 주석처리해도 정상 작동함을 확인했다.
     만약의 경우를 위해 삭제하지는 않았다. 필요시 기능을 확인하고 삭제 후 테스트해보라.
@@ -371,6 +379,8 @@ public class MainActivity extends AppCompatActivity
         NewsFeedFragment newsFeedFragment = new NewsFeedFragment();
         WebFragment webFragment = new WebFragment();
 
+        NoticeItemFragment noticeItemFragment = new NoticeItemFragment();
+
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
@@ -391,7 +401,7 @@ public class MainActivity extends AppCompatActivity
 
 
                 case 2:
-                    return new BlankFragment();
+                    return noticeItemFragment;
 
 
                 default:
