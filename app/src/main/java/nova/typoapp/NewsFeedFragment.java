@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -403,10 +404,14 @@ public class NewsFeedFragment extends Fragment {
                         public boolean onLoadMore(int position) {
 
 
-                            // 아래의 태스크에서 리사이클러뷰를 이어붙이게 된다. notify를 post에서 해주어야 리사이클러뷰가 이어짐에 유의하라.
+                            // 아래의 LoadMoreFeedTask 태스크에서 리사이클러뷰를 이어붙이게 된다.
+                            // notifyDataSetChanged 를 LoadMoreFeedTask 태스크의 postExecute 에서 해주어야,
+                            // 리사이클러뷰가 갱신되어 이어진다.
 
+                            //todo 이 부분을 주석처리하면 페이징이 작동하지 않는다. - 시연할 때 보여주기
                             LoadMoreFeedTask loadMoreFeedTask = new LoadMoreFeedTask();
 
+                            Toast.makeText(getContext(), "페이징 작동", Toast.LENGTH_SHORT).show();
                             Log.e("paging", "onLoadMore: "+NewsFeedContent.ITEMS.get(position-1).getFeedID() );
                             loadMoreFeedTask.execute( NewsFeedContent.ITEMS.get(position-1).getFeedID() );
 
