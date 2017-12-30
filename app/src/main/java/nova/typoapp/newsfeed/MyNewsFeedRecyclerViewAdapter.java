@@ -1,7 +1,6 @@
 package nova.typoapp.newsfeed;
 
 import android.annotation.TargetApi;
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -593,7 +592,8 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 param.height = 0;
                 param.width = 0;
             }
-            else if( holder.itemView.getContext().getClass().getSimpleName().equals(MainActivity.class.getSimpleName() ))
+
+            if( holder.itemView.getContext().getClass().getSimpleName().equals(MainActivity.class.getSimpleName() ))
             {
 
                 ((VHHeader) holder).cardViewAdd.setVisibility(View.VISIBLE);

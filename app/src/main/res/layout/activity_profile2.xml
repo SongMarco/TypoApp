@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/transGrey">
+
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+
+                >
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/CardViewProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/margin_border"
+                    android:clickable="true"
+
+                    android:focusable="true">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:id="@+id/ImageViewProfile"
+                            android:layout_width="150dp"
+                            android:layout_height="150dp"
+                            android:layout_gravity="center"
+                            android:layout_margin="@dimen/margin_border"
+                            android:scaleType="center"
+                            app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
+
+                        <Button
+                            android:id="@+id/button3"
+                            style="?android:attr/borderlessButtonStyle"
+                            android:layout_width="match_parent"
+
+
+                            android:layout_height="30dp"
+
+                            android:layout_gravity="bottom|end"
+                            android:layout_margin="@dimen/margin_border"
+                            android:background="@drawable/buttonshape"
+                            android:clickable="false"
+                            android:drawableLeft="@android:drawable/ic_menu_manage"
+                            android:padding="@dimen/margin_border"
+                            android:text="수정" />
+                    </FrameLayout>
+
+
+                </android.support.v7.widget.CardView>
+
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/profileName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:layout_weight="0"
+                android:gravity="center"
+                android:text="name"
+                android:textAlignment="center"
+                android:textSize="20sp" />
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/margin_border">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/profileEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="email"
+                        android:textSize="18sp" />
+
+                    <View
+                        android:id="@+id/view3"
+
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+
+
+                        android:background="@color/borderGrey" />
+
+                    <TextView
+                        android:id="@+id/profileBirthday"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/cookie_birthday"
+                        android:textSize="18sp" />
+
+
+                </LinearLayout>
+
+
+            </android.support.v7.widget.CardView>
+
+
+            <android.support.v7.widget.CardView
+
+
+                android:layout_margin="@dimen/margin_border"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textView3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="@dimen/margin_border"
+                        android:text="내가 등록한 단어"
+                        android:textAlignment="center"
+                        android:textSize="18sp" />
+
+                    <View
+                        android:id="@+id/lineview1"
+
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+
+
+                        android:background="@color/borderGrey" />
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/recyclerViewProfile"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </LinearLayout>
+
+
+            </android.support.v7.widget.CardView>
+
+
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+</LinearLayout>

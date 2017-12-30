@@ -19,10 +19,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,14 +34,23 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.signature.ObjectKey;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import nova.typoapp.newsfeed.MyNewsFeedRecyclerViewAdapter;
+import nova.typoapp.newsfeed.NewsFeedContent;
 import nova.typoapp.retrofit.AddCookiesInterceptor;
 import nova.typoapp.retrofit.ApiService;
 import nova.typoapp.retrofit.ImageUploadResult;
@@ -50,11 +61,16 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ProfileActivity extends AppCompatActivity {
+import static nova.typoapp.retrofit.ApiService.API_URL;
+
+public class ProfileActivity extends AppCompatActivity
+implements  NewsFeedFragment.OnListFragmentInteractionListener{
 
     private static final int MY_PERMISSION_CAMERA = 1111;
     private static final int REQUEST_TAKE_PHOTO = 2222;
@@ -82,24 +98,48 @@ public class ProfileActivity extends AppCompatActivity {
     ImageView imageViewProfile;
 
 
+    @BindView(R.id.recyclerViewProfile)
+    RecyclerView recyclerViewProfile;
 
+
+    MyNewsFeedRecyclerViewAdapter myNewsFeedRecyclerViewAdapter = new MyNewsFeedRecyclerViewAdapter(NewsFeedContent.ITEMS, new MyNewsFeedRecyclerViewAdapter.ClickListener() {
+        @Override
+        public void onPositionClicked(int position) {
+
+        }
+
+        @Override
+        public void onLongClicked(int position) {
+
+        }
+    });
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
+        setContentView(R.layout.activity_profile2);
         ButterKnife.bind(this);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
 
+        //매끄러운 스크롤을 위해 리사이클러뷰의 스크롤을 차단한다.
+       recyclerViewProfile.setNestedScrollingEnabled(false);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+//
+//
+//
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         LookupSessionTask profileTask = new LookupSessionTask();
         profileTask.execute();
+
+
+        RefreshMyFeedTask refreshFeedTask = new RefreshMyFeedTask();
+        refreshFeedTask.execute();
 
 
 
@@ -117,6 +157,204 @@ public class ProfileActivity extends AppCompatActivity {
     String json_result = "";
 
     String email, name, birthday, profileImageUrl, profileImageName;
+
+    @Override
+    public void onListFragmentInteraction(NewsFeedContent.FeedItem item) {
+
+    }
+
+
+
+    public class RefreshMyFeedTask extends AsyncTask<Void, String, String> {
+
+
+        Context context = ProfileActivity.this;
+
+        List<NewsFeedContent.FeedItem> productItems = new ArrayList<NewsFeedContent.FeedItem>();
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            Log.e("refresh", "doInBackground: refresh called");
+
+            //레트로핏 기초 컴포넌트 만드는 과정. 자주 복붙할 것.
+            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(new ReceivedCookiesInterceptor(context))
+                    .addInterceptor(new AddCookiesInterceptor(context))
+                    .addInterceptor(httpLoggingInterceptor)
+                    .build();
+
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(API_URL)
+                    .client(okHttpClient)
+                    .build();
+
+
+            ApiService apiService = retrofit.create(ApiService.class);
+//            Log.e("myimg", "doInBackground: " + uploadImagePath);
+            Call<ResponseBody> retrofitCall;
+
+
+            //세션값과 비교해서 게시물 가져오면 됨
+            retrofitCall = apiService.getMyFeed();
+
+
+
+            try {
+                json_result = retrofitCall.execute().body().string();
+                JSONArray jsonRes = null;
+
+                jsonRes = new JSONArray(json_result);
+
+                for (int i = 0; i < jsonRes.length(); i++) {
+                    JSONObject jObject = jsonRes.getJSONObject(i);  // JSONObject 추출
+                    int feedNum = jObject.getInt("feedNum");
+                    String writer = jObject.getString("writer");
+                    String title = jObject.getString("title");
+                    String content = jObject.getString("text_content");
+                    String writtenDate = jObject.getString("written_time");
+
+                    String writerEmail = jObject.getString("writer_email");
+//                            Log.e("hoss", "onResponse: 작성자 email = "+writerEmail );
+
+
+                    String imgUrl = "";
+                    String profileUrl = "";
+
+                    int commentNum = jObject.getInt("comment_num");
+
+                    int likeFeed = jObject.getInt("feed_like");
+
+                    if (!Objects.equals(jObject.getString("imgUrl"), "")) {
+                        imgUrl = jObject.getString("imgUrl");
+                    }
+                    if (!jObject.getString("writer_profile").equals("")) {
+
+                        profileUrl = jObject.getString("writer_profile");
+                    }
+
+                    String isLiked = jObject.getString("is_liked");
+
+//                    Log.e("hoss", "onResponse: 작성자 email = "+writerEmail );
+//                    Log.e("myCommentNum", "onResponse: " + commentNum);
+//                            Log.v("hey", writer+title+content);
+
+//                            FeedItem productFeed = NewsFeedContent.createFeed4(writer, title, content, imgUrl);
+//                                FeedItem productFeed = NewsFeedContent.createFeed7(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate);
+
+
+                    NewsFeedContent.FeedItem productFeed = new NewsFeedContent.FeedItem(feedNum, likeFeed, isLiked, writer, title, content, imgUrl, profileUrl, writtenDate, commentNum, writerEmail);
+
+                    //새로운 아이템 어레이를 만들고, post 에서 카피한다.
+                    productItems.add(productFeed);
+//                    NewsFeedContent.addItem(productFeed);
+
+
+                }
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            //endregion
+
+            return null;
+        }
+
+
+        @Override
+
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+
+
+            //게시물 데이터를 서버에서 모두 불러왔다.
+
+            //기존의 게시물 리스트를 비우고, 불러왔던 리스트를 담는다.
+            //이렇게 하면 inconsistency 문제를 해결할 수 있다.
+            NewsFeedContent.ITEMS.clear();
+            NewsFeedContent.ITEMS.addAll(productItems);
+
+// Set the adapter
+            if (recyclerViewProfile != null) {
+                recyclerViewProfile.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+
+                        //At this point the layout is complete and the
+                        //dimensions of recyclerView and any child views are known.
+                    }
+                });
+
+                if (recyclerViewProfile.getLayoutManager() == null) {
+                    recyclerViewProfile.setLayoutManager(new LinearLayoutManager(context));
+                }
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        getActivity().runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                updateRecyclerView();
+//                                // 해당 작업을 처리함
+//                            }
+//                        });
+//                    }
+//                }).start();
+
+                if(myNewsFeedRecyclerViewAdapter.getEndlessScrollListener() == null){
+                    myNewsFeedRecyclerViewAdapter.setEndlessScrollListener(new MyNewsFeedRecyclerViewAdapter.EndlessScrollListener() {
+                        @Override
+                        public boolean onLoadMore(int position) {
+
+//
+//                            // 아래의 LoadMoreFeedTask 태스크에서 리사이클러뷰를 이어붙이게 된다.
+//                            // notifyDataSetChanged 를 LoadMoreFeedTask 태스크의 postExecute 에서 해주어야,
+//                            // 리사이클러뷰가 갱신되어 이어진다.
+//
+//                            //todo 프로필에서 페이징 적용해야 한다. getMyFeed 페이징 적용해서 하도록 개선할 것.
+//                            LoadMoreFeedTask loadMoreFeedTask = new LoadMoreFeedTask();
+//
+//                            Toast.makeText(getContext(), "페이징 작동", Toast.LENGTH_SHORT).show();
+////                            Log.e("paging", "onLoadMore: "+NewsFeedContent.ITEMS.get(position-1).getFeedID() );
+//                            loadMoreFeedTask.execute( NewsFeedContent.ITEMS.get(position-1).getFeedID() );
+
+                            return false;
+
+                        }
+                    });
+                }
+
+
+                recyclerViewProfile.setAdapter(myNewsFeedRecyclerViewAdapter);
+            }
+
+
+//            mSwipeViewNewsFeed.setRefreshing(false);
+//            Log.e("wow", result);
+
+        }
+
+    }
+
+
+
+
+
     public class LookupSessionTask extends AsyncTask<Void, String, Void> {
 
 

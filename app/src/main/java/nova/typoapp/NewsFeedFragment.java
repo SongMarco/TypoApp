@@ -185,6 +185,19 @@ public class NewsFeedFragment extends Fragment {
         }
 
 
+//        if(  getActivity().getClass().getSimpleName().equals( ProfileActivity.class.getSimpleName() )){
+//
+//            Toast.makeText(getContext(), "프로필에서 들어옴", Toast.LENGTH_SHORT).show();
+//
+////            recyclerViewNewsFeed.setNestedScrollingEnabled(false);
+////            recyclerViewNewsFeed.setHasFixedSize(false);
+//
+//            RefreshFeedTask refreshFeedTask = new RefreshFeedTask();
+//            refreshFeedTask.execute();
+//
+//        }
+
+
         //왜 on Create 에서 새로고침을 하는가? onResume에서 하면 어떻게되는데?
 
 

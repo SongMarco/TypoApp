@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 
 import nova.typoapp.NewsFeedFragment;
 import nova.typoapp.R;
@@ -64,6 +65,19 @@ public class NoticeClickedActivity extends AppCompatActivity
     }
 
 
+    /*
+    좌측 상단의 뒤로가기 버튼을 세팅하기 위한 코드
+    뒤로가기 버튼을 누르면, 이전 액티비티로 돌아가게 된다.
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
     @Override
     public void onListFragmentInteraction(NewsFeedContent.FeedItem item) {
 

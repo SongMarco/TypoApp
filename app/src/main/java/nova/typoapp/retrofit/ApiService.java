@@ -44,6 +44,11 @@ public interface ApiService {
     Call<ResponseBody> getFeedList();
 
 
+    //게시판 리스트를 불러오는 메소드. 파라미터 필요 없음
+    @GET("getMyFeed.php")
+    Call<ResponseBody> getMyFeed();
+
+
     //  무한 스크롤을 할 때, 아이템을 더 가져오는 메소드
     // 마지막 리스트에서 보인 아이템의 피드번호를 서버로 보낸다.
     @FormUrlEncoded
