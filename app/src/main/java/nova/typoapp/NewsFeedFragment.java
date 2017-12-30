@@ -29,6 +29,7 @@ import butterknife.ButterKnife;
 import nova.typoapp.newsfeed.MyNewsFeedRecyclerViewAdapter;
 import nova.typoapp.newsfeed.NewsFeedContent;
 import nova.typoapp.newsfeed.NewsFeedContent.FeedItem;
+import nova.typoapp.notificationlist.NoticeClickedActivity;
 import nova.typoapp.retrofit.AddCookiesInterceptor;
 import nova.typoapp.retrofit.ApiService;
 import nova.typoapp.retrofit.ReceivedCookiesInterceptor;
@@ -39,6 +40,7 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 
 import static nova.typoapp.MainActivity.feedIDFromFcm;
+import static nova.typoapp.notificationlist.NoticeClickedActivity.feedIDFromFcmInNoticeClicked;
 import static nova.typoapp.retrofit.ApiService.API_URL;
 
 /**
@@ -93,6 +95,16 @@ public class NewsFeedFragment extends Fragment {
 //        recyclerViewNewsFeed.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewNewsFeed.setAdapter(myNewsFeedRecyclerViewAdapter);
 //        myNewsFeedRecyclerViewAdapter.notifyDataSetChanged();
+
+    }
+
+    public void getFeedInfo() {
+
+
+        RefreshOneFeedTask refreshOneFeedTask = new RefreshOneFeedTask();
+        refreshOneFeedTask.execute();
+
+
 
     }
 
@@ -154,13 +166,29 @@ public class NewsFeedFragment extends Fragment {
         });
 
 
-        RefreshFeedTask refreshFeedTask = new RefreshFeedTask();
-        refreshFeedTask.execute();
-//        Toast.makeText(getActivity(), "onCreateViewCalled", Toast.LENGTH_SHORT).show();
 
-//
-//
-//        });
+
+
+        // 프래그먼트의 액티비티를 가져와서, 메인일 경우 새로고침을 진행.(게시물을 10 개 가져온다.)
+        // 메인이 아니라 알림에서 접근한 경우 그에 맞게 asyncTask를 돌린다.(알림 받은 게시물만 한 개 불러온다.)
+        if(getActivity().getClass().getSimpleName().equals( MainActivity.class.getSimpleName() )){
+
+            RefreshFeedTask refreshFeedTask = new RefreshFeedTask();
+            refreshFeedTask.execute();
+//            Toast.makeText(getContext(), "메인에서 들어옴", Toast.LENGTH_SHORT).show();
+        }
+
+        if(  getActivity().getClass().getSimpleName().equals( NoticeClickedActivity.class.getSimpleName() )){
+
+//            Toast.makeText(getContext(), "알림에서 들어옴", Toast.LENGTH_SHORT).show();
+
+        }
+
+
+        //왜 on Create 에서 새로고침을 하는가? onResume에서 하면 어떻게되는데?
+
+
+
         recyclerViewNewsFeed.setItemAnimator(null);
 
         return view;
@@ -217,6 +245,9 @@ public class NewsFeedFragment extends Fragment {
     }
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "classname.recycler.layout";
+
+    public interface OnFragmentInteractionListener {
+    }
 
 
     public class RefreshFeedTask extends AsyncTask<Void, String, String> {
@@ -433,6 +464,191 @@ public class NewsFeedFragment extends Fragment {
 
     }
 
+
+    // 알림에서 접근했을 때 하나의 게시물만 가져오는 태스크
+
+    public class RefreshOneFeedTask extends AsyncTask<Void, String, String> {
+
+        Context mContext = getContext();
+        List<FeedItem> productItems = new ArrayList<FeedItem>();
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            //okHttp 클라이언트를 생성한다.
+            // 로그 생성을 위해 httpLoggingInterceptor 를 사용했다.
+            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(new ReceivedCookiesInterceptor(mContext))
+                    .addInterceptor(new AddCookiesInterceptor(mContext))
+                    .addInterceptor(httpLoggingInterceptor)
+                    .build();
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(API_URL)
+                    .client(okHttpClient)
+                    .build();
+
+
+            ApiService apiService = retrofit.create(ApiService.class);
+//            Log.e("myimg", "doInBackground: " + uploadImagePath);
+
+            //레트로핏 콜 객체를 만든다.
+            //feedID를 가져온다. (해당 글의 댓글을 가져오기 위함)
+            Call<ResponseBody> retrofitCall;
+
+            Log.e("feedIDFromFcm", "inTask: "+feedIDFromFcmInNoticeClicked );
+            retrofitCall = apiService.getFeedInfo(feedIDFromFcmInNoticeClicked);
+
+            try {
+                json_result = retrofitCall.execute().body().string();
+                JSONArray jsonRes = null;
+
+                jsonRes = new JSONArray(json_result);
+
+                for (int i = 0; i < jsonRes.length(); i++) {
+                    JSONObject jObject = jsonRes.getJSONObject(i);  // JSONObject 추출
+                    int feedNum = jObject.getInt("feedNum");
+                    String writer = jObject.getString("writer");
+                    String title = jObject.getString("title");
+                    String content = jObject.getString("text_content");
+                    String writtenDate = jObject.getString("written_time");
+
+                    String writerEmail = jObject.getString("writer_email");
+//                            Log.e("hoss", "onResponse: 작성자 email = "+writerEmail );
+
+
+                    String imgUrl = "";
+                    String profileUrl = "";
+
+                    int commentNum = jObject.getInt("comment_num");
+
+                    int likeFeed = jObject.getInt("feed_like");
+
+                    if (!Objects.equals(jObject.getString("imgUrl"), "")) {
+                        imgUrl = jObject.getString("imgUrl");
+                    }
+                    if (!jObject.getString("writer_profile").equals("")) {
+
+                        profileUrl = jObject.getString("writer_profile");
+                    }
+
+                    String isLiked = jObject.getString("is_liked");
+
+//                    Log.e("hoss", "onResponse: 작성자 email = "+writerEmail );
+//                    Log.e("myCommentNum", "onResponse: " + commentNum);
+//                            Log.v("hey", writer+title+content);
+
+//                            FeedItem productFeed = NewsFeedContent.createFeed4(writer, title, content, imgUrl);
+//                                FeedItem productFeed = NewsFeedContent.createFeed7(feedNum, writer, title, content, imgUrl, profileUrl, writtenDate);
+
+
+                    FeedItem productFeed = new FeedItem(feedNum, likeFeed, isLiked, writer, title, content, imgUrl, profileUrl, writtenDate, commentNum, writerEmail);
+
+                    //새로운 아이템 어레이를 만들고, post 에서 카피한다.
+                    productItems.add(productFeed);
+//                    NewsFeedContent.addItem(productFeed);
+
+
+                }
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            //endregion
+
+            return null;
+        }
+
+
+        @Override
+
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+
+
+            //게시물 데이터를 서버에서 모두 불러왔다.
+
+            //기존의 게시물 리스트를 비우고, 불러왔던 리스트를 담는다.
+            //이렇게 하면 inconsistency 문제를 해결할 수 있다.
+            NewsFeedContent.ITEMS.clear();
+            NewsFeedContent.ITEMS.addAll(productItems);
+
+// Set the adapter
+            if (recyclerViewNewsFeed != null) {
+                recyclerViewNewsFeed.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+
+                        //At this point the layout is complete and the
+                        //dimensions of recyclerView and any child views are known.
+                    }
+                });
+
+                if (recyclerViewNewsFeed.getLayoutManager() == null) {
+                    recyclerViewNewsFeed.setLayoutManager(new LinearLayoutManager(getContext()));
+                }
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        getActivity().runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                updateRecyclerView();
+//                                // 해당 작업을 처리함
+//                            }
+//                        });
+//                    }
+//                }).start();
+
+
+                if(myNewsFeedRecyclerViewAdapter.getEndlessScrollListener() == null){
+                    myNewsFeedRecyclerViewAdapter.setEndlessScrollListener(new MyNewsFeedRecyclerViewAdapter.EndlessScrollListener() {
+                        @Override
+                        public boolean onLoadMore(int position) {
+
+
+                            // 아래의 LoadMoreFeedTask 태스크에서 리사이클러뷰를 이어붙이게 된다.
+                            // notifyDataSetChanged 를 LoadMoreFeedTask 태스크의 postExecute 에서 해주어야,
+                            // 리사이클러뷰가 갱신되어 이어진다.
+//
+//                            //todo 이 부분을 주석처리하면 페이징이 작동하지 않는다. - 시연할 때 보여주기
+//                            LoadMoreFeedTask loadMoreFeedTask = new LoadMoreFeedTask();
+//
+//                            Toast.makeText(getContext(), "페이징 작동", Toast.LENGTH_SHORT).show();
+////                            Log.e("paging", "onLoadMore: "+NewsFeedContent.ITEMS.get(position-1).getFeedID() );
+//                            loadMoreFeedTask.execute( NewsFeedContent.ITEMS.get(position-1).getFeedID() );
+
+                            return false;
+
+                        }
+                    });
+                }
+
+
+                recyclerViewNewsFeed.setAdapter(myNewsFeedRecyclerViewAdapter);
+            }
+
+
+            mSwipeViewNewsFeed.setRefreshing(false);
+//            Log.e("wow", result);
+
+        }
+
+    }
 
     /*
 

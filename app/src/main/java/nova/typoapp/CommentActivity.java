@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -53,7 +55,7 @@ CommentActivity
 (댓글 입력 - 공백은 예외처리 필요)
  */
 
-public class CommentActivity extends FragmentActivity
+public class CommentActivity extends AppCompatActivity
 implements CommentFragment.OnListFragmentInteractionListener {
 
     //덧글 화면의 뷰를 세팅 -> onCreate 에서 butterknife 의 bind 메소드를 통해
@@ -113,10 +115,24 @@ implements CommentFragment.OnListFragmentInteractionListener {
         ButterKnife.bind(this);
 
 
-
+        //인텐트로부터 필요한 변수를 가져온다.
         likeNum = getIntent().getIntExtra("likeNum", 0);
         wordName = getIntent().getStringExtra("wordName");
         emailFeedWriter = getIntent().getStringExtra("emailFeedWriter");
+
+
+        //상단 툴바를 세팅한다.
+        Toolbar toolbarComment = (Toolbar) findViewById(R.id.toolbarComment);
+
+        setSupportActionBar(toolbarComment);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("댓글 - "+wordName);
+
+
+
+
+
 
         textViewLikeInComment.setText("좋아요 "+likeNum+"개");
         /*
@@ -145,6 +161,7 @@ implements CommentFragment.OnListFragmentInteractionListener {
         }
 
         Log.e(TAG, "onCreate: "+feedID);
+
 
 
 
@@ -694,7 +711,19 @@ feedID를 파라미터로 받아, 서버로 전송하게 된다.
         refreshCommentTask.execute();
     }
 
-
+    /*
+       좌측 상단의 뒤로가기 버튼을 세팅하기 위한 코드
+       뒤로가기 버튼을 누르면, 이전 액티비티로 돌아가게 된다.
+        */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 
 

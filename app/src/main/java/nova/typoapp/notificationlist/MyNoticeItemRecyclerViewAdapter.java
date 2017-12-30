@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,11 +86,14 @@ public class MyNoticeItemRecyclerViewAdapter extends RecyclerView.Adapter<MyNoti
                 Context context = holder.mView.getContext();
                 switch (item.toActivity){
 
+                    //todo Main 이 아니라 NoticeClickedActivity 이다. 변수명 나중에 바꿀 것
                     case "MainActivity":
 
-                        intent = new Intent(context, MainActivity.class);
+                        intent = new Intent(context, NoticeClickedActivity.class);
 
                         intent.putExtra("feedIDFromFcm", item.feedID);
+
+                        Log.e("feedIDFromFcm", "onClick: "+item.feedID );
 
                         context.startActivity(intent);
 
@@ -99,6 +103,9 @@ public class MyNoticeItemRecyclerViewAdapter extends RecyclerView.Adapter<MyNoti
                     case "CommentActivity":
 
                         intent = new Intent(context, CommentActivity.class);
+
+                        intent.putExtra("wordName", item.wordName);
+                        intent.putExtra("emailFeedWriter", item.ownerEmail);
 
                         intent.putExtra("feedIDFromFcm", item.feedID);
 
@@ -112,6 +119,8 @@ public class MyNoticeItemRecyclerViewAdapter extends RecyclerView.Adapter<MyNoti
 
                         intent.putExtra("feedIDFromFcm", item.feedID);
                         intent.putExtra("commentIDFromFcm", item.commentID);
+
+                        intent.putExtra("emailCommentWriter", item.commentWriterEmail);
 
                         context.startActivity(intent);
 

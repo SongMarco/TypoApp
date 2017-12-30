@@ -55,6 +55,9 @@ public class NoticeContent {
 
         String ownerEmail;
 
+        String commentWriterEmail;
+
+        String wordName;
 
         public String noticeContent;
 
@@ -79,11 +82,16 @@ public class NoticeContent {
             this.profileUrl = profileUrl;
         }
 
-        public NoticeItem(int noticeID, int feedID, int commentID, String ownerEmail, String noticeContent, String noticeDate, String toActivity, String profileUrl) {
+        public NoticeItem(int noticeID, int feedID, int commentID, String wordName, String ownerEmail, String commentWriterEmail, String noticeContent, String noticeDate, String toActivity, String profileUrl) {
             this.noticeID = noticeID;
             this.feedID = feedID;
             this.commentID = commentID;
+
+
+            this.wordName = wordName;
+
             this.ownerEmail = ownerEmail;
+            this.commentWriterEmail = commentWriterEmail;
             this.noticeContent = noticeContent;
             this.noticeDate = noticeDate;
             this.toActivity = toActivity;

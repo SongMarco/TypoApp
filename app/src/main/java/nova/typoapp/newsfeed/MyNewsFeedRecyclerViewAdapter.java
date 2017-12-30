@@ -1,6 +1,7 @@
 package nova.typoapp.newsfeed;
 
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -43,6 +44,7 @@ import nova.typoapp.NewsFeedFragment.OnListFragmentInteractionListener;
 import nova.typoapp.R;
 import nova.typoapp.WriteActivity;
 import nova.typoapp.newsfeed.NewsFeedContent.FeedItem;
+import nova.typoapp.notificationlist.NoticeClickedActivity;
 import nova.typoapp.retrofit.AddCookiesInterceptor;
 import nova.typoapp.retrofit.ApiService;
 import nova.typoapp.retrofit.ReceivedCookiesInterceptor;
@@ -52,6 +54,8 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 
+import static android.view.View.GONE;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static com.facebook.FacebookSdk.getApplicationContext;
 import static nova.typoapp.newsfeed.NewsFeedContent.ITEMS;
 import static nova.typoapp.retrofit.ApiService.API_URL;
@@ -207,6 +211,8 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.fragment_newsfeed_layoutadd, parent, false);
 
+
+
             //inflate your layout and pass it to view holder
             return new VHHeader(view);
         }
@@ -235,17 +241,17 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             itemHolder.mContentView.setText("뜻 : " + item.content);
             itemHolder.mDateView.setText(item.writtenDate);
 
-            itemHolder.textViewLikeFeed.setText("좋아요 " + item.likeFeedNum + "개");
+            itemHolder.textViewLikeFeed.setText("좋아요 " + item.likeFeedNum );
 
             //댓글이 0개면 댓글 개수를 표시하지 않는다.
             if(item.commentNum == 0){
 
-                itemHolder.mCommentNum.setVisibility(View.GONE);
+                itemHolder.mCommentNum.setVisibility(GONE);
             }
             //1개 이상이다. 댓글 개수를 표시한다.
             else{
                 itemHolder.mCommentNum.setVisibility(View.VISIBLE);
-                itemHolder.mCommentNum.setText("댓글 " + item.commentNum + "개");
+                itemHolder.mCommentNum.setText("댓글 " + item.commentNum );
 
             }
 
@@ -575,6 +581,28 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
         } else if (holder instanceof VHHeader) {
             //cast holder to VHHeader and set data for header.
+
+
+            ViewGroup.LayoutParams param= ((VHHeader) holder).cardViewAdd.getLayoutParams();
+
+            Log.e("context", "onBindViewHolder: "+ holder.itemView.getContext().getClass().getSimpleName() );
+
+            if(holder.itemView.getContext().getClass().getSimpleName().equals(NoticeClickedActivity.class.getSimpleName() ) ){
+
+                ((VHHeader) holder).cardViewAdd.setVisibility(GONE);
+                param.height = 0;
+                param.width = 0;
+            }
+            else if( holder.itemView.getContext().getClass().getSimpleName().equals(MainActivity.class.getSimpleName() ))
+            {
+
+                ((VHHeader) holder).cardViewAdd.setVisibility(View.VISIBLE);
+                param.height = WRAP_CONTENT ;
+                param.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            }
+
+
+
         }
 
 

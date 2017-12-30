@@ -76,6 +76,9 @@
     <bool name="called">true</bool>
     <bool name="not_called">false</bool>
     <string name="title_activity_write">WriteActivity</string>
+
+    <string name="title_activity_comment">댓글</string>
+
     <string name="cookie_sessID">cookie_sessID</string>
     <string name="string_title_upload_progressbar_">이미지를 업로드 중입니다...</string>
     <string name="string_upload_success">업로드에 성공하였습니다</string>

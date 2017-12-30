@@ -151,14 +151,17 @@ public class SubCommentActivity extends AppCompatActivity implements SubCommentF
 
         feedID = getIntent().getIntExtra("feedID", -1);
 
+        emailCommentWriter = getIntent().getStringExtra("emailCommentWriter");
+
         // commentIDFromFcm 이 인텐트에 들어있다면, 알림을 통해 답글 화면에 접근한 것이다.
         if (getIntent().getIntExtra("commentIDFromFcm", -1) != -1) {
 
+
+            emailCommentWriter = getIntent().getStringExtra("emailCommentWriter");
             commentID = getIntent().getIntExtra("commentIDFromFcm", -1);
             feedID = getIntent().getIntExtra("feedIDFromFcm", -1);
         }
 
-        emailCommentWriter = getIntent().getStringExtra("emailCommentWriter");
 
         //댓글의 데이터를 인텐트에서 가져온다
         Intent gotIntent = getIntent();

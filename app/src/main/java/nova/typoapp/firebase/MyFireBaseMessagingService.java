@@ -18,9 +18,9 @@ import com.google.firebase.messaging.RemoteMessage;
 import java.util.concurrent.ExecutionException;
 
 import nova.typoapp.CommentActivity;
-import nova.typoapp.MainActivity;
 import nova.typoapp.R;
 import nova.typoapp.SubCommentActivity;
+import nova.typoapp.notificationlist.NoticeClickedActivity;
 
 
 public class MyFireBaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService  {
@@ -55,13 +55,30 @@ public class MyFireBaseMessagingService extends com.google.firebase.messaging.Fi
             int feedID = Integer.parseInt(remoteMessage.getData().get("feedID"));
 
 
+            String wordName = "";
+            String emailFeedWriter = "";
+
+            //답글 알림시 필요한 답글 작성자 이메일
+
+            String emailCommentWriter = "";
+         
+                    
+            
+            if(activityString.equals("CommentActivity")){
+               wordName = remoteMessage.getData().get("wordName");
+                emailFeedWriter =  remoteMessage.getData().get("emailFeedWriter");
+            }
+                    
+            remoteMessage.getData().get("emailFeedWriter");
             // 댓글에 답글을 달아 알림이 오는 경우 댓글 ID 값도 가져온다.
             int commentID = -1;
             if(activityString.equals("SubCommentActivity") ){
                 commentID = Integer.parseInt(remoteMessage.getData().get("commentID"));
+
+                emailCommentWriter = remoteMessage.getData().get("emailCommentWriter");
             }
 
-            sendNotification(messageBody, activityString, profileImageUrl, feedID, commentID);
+            sendNotification(messageBody, activityString, profileImageUrl, wordName, emailFeedWriter, emailCommentWriter ,feedID, commentID);
 
 
 
@@ -89,7 +106,7 @@ public class MyFireBaseMessagingService extends com.google.firebase.messaging.Fi
     objectID[1] 은 댓글 ID가 될 것이다.
 
      */
-    private void sendNotification(String messageBody, String activityString, String profileImageUrl, int... objectID ) {
+    private void sendNotification(String messageBody, String activityString, String profileImageUrl, String wordName, String emailFeedWriter, String emailCommentWriter, int... objectID ) {
         Log.d("MyFirebaseIIDService", "received messasge : " + messageBody);
 
 
@@ -100,9 +117,12 @@ public class MyFireBaseMessagingService extends com.google.firebase.messaging.Fi
 
             case "MainActivity":
 
-                intent = new Intent(this, MainActivity.class);
+                intent = new Intent(this, NoticeClickedActivity.class);
 
                 intent.putExtra("feedIDFromFcm", objectID[0]);
+
+
+
 
                 break;
 
@@ -111,6 +131,12 @@ public class MyFireBaseMessagingService extends com.google.firebase.messaging.Fi
 
                 intent = new Intent(this, CommentActivity.class);
 
+
+               
+                    
+                intent.putExtra("wordName", wordName);       
+                intent.putExtra("emailFeedWriter", emailFeedWriter);
+                
                 intent.putExtra("feedIDFromFcm", objectID[0]);
 
                 break;
@@ -119,6 +145,10 @@ public class MyFireBaseMessagingService extends com.google.firebase.messaging.Fi
             case "SubCommentActivity":
 
                 intent = new Intent(this, SubCommentActivity.class);
+
+
+                intent.putExtra("emailCommentWriter", emailCommentWriter);
+
 
                 intent.putExtra("feedIDFromFcm", objectID[0]);
                 intent.putExtra("commentIDFromFcm", objectID[1]);

@@ -197,9 +197,7 @@ public class NoticeItemFragment extends Fragment {
                         commentID = jObject.getInt("comment_id");
                     }
 
-
-
-
+                    String wordName = jObject.getString("notice_word_name");
 
 
                     String ownerEmail = jObject.getString("notice_owner_email");
@@ -209,18 +207,25 @@ public class NoticeItemFragment extends Fragment {
 
                     String toWhereActivity = jObject.getString("to_where_activity");
 
+
+
+
                     String profileUrl = "";
                     if (!jObject.getString("notice_sender_profile_url").equals("")) {
 
                         profileUrl = jObject.getString("notice_sender_profile_url");
                     }
 
+                    String emailCommentWriter = "";
+                    if (!jObject.getString("notice_commenter_email").equals("")) {
+
+                        emailCommentWriter = jObject.getString("notice_commenter_email");
+                    }
 
 
 
 
-
-                    NoticeItem productNotice = new NoticeItem(noticeID, feedID, commentID, ownerEmail, content, noticeDate, toWhereActivity, profileUrl );
+                    NoticeItem productNotice = new NoticeItem(noticeID, feedID, commentID, wordName,  ownerEmail, emailCommentWriter, content, noticeDate, toWhereActivity, profileUrl );
 
                     //새로운 아이템 어레이를 만들고, post 에서 카피한다.
                     productItems.add(productNotice);

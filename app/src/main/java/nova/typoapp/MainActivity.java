@@ -44,7 +44,6 @@ import nova.typoapp.notificationlist.NoticeItemFragment;
 페이지 이동으로 프래그먼트를 가져올 때에는, getItem으로 호출한다.
 이 때 액티비티에 인터페이스(OnListFragmentInteractionListener)를 적용하는 것을 잊지말라.
 
-
 */
 public class MainActivity extends AppCompatActivity
         implements
