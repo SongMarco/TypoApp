@@ -59,9 +59,7 @@ public class NewsFeedContent {
 
         public int feedID;
 
-        public int getCommentNum() {
-            return commentNum;
-        }
+
 
         public int commentNum;
 
@@ -69,8 +67,9 @@ public class NewsFeedContent {
 
 
 
+
         public String isLiked;
-        public String details = "aa";
+
 
 
         public FeedItem(int feedID, int likeFeedNum, String isLiked  ,String writer, String title, String content, String imgUrl, String imgProfileUrl, String writtenDate, int commentNum, String writerEmail) {
@@ -115,9 +114,6 @@ public class NewsFeedContent {
             return imgUrl;
         }
 
-        public void setImgUrl(String imgUrl) {
-            this.imgUrl = imgUrl;
-        }
 
         public String getTitle() {
             return title;
@@ -127,9 +123,6 @@ public class NewsFeedContent {
             return content;
         }
 
-        public String getWrittenDate() {
-            return writtenDate;
-        }
 
     }
 }

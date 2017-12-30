@@ -67,7 +67,7 @@
                 android:tint="@color/transGrey"
                 android:layout_gravity="center"
 
-                android:layout_margin="@dimen/margin_border"
+                android:layout_marginRight="@dimen/text_margin"
 
 
                 card_view:srcCompat="@drawable/ic_more_vert_black_48dp" />
@@ -83,13 +83,53 @@
 
             />
 
-        <TextView
-            android:id="@+id/id"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:text="글 제목"
-            android:textAppearance="?attr/textAppearanceListItem" />
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/text_margin"
+                android:layout_weight="1"
+                android:text="글 제목"
+                android:textAppearance="?attr/textAppearanceListItem" />
+
+            <ImageView
+                android:id="@+id/imageViewDic"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+
+
+                android:layout_gravity="center"
+                android:layout_marginRight="22dp"
+                android:layout_weight="0"
+
+
+                android:tint="@color/fontGrey"
+
+                />
+
+            <ImageView
+                android:id="@+id/imageViewSound"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+
+
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/text_margin"
+                android:layout_weight="0"
+
+
+                android:tint="@color/fontGrey"
+
+                 />
+
+        </LinearLayout>
 
         <View
             android:id="@+id/view5"
@@ -234,6 +274,11 @@
                     android:layout_centerHorizontal="true"
                     android:background="@android:color/white"
                     android:drawableLeft="@drawable/ic_comment_black"
+
+                    android:drawableTint="@color/fontGrey"
+
+
+
                     android:drawablePadding="6dp"
                     android:duplicateParentState="true"
                     android:gravity="center"
@@ -259,6 +304,9 @@
                     android:layout_centerHorizontal="true"
                     android:background="@android:color/white"
                     android:drawableLeft="@drawable/share_black"
+
+                    android:drawableTint="@color/fontGrey"
+
 
                     android:drawablePadding="6dp"
 

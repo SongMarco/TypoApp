@@ -1,5 +1,6 @@
 package nova.typoapp.newsfeed;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -7,7 +8,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,7 +19,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -27,6 +30,7 @@ import com.bumptech.glide.request.RequestOptions;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -48,6 +52,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 
+import static com.facebook.FacebookSdk.getApplicationContext;
 import static nova.typoapp.newsfeed.NewsFeedContent.ITEMS;
 import static nova.typoapp.retrofit.ApiService.API_URL;
 
@@ -104,7 +109,14 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
 
 
-
+    TextToSpeech tts =new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+        @Override
+        public void onInit(int status) {
+            if(status != TextToSpeech.ERROR) {
+                tts.setLanguage(Locale.ENGLISH);
+            }
+        }
+    });
 
     public EndlessScrollListener getEndlessScrollListener() {
         return endlessScrollListener;
@@ -299,12 +311,10 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             //이미 좋아요 한 버튼임 -> 좋아요모양 세팅
             if(item.isLiked.equals("true")){
                 itemHolder.buttonLikeFeed.setCompoundDrawablesWithIntrinsicBounds(R.drawable.likegrey, 0, 0, 0);
-
                 itemHolder.buttonLikeFeed.setChecked(true);
             }
             //좋아요 안한 버튼임
             else{
-
 
                 itemHolder.buttonLikeFeed.setCompoundDrawablesWithIntrinsicBounds(R.drawable.likewhite, 0, 0, 0);
                 itemHolder.buttonLikeFeed.setChecked(false);
@@ -322,10 +332,10 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             바뀌어서 체크된 상태다 -> 좋아요 적용
             바뀌어서 체크가 안된 상태 -> 좋아요 해제
              */
-            itemHolder.buttonLikeFeed.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            itemHolder.buttonLikeFeed.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
+                public void onClick(View v) {
+                    Boolean isChecked = ((ToggleButton)v).isChecked();
 
                     if (isChecked) {
 //                        Toast.makeText(buttonView.getContext(), "좋아요 적용" + item.getFeedID(), Toast.LENGTH_SHORT).show();
@@ -349,9 +359,8 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                         likeFeedTask.execute(item.feedID);
 
                     }
-
-
                 }
+
 
             });
 
@@ -360,17 +369,22 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             댓글 갯수와 댓글 달기에 리스너를 세팅하여,
             클릭시 댓글 액티비티로 이동시킨다.
 
+            아이템에 이 리스너를 세팅해야 리스너가 작동함에 유의.
+
              */
 
-            View.OnClickListener mCommentClickListener = new View.OnClickListener() {
+            View.OnClickListener mFeedClickListener = new View.OnClickListener() {
+                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                 @Override
                 public void onClick(View v) {
 
                     //댓글 달기 버튼 혹은 댓글 갯수를 클릭했다면 댓글 액티비티로 이동시킨다.
-                    if(v.getId()== itemHolder.mCommentNum.getId() || v.getId() == itemHolder.mLayoutWriteComment.getId() ){
+
+                    int clickedViewId = v.getId();
+
+                    if(  clickedViewId== itemHolder.mCommentNum.getId() || clickedViewId == itemHolder.mLayoutWriteComment.getId() ) {
                         Intent intent = new Intent(v.getContext(), CommentActivity.class);
                         intent.putExtra("feedID", item.getFeedID());
-
 
                         //좋아요를 누른 상태라면 isLiked 를 true 로 세팅해 보내서, 댓글에서도 좋아요를 적용한다.
                         if( itemHolder.buttonLikeFeed.isChecked() ){
@@ -388,15 +402,63 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                         v.getContext().startActivity(intent);
                     }
 
+                    // 발음 기호를 클릭했다.
+                    // tts로 영어 발음을 하도록 해준다.
+
+
+                    if(clickedViewId == itemHolder.imageViewSound.getId() ){
+
+                        //발음 관련 변수들 초기화
+
+
+//                        Toast.makeText(context, "speak clicked "+item.getTitle(), Toast.LENGTH_SHORT).show();
+
+                        String text = item.title;
+//                        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+
+
+                        //발음 실행. 주의사항 : 롤리팝 버전 이상에서만 가능. 추가 코드 필요
+
+                        String utteranceId=this.hashCode() + "";
+                        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId);
+
+
+                    }
+
+
+                    //사전 모양을 클릭했다.
+                    //다음 사전으로 보내준다.
+
+                    if(clickedViewId == itemHolder.imageViewDic.getId() ){
+
+
+//                        String dicUrl = "http://dic.daum.net/search.do?q="+item.getTitle();
+
+                        String dicUrl = "https://m.search.naver.com/search.naver?query="+item.getTitle();
+
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(dicUrl));
+
+                       context.startActivity(intent);
+
+
+
+
+                    }
+
+
+
 
 
 
                 }
             };
 
+            itemHolder.mCommentNum.setOnClickListener(mFeedClickListener);
+            itemHolder.mLayoutWriteComment.setOnClickListener(mFeedClickListener);
+            itemHolder.imageViewSound.setOnClickListener(mFeedClickListener);
+            itemHolder.imageViewDic.setOnClickListener(mFeedClickListener);
 
-            itemHolder.mCommentNum.setOnClickListener(mCommentClickListener);
-            itemHolder.mLayoutWriteComment.setOnClickListener(mCommentClickListener);
+
 
 
 
@@ -590,6 +652,13 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
         @BindView(R.id.textViewLikeFeed)
         TextView textViewLikeFeed;
 
+        @BindView(R.id.imageViewSound)
+        ImageView imageViewSound;
+
+        @BindView(R.id.imageViewDic)
+        ImageView imageViewDic;
+
+
         public FeedItem mItem;
 
 
@@ -609,6 +678,9 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
             buttonLikeFeed.setOnClickListener(this);
             textViewLikeFeed.setOnClickListener(this);
+
+            Glide.with(mView.getContext()).load(R.drawable.ic_volume_up_black_24dp).into(imageViewSound);
+            Glide.with(mView.getContext()).load(R.drawable.dic).into(imageViewDic);
         }
 
         @Override
