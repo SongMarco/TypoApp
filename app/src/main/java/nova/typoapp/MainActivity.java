@@ -91,14 +91,32 @@ public class MainActivity extends AppCompatActivity
         /*
         The {@link ViewPager} that will host the section contents.
          */
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayoutMain);
         ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
 
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
+//        tabLayout.setupWithViewPager(mViewPager);
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager) {
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+                Toast.makeText(MainActivity.this, "올라가즈아", Toast.LENGTH_SHORT).show();
+
+
+                if (tab.getPosition() == 0) {
+
+//                Toast.makeText(context, "update called", Toast.LENGTH_SHORT).show();
+                  mSectionsPagerAdapter.newsFeedFragment.scrollToTop();
+
+                }
+
+                // Scroll to top or whatever
+            }
+        });
 
         //만약 인텐트에서 feedID 값이 세팅된다면 알림을 통해 / 혹은 외부에서 접근한 것이다.
         //feedIDFromFcm 값이 -1이 아니게 될 것이고, 그렇게 되면 프래그먼트에서 해당 게시물부터 페이징이 가능해진다.

@@ -143,6 +143,13 @@ public class NewsFeedFragment extends Fragment {
         }
     });
 
+    public void scrollToTop(){
+
+        LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerViewNewsFeed
+                .getLayoutManager();
+        layoutManager.scrollToPositionWithOffset(0, 0);
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
