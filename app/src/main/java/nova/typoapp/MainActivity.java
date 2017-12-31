@@ -104,7 +104,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
 
-                Toast.makeText(MainActivity.this, "올라가즈아", Toast.LENGTH_SHORT).show();
 
 
                 if (tab.getPosition() == 0) {
