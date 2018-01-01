@@ -109,6 +109,8 @@ public class MainActivity extends AppCompatActivity
                 if (tab.getPosition() == 0) {
 
 //                Toast.makeText(context, "update called", Toast.LENGTH_SHORT).show();
+
+                    //와! 이렇게 현재 프래그먼트를 가져올 수 있구나!
                   mSectionsPagerAdapter.newsFeedFragment.scrollToTop();
 
                 }

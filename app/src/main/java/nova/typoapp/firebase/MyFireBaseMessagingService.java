@@ -32,10 +32,6 @@ public class MyFireBaseMessagingService extends com.google.firebase.messaging.Fi
 
         Log.d(TAG, "From: " + remoteMessage.getFrom());
 
-
-
-
-
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
 
@@ -89,11 +85,13 @@ public class MyFireBaseMessagingService extends com.google.firebase.messaging.Fi
 //        // Check if message contains a notification payload.
 //        if (remoteMessage.getNotification() != null) {
 //
-//            sendNotification(remoteMessage.getNotification().getBody());
+////            sendNotification(remoteMessage.getNotification().getBody());
 //            Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-//        }
+//
+//            Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().get);
+//    }
 
-//        //추가한것
+        //추가한것
 //        sendNotification(remoteMessage.getData().get("message"));
     }
 
@@ -116,6 +114,7 @@ public class MyFireBaseMessagingService extends com.google.firebase.messaging.Fi
         switch (activityString){
 
             case "MainActivity":
+
 
                 intent = new Intent(this, NoticeClickedActivity.class);
 

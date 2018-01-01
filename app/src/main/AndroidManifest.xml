@@ -219,9 +219,17 @@ application 태그 참고사항
 
         <activity
 
+
             android:name=".notificationlist.NoticeClickedActivity"
 
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar">
+
+            <!--<intent-filter>-->
+                <!--<action android:name="NoticeClicked" />-->
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+            <!--</intent-filter>-->
+
+        </activity>
 
 
         <!-- [START firebase_service] -->
@@ -229,6 +237,8 @@ application 태그 참고사항
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
+
+
         </service>
         <!-- [END firebase_service] -->
         <!-- [START firebase_iid_service] -->
