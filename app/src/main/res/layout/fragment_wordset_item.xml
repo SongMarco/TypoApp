@@ -42,7 +42,7 @@
                 android:layout_weight="0"
 
 
-                android:scaleType="fitCenter"
+                android:scaleType="center"
 
                 app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
 

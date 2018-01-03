@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -28,7 +29,12 @@ import android.widget.ToggleButton;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -47,6 +53,7 @@ import nova.typoapp.notificationlist.NoticeClickedActivity;
 import nova.typoapp.retrofit.AddCookiesInterceptor;
 import nova.typoapp.retrofit.ApiService;
 import nova.typoapp.retrofit.ReceivedCookiesInterceptor;
+import nova.typoapp.wordset.WordSetContent;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -293,7 +300,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             }
 
             // 프로필 이미지의 유무에 따라 이미지뷰 세팅. 없으면 -> 기본 세팅
-            if (!getItem(position).imgProfileUrl.equals("") && getItem(position).imgProfileUrl != null) {
+            if (getItem(position).imgProfileUrl != null && !getItem(position).imgProfileUrl.equals("") ) {
                 RequestOptions requestOptions = new RequestOptions()
                         .error(R.drawable.com_facebook_profile_picture_blank_square);
 
@@ -456,11 +463,21 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
 
 //
-                        Toast.makeText(context, "단어장을 선택함", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(context, "단어장을 선택함", Toast.LENGTH_SHORT).show();
 
                         //단어장 리스트를 열어야 한다.
 
-                        //itembuilder.setAdapter 로 리스트뷰 세팅 가능
+
+
+
+
+                        //어댑터에 단어장 이름을 세팅하는 비동기 태스크를 실행한다.
+
+                        GetWordSetListTaskInDialog getWordSetListTaskInDialog = new GetWordSetListTaskInDialog(context , item.feedID, item.title  );
+                        getWordSetListTaskInDialog.execute();
+
+
+
 
 
 
@@ -891,6 +908,253 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
     }
 
+
+
+
+    public class GetWordSetListTaskInDialog extends AsyncTask<Void, String, String> {
+
+        String json_result;
+
+        private Context mContext;
+
+        ArrayAdapter<String> arrayAdapter;
+
+        List<WordSetContent.WordSetItem> itemSet  = new ArrayList<>();;
+
+
+
+        int idWord;
+        String nameWord;
+
+
+        public GetWordSetListTaskInDialog(Context context, int idWord, String nameWord) {
+
+            mContext = context;
+            this.arrayAdapter = new ArrayAdapter<>(mContext, android.R.layout.select_dialog_singlechoice);
+            this.idWord = idWord;
+            this.nameWord = nameWord;
+        }
+
+
+
+
+
+        @Override
+        protected String doInBackground(Void... integers) {
+
+            //region//글 삭제하기 - DB상에서 뉴스피드 글을 삭제한다.
+            //레트로핏 기초 컴포넌트 만드는 과정. 자주 복붙할 것.
+            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(new ReceivedCookiesInterceptor(mContext))
+                    .addInterceptor(new AddCookiesInterceptor(mContext))
+                    .addInterceptor(httpLoggingInterceptor)
+                    .build();
+
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(API_URL)
+                    .client(okHttpClient)
+                    .build();
+
+            ApiService apiService = retrofit.create(ApiService.class);
+//            Log.e("myimg", "doInBackground: " + uploadImagePath);
+
+
+            // 레트로핏 콜 객체를 만든다. 파라미터로 게시물의 ID값, 게시물의 타입을 전송한다.
+
+            Call<ResponseBody> comment = apiService.getWordSetList();
+
+            try {
+                json_result = comment.execute().body().string();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            JSONArray jsonRes = null;
+            try {
+
+                //받아온 결과값을 jsonArray 로 만든다.
+                jsonRes = new JSONArray(json_result);
+
+
+                //jsonArray 에 담긴 아이템 정보들을 빼내어, 댓글 아이템으로 만들고, 리스트에 추가한다.
+                for (int i = 0; i < jsonRes.length(); i++) {
+
+                    //jsonArray 의 데이터를 댓글 아이템 객체에 담는다.
+                    JSONObject jObject = jsonRes.getJSONObject(i);  // JSONObject 추출
+
+                    int idWordSet = jObject.getInt("id_wordset");
+
+                    String nameSet = jObject.getString("set_name");
+
+                    String emailSetOwner = jObject.getString("email_set_owner");
+
+                    String nameSetOwner = jObject.getString("name_set_owner");
+
+                    int numSetWords = jObject.getInt("num_set_words");
+
+                    int numSetTaken = jObject.getInt("num_set_taken");
+
+                    int numSetLike = jObject.getInt("num_set_like");
+
+
+                    String dateSetMade = jObject.getString("date_set_made");
+
+
+                    String profileUrl = "";
+                    if (!jObject.getString("profile_url").equals("")) {
+                        profileUrl = jObject.getString("profile_url");
+                    }
+
+
+                    //아이템 객체에 데이터를 다 담은 후, 아이템을 어레이어댑터에 추가한다.
+
+
+//                    Log.e(TAG, "doInBackground: " + nameSet + numSetWords + nameSetOwner);
+                    WordSetContent.WordSetItem productWordSetItem = new WordSetContent.WordSetItem(idWordSet, nameSet, numSetWords, nameSetOwner, profileUrl);
+
+                    itemSet.add(productWordSetItem);
+
+                    arrayAdapter.add(productWordSetItem.nameWordSet);
+//                    for(int j = 0; j<ITEMS.size(); j++){
+//
+//                        Log.e(TAG, "onPostExecute: "+productItems.get(i).nameWordSetOwner);
+//
+//                    }
+
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+            return null;
+        }
+
+        @Override
+
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+
+
+            AlertDialog.Builder builderSingle = new AlertDialog.Builder(mContext);
+
+            builderSingle.setTitle("단어장을 선택하세요");
+
+
+
+
+            builderSingle.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+
+            builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                    Toast.makeText(mContext, "selected item = "+arrayAdapter.getItem(which), Toast.LENGTH_SHORT).show();
+
+                    String nameWordSet = arrayAdapter.getItem(which);
+
+
+
+                    AddFeedToSetTask addWordToWordSetTask = new AddFeedToSetTask(mContext, nameWordSet, nameWord,  idWord );
+                    addWordToWordSetTask.execute();
+
+                }
+            });
+            builderSingle.show();
+            //받아온 리스트를 다이얼로그의 어레이 어댑터에 세팅한다.
+
+
+
+        }
+
+    }
+
+
+    //서버에서 단어장을 추가하도록 하는 태스크
+    public class AddFeedToSetTask extends AsyncTask<Integer, String, String> {
+
+        String json_result;
+        private Context mContext;
+
+        String nameWordSet;
+        String nameWord;
+        int idWord;
+
+        public AddFeedToSetTask(Context mContext, String nameWordSet, String nameWord, int idWord) {
+            this.mContext = mContext;
+            this.nameWordSet = nameWordSet;
+            this.nameWord = nameWord;
+            this.idWord = idWord;
+        }
+
+        @Override
+        protected String doInBackground(Integer... integers) {
+
+            //region//글 삭제하기 - DB상에서 뉴스피드 글을 삭제한다.
+            //레트로핏 기초 컴포넌트 만드는 과정. 자주 복붙할 것.
+            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(new ReceivedCookiesInterceptor(mContext))
+                    .addInterceptor(new AddCookiesInterceptor(mContext))
+                    .addInterceptor(httpLoggingInterceptor)
+                    .build();
+
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(API_URL)
+                    .client(okHttpClient)
+                    .build();
+
+            ApiService apiService = retrofit.create(ApiService.class);
+//            Log.e("myimg", "doInBackground: " + uploadImagePath);
+
+/////////////////////////////////////////////////////////////////////////////공통 부분
+            // 레트로핏 콜 객체를 만든다. 파라미터로 게시물의 ID값, 게시물의 타입을 전송한다.
+
+            /////////////////////////@@@@@@@@@@@@ 메소드 세팅하기!!
+
+            Call<ResponseBody> comment = apiService.addFeedToSet(nameWordSet, nameWord, idWord);
+
+            try {
+
+                json_result = comment.execute().body().string();
+                return json_result;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            return null;
+        }
+
+        @Override
+
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+
+            //서버로 데이터 전송이 완료되었다.
+            //단어장 데이터를 갱신한다.
+
+
+        }
+
+    }
 }
 
 

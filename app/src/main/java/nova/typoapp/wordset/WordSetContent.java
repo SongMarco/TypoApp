@@ -23,7 +23,6 @@ public class WordSetContent {
 
     private static void addItem(WordSetItem item) {
         ITEMS.add(item);
-
     }
 
 
@@ -34,34 +33,23 @@ public class WordSetContent {
      public static class WordSetItem {
         public  String id;
         public  String content;
-        public  String details;
 
-        public String titleWordSet;
+
+        int idWordSet;
+
+        public String nameWordSet;
         public int numWords;
         public String nameWordSetOwner;
 
         String UrlOwnerProfileImg;
 
 
-        public WordSetItem(String id, String content, String details) {
-            this.id = id;
-            this.content = content;
-            this.details = details;
-        }
-
-        public WordSetItem(String titleWordSet, int numWords, String nameWordSetOwner) {
-
-            this.titleWordSet = titleWordSet;
-            this.numWords = numWords;
-            this.nameWordSetOwner = nameWordSetOwner;
-        }
-
-        public WordSetItem(String titleWordSet, int numWords, String nameWordSetOwner, String urlOwnerProfileImg) {
-            this.titleWordSet = titleWordSet;
+        public WordSetItem(int idWordSet, String nameWordSet, int numWords, String nameWordSetOwner, String urlOwnerProfileImg) {
+            this.idWordSet = idWordSet;
+            this.nameWordSet = nameWordSet;
             this.numWords = numWords;
             this.nameWordSetOwner = nameWordSetOwner;
             UrlOwnerProfileImg = urlOwnerProfileImg;
         }
-
     }
 }

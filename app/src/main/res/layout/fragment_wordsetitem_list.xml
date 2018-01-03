@@ -22,7 +22,10 @@
 
             android:layout_height="match_parent"
 
-            android:layout_margin="@dimen/margin_balloon">
+            android:layout_margin="@dimen/margin_balloon"
+
+            android:focusableInTouchMode="true"
+            >
 
 
             <TextView
@@ -58,8 +61,10 @@
             android:layout_height="match_parent"
 
             app:layoutManager="LinearLayoutManager"
-            tools:context="nova.typoapp.wordset.WordSetFragment"
-            tools:listitem="@layout/fragment_wordset_item" />
+            tools:context="nova.typoapp.wordset.WordSetListFragment"
+            tools:listitem="@layout/fragment_wordset_item"
+
+            />
 
 
 

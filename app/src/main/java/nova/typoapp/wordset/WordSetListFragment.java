@@ -51,11 +51,53 @@ import static nova.typoapp.wordset.WordSetContent.ITEMS;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class WordSetFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
+/*
+WordSetListFragment
+
+1. 클래스 개요
+
+ - 단어장 리스트 페이지를 보여주기 위한 프래그먼트
+
+ - 단어장을 추가하거나 단어장 목록을 조회한다.
+
+2. 클래스 구성
+
+ 1) AddWordSetTask : 단어장을 추가하기 위한 비동기 태스크
+ 2) GetWordSetTask : 서버에서 단어장 리스트를 불러오는 비동기 태스크
+ 3) 그 외 프래그먼트 기본 컴포넌트 등
+
+3. 클래스 흐름 설명
+
+ 1) 단어장 추가하기
+
+    a. 상단의 단어장 추가를 클릭하면 단어장 이름을 입력받는 다이얼로그를 띄운다.
+    b. 다이얼로그의 editText 에 단어장 이름을 입력받는다.
+    c. AddWordSetTask 가 실행되어, 서버의 단어장 DB에 해당 이름의 단어장을 추가한다.
+    d. 위의 비동기 태스크가 끝나면 GetWordSetTask 가 실행되어, 서버의 단어장 목록을 가져와 화면을 업데이트한다.
+
+ 2) 단어장 목록 초기화 / 새로고침
+    a. 프래그먼트가 초기화될 때(onCreateView) 에서 GetWordSetTask 가 실행된다.
+    b. 위의 비동기 태스크가 실행되면 단어장 목록을 업데이트하여 화면에 보여준다.
+    c. 이 흐름은 단어장을 추가할 때에도 동작한다.
+
+ 3) 단어장 조회하기
+    a. 단어장 리스트의 아이템을 클릭하면 단어장 액티비티(WordSetActivity) 로 넘어간다.
+    b. 단어장 액티비티에서 내부 컨텐츠를 이용할 수 있다.(학습, 퍼즐 등)
+
+4. 특이사항
+ - 단어장 리사이클러뷰의 어댑터가 세팅되지 않았다는 경고 로그가 확인되나, 실제로는 정상적으로 작동되고 있다.
+
+ */
+
+
+
+
+public class WordSetListFragment extends Fragment {
+
+
     private static final String ARG_COLUMN_COUNT = "column-count";
-    private static final String TAG = "WordSetFragment";
+    private static final String TAG = "WordSetListFragment";
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
@@ -64,13 +106,13 @@ public class WordSetFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public WordSetFragment() {
+    public WordSetListFragment() {
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static WordSetFragment newInstance(int columnCount) {
-        WordSetFragment fragment = new WordSetFragment();
+    public static WordSetListFragment newInstance(int columnCount) {
+        WordSetListFragment fragment = new WordSetListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -111,6 +153,8 @@ public class WordSetFragment extends Fragment {
 
         Glide.with(getActivity()).load(R.drawable.add3).into(imgAddWordSet);
 
+        rvWordSet.setNestedScrollingEnabled(false);
+
 
 
 //        // Set the adapter
@@ -135,7 +179,7 @@ public class WordSetFragment extends Fragment {
     @OnClick(R.id.cvAddWordSet)
     public void clickAddSet(){
 
-        Toast.makeText(getActivity(), "세트 추가 클릭", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getActivity(), "세트 추가 클릭", Toast.LENGTH_SHORT).show();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
@@ -348,7 +392,7 @@ public class WordSetFragment extends Fragment {
 
 
                     Log.e(TAG, "doInBackground: " + nameSet + numSetWords + nameSetOwner);
-                    WordSetContent.WordSetItem productWordSetItem = new WordSetContent.WordSetItem(nameSet, numSetWords, nameSetOwner, profileUrl);
+                    WordSetContent.WordSetItem productWordSetItem = new WordSetContent.WordSetItem(idWordSet, nameSet, numSetWords, nameSetOwner, profileUrl);
 
                     productItems.add(productWordSetItem);
 
@@ -383,7 +427,7 @@ public class WordSetFragment extends Fragment {
             for (int j = 0; j < ITEMS.size(); j++) {
 
                 WordSetItem item = ITEMS.get(j);
-                Log.e(TAG, "onPostExecute: " + item.nameWordSetOwner + item.numWords + item.titleWordSet);
+                Log.e(TAG, "onPostExecute: " + item.nameWordSetOwner + item.numWords + item.nameWordSet);
 
             }
 

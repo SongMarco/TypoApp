@@ -1,5 +1,6 @@
 package nova.typoapp.wordset;
 
+import android.content.Intent;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.support.v7.widget.RecyclerView;
@@ -18,7 +19,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import nova.typoapp.R;
 import nova.typoapp.wordset.WordSetContent.WordSetItem;
-import nova.typoapp.wordset.WordSetFragment.OnListFragmentInteractionListener;
+import nova.typoapp.wordset.WordSetListFragment.OnListFragmentInteractionListener;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link WordSetItem} and makes a call to the
@@ -45,13 +46,10 @@ public class MyWordSetItemRecyclerViewAdapter extends RecyclerView.Adapter<MyWor
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-//        holder.mIdView.setText(mValues.get(position).id);
-//        holder.mContentView.setText(mValues.get(position).content);
 
+        final WordSetItem item = holder.mItem;
 
-        WordSetItem item = holder.mItem;
-
-        holder.tvTitleSet.setText(item.titleWordSet);
+        holder.tvTitleSet.setText(item.nameWordSet);
 
         holder.tvNameSetOwner.setText(item.nameWordSetOwner);
 
@@ -76,15 +74,33 @@ public class MyWordSetItemRecyclerViewAdapter extends RecyclerView.Adapter<MyWor
 
 
 
+        //아이템에 클릭 리스너 세팅
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
-                }
+
+//                Toast.makeText(v.getContext(), "아이템 클릭 : "+item.nameWordSet, Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(v.getContext() , WordSetActivity.class);
+
+                intent.putExtra("nameWordSet", item.nameWordSet);
+                intent.putExtra("nameWordSetOwner",item.nameWordSetOwner);
+
+                intent.putExtra("numWords", item.numWords);
+
+                intent.putExtra( "UrlOwnerProfileImg", item.UrlOwnerProfileImg);
+
+
+                intent.putExtra( "idWordSet", item.idWordSet);
+
+
+                v.getContext().startActivity(intent);
+
+
+
+
+
             }
         });
     }
@@ -96,8 +112,7 @@ public class MyWordSetItemRecyclerViewAdapter extends RecyclerView.Adapter<MyWor
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public  View mView;
-        public  TextView mIdView;
-        public  TextView mContentView;
+
         public WordSetItem mItem;
 
 
@@ -120,8 +135,7 @@ public class MyWordSetItemRecyclerViewAdapter extends RecyclerView.Adapter<MyWor
             ButterKnife.bind(this,view);
             mView = view;
 
-            mIdView = (TextView) view.findViewById(R.id.id);
-            mContentView = (TextView) view.findViewById(R.id.content);
+
 
 
             imgSetOwnerProfile.setBackground(new ShapeDrawable(new OvalShape()));
@@ -129,9 +143,5 @@ public class MyWordSetItemRecyclerViewAdapter extends RecyclerView.Adapter<MyWor
 
         }
 
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
-        }
     }
 }

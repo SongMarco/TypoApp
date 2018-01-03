@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+
+    android:layout_marginBottom="@dimen/margin_balloon"
+    android:layout_marginEnd="@dimen/margin_balloon"
+    android:layout_marginStart="@dimen/margin_balloon">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+
+        android:layout_margin="@dimen/margin_border"
+
+        >
+
+        <ImageView
+            android:id="@+id/imgWord"
+            android:layout_width="70dp"
+            android:layout_height="50dp"
+
+
+            android:layout_gravity="center"
+            android:layout_marginRight="@dimen/margin_right_item"
+            android:layout_marginStart="@dimen/margin_border"
+
+            android:layout_weight="0.5"
+
+
+            android:scaleType="fitXY"
+
+            app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/margin_right_item"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvNameWord"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_margin="@dimen/margin_border"
+                android:layout_gravity="center"
+
+
+                android:layout_weight="0"
+                android:text="banana" />
+
+            <TextView
+                android:id="@+id/tvMeanWord"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/margin_border"
+
+                android:layout_weight="0"
+
+                android:text="바나나" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imgSoundWord"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/margin_border"
+
+            android:layout_weight="0"
+/>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

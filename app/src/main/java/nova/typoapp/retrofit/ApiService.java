@@ -82,11 +82,19 @@ public interface ApiService {
 
 
 
-    //단어장 페이지로 갔을 때 단어장 리스트를 가져오는 메소드
+    //단어장 모음 페이지로 갔을 때 단어장 리스트를 가져오는 메소드
     //세션 정보를 기준으로 세트 정보를 가져올 수 있으므로, 파라미터를 세팅하지 않아도 ok
 
     @POST("wordset/getWordSetList.php")
     Call<ResponseBody> getWordSetList();
+
+
+    //단어장에 단어들을 세팅하는 메소드
+    //서버에 단어장 id를 보내고, 단어-단어장 db 에서 단어들을 가져온다.
+    @FormUrlEncoded
+    @POST("wordset/getWordListFromSet.php")
+    Call<ResponseBody> getWordListFromSet(@Field("idWordSet") int idWordSet);
+
 
 
     //단어장을 추가하는 메소드
@@ -94,6 +102,14 @@ public interface ApiService {
     @FormUrlEncoded
     @POST("wordset/addWordSet.php")
     Call<ResponseBody> addWordSet(@Field("nameWordSet") String nameWordSet);
+
+
+    //단어 게시물을 단어장에 추가하는 메소드
+    @FormUrlEncoded
+    @POST("wordset/addWordToSet.php")
+    Call<ResponseBody> addFeedToSet(@Field("nameWordSet") String nameWordSet, @Field("nameWord") String nameWord, @Field("idWord") int idWord );
+
+
 
 
 

@@ -28,7 +28,7 @@ import nova.typoapp.newsfeed.NewsFeedContent;
 import nova.typoapp.notificationlist.NoticeContent;
 import nova.typoapp.notificationlist.NoticeItemFragment;
 import nova.typoapp.wordset.WordSetContent;
-import nova.typoapp.wordset.WordSetFragment;
+import nova.typoapp.wordset.WordSetListFragment;
 
 
 /*
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity
         WebFragment.OnFragmentInteractionListener,
         BlankFragment.OnFragmentInteractionListener,
         NoticeItemFragment.OnListFragmentInteractionListener,
-        WordSetFragment.OnListFragmentInteractionListener
+        WordSetListFragment.OnListFragmentInteractionListener
 
         {
 
@@ -414,7 +414,7 @@ public class MainActivity extends AppCompatActivity
 
         NoticeItemFragment noticeItemFragment = new NoticeItemFragment();
 
-        WordSetFragment wordSetFragment = new WordSetFragment();
+        WordSetListFragment wordSetFragment = new WordSetListFragment();
 
         @Override
         public Fragment getItem(int position) {
