@@ -450,6 +450,22 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
                     }
 
+                    // 단어장에 추가하기 버튼을 눌렀다.
+                    // 단어장 리스트를 열어, 단어장을 선택하게 한다.
+                    if(clickedViewId == itemHolder.mLayoutAddToSet.getId() ){
+
+
+//
+                        Toast.makeText(context, "단어장을 선택함", Toast.LENGTH_SHORT).show();
+
+                        //단어장 리스트를 열어야 한다.
+
+                        //itembuilder.setAdapter 로 리스트뷰 세팅 가능
+
+
+
+                    }
+
 
 
 
@@ -462,6 +478,8 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             itemHolder.mLayoutWriteComment.setOnClickListener(mFeedClickListener);
             itemHolder.imageViewSound.setOnClickListener(mFeedClickListener);
             itemHolder.imageViewDic.setOnClickListener(mFeedClickListener);
+
+            itemHolder.mLayoutAddToSet.setOnClickListener(mFeedClickListener);
 
 
 
@@ -485,6 +503,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     if (v.getId() == itemHolder.mMoreView.getId()) {
 
                         AlertDialog.Builder builderItem = new AlertDialog.Builder(context);
+
 
                                 // 여기서 분기를 가른다.
                                 // 작성자 이메일 = 쉐어드에 담긴 로그인 이메일이면 수정삭제 가능
@@ -660,7 +679,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
         TextView mDateView;
 
         @BindView(R.id.imageViewItem)
-        public ImageView mImageView;
+        ImageView mImageView;
 
         @BindView(R.id.imageProf)
         ImageView mProfileView;
@@ -670,6 +689,10 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
         @BindView(R.id.layoutWriteComment)
         RelativeLayout mLayoutWriteComment;
+
+        @BindView(R.id.layoutAddToSet)
+        RelativeLayout mLayoutAddToSet;
+
 
         @BindView(R.id.textViewCommentNum)
         TextView mCommentNum;

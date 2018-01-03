@@ -8,7 +8,7 @@
 
 
     android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp">
+    android:layout_marginBottom="@dimen/margin_balloon">
 
     <LinearLayout
 
@@ -287,7 +287,7 @@
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/layoutShare"
+                android:id="@+id/layoutAddToSet"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -301,17 +301,17 @@
                     android:layout_height="40dp"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
+
                     android:background="@android:color/white"
-                    android:drawableLeft="@drawable/share_black"
+
+
+                    android:drawableLeft="@drawable/add_list"
 
                     android:drawablePadding="6dp"
-
-
                     android:drawableTint="@color/fontGrey"
-
                     android:duplicateParentState="true"
                     android:gravity="center"
-                    android:text="공유하기"
+                    android:text="단어장"
                     android:textSize="15sp" />
 
             </RelativeLayout>

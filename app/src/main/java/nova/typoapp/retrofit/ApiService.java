@@ -49,7 +49,7 @@ public interface ApiService {
     Call<ResponseBody> getMyFeed();
 
 
-    //  무한 스크롤을 할 때, 아이템을 더 가져오는 메소드
+    //  무한 스크롤을 할 때, 영단어 게시물 아이템을 더 가져오는 메소드
     // 마지막 리스트에서 보인 아이템의 피드번호를 서버로 보낸다.
     @FormUrlEncoded
     @POST("getMoreFeed.php")
@@ -79,6 +79,27 @@ public interface ApiService {
     @FormUrlEncoded
     @POST("getLikeList.php")
     Call<ResponseBody> getLikeList(@Field("feedID") int feedID);
+
+
+
+    //단어장 페이지로 갔을 때 단어장 리스트를 가져오는 메소드
+    //세션 정보를 기준으로 세트 정보를 가져올 수 있으므로, 파라미터를 세팅하지 않아도 ok
+
+    @POST("wordset/getWordSetList.php")
+    Call<ResponseBody> getWordSetList();
+
+
+    //단어장을 추가하는 메소드
+    //단어장 제목
+    @FormUrlEncoded
+    @POST("wordset/addWordSet.php")
+    Call<ResponseBody> addWordSet(@Field("nameWordSet") String nameWordSet);
+
+
+
+
+
+    //////////////////////////////////////////////////////////
 
 
     //포스트 방식으로 글쓰기 해주기. formurlEncoded 와 필드 골뱅이를 주목할 것.
@@ -184,6 +205,9 @@ public interface ApiService {
 
     @POST("notice/getNoticeList.php")
     Call<ResponseBody> getNoticeList();
+
+
+
 
 
 

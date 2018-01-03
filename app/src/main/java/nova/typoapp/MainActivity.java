@@ -27,6 +27,8 @@ import java.util.Set;
 import nova.typoapp.newsfeed.NewsFeedContent;
 import nova.typoapp.notificationlist.NoticeContent;
 import nova.typoapp.notificationlist.NoticeItemFragment;
+import nova.typoapp.wordset.WordSetContent;
+import nova.typoapp.wordset.WordSetFragment;
 
 
 /*
@@ -50,7 +52,9 @@ public class MainActivity extends AppCompatActivity
         NewsFeedFragment.OnListFragmentInteractionListener,
         WebFragment.OnFragmentInteractionListener,
         BlankFragment.OnFragmentInteractionListener,
-        NoticeItemFragment.OnListFragmentInteractionListener
+        NoticeItemFragment.OnListFragmentInteractionListener,
+        WordSetFragment.OnListFragmentInteractionListener
+
         {
 
     /**
@@ -63,6 +67,10 @@ public class MainActivity extends AppCompatActivity
      */
 
     //페이저 어댑터는 뷰페이저에 사용되는 어댑터이다. 각 프래그먼트 객체를 불러올 때 사용한다.
+//            위의 기본 주석에 따르면, FragmentPagerAdapter 어댑터는 모든 페이지를 메모리에 올려두는데,
+//            메모리가 부족해질 경우 FragmentStatePagerAdapter 어댑터를 쓰라고 언급하고 있다.
+            //아래의 SectionsPagerAdapter 어댑터는 메인 액티비티에서 FragmentPagerAdapter 를 상속하여
+            //만든 커스텀 어댑터다.
     private SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());;
 
     public static int feedIDFromFcm = -1;
@@ -110,12 +118,13 @@ public class MainActivity extends AppCompatActivity
 
 //                Toast.makeText(context, "update called", Toast.LENGTH_SHORT).show();
 
-                    //와! 이렇게 현재 프래그먼트를 가져올 수 있구나!
+
+                    //'영어단어' 페이지를 한 번 더 클릭할 경우, 맨 위로 스크롤해주는 기능이다.
+                    //와! 이렇게 현재 프래그먼트를 가져올 수 있구나! - 새로고침에서도 써먹을 수 있겠어.
                   mSectionsPagerAdapter.newsFeedFragment.scrollToTop();
 
                 }
 
-                // Scroll to top or whatever
             }
         });
 
@@ -269,6 +278,12 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+            @Override
+            public void onListFragmentInteraction(WordSetContent.WordSetItem item) {
+
+            }
+
+
 
 
 
@@ -399,6 +414,8 @@ public class MainActivity extends AppCompatActivity
 
         NoticeItemFragment noticeItemFragment = new NoticeItemFragment();
 
+        WordSetFragment wordSetFragment = new WordSetFragment();
+
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
@@ -415,7 +432,7 @@ public class MainActivity extends AppCompatActivity
 
 
                 case 1:
-                    return webFragment;
+                    return wordSetFragment;
 
 
                 case 2:

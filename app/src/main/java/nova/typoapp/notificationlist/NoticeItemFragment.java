@@ -154,7 +154,7 @@ public class NoticeItemFragment extends Fragment {
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
                     .addInterceptor(new ReceivedCookiesInterceptor(getContext()))
                     .addInterceptor(new AddCookiesInterceptor(getContext()))
-                    .addInterceptor(httpLoggingInterceptor)
+//                    .addInterceptor(httpLoggingInterceptor)
                     .build();
 
 
@@ -276,6 +276,7 @@ public class NoticeItemFragment extends Fragment {
 
 
             recyclerViewNotice.setAdapter(myNoticeItemRecyclerViewAdapter);
+            myNoticeItemRecyclerViewAdapter.notifyDataSetChanged();
 
 
             mSwipeViewNotice.setRefreshing(false);
