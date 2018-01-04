@@ -1,5 +1,8 @@
 package nova.typoapp.worditem;
 
+import android.os.Build;
+import android.speech.tts.TextToSpeech;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,11 +15,14 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nova.typoapp.R;
 import nova.typoapp.worditem.WordItemContent.WordItem;
+
+import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
  * Created by Administrator on 2018-01-03.
@@ -31,6 +37,17 @@ public class MyWordItemRecyclerViewAdapter extends RecyclerView.Adapter<MyWordIt
         mValues = items;
 
     }
+
+
+
+    TextToSpeech tts =new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+        @Override
+        public void onInit(int status) {
+            if(status != TextToSpeech.ERROR) {
+                tts.setLanguage(Locale.ENGLISH);
+            }
+        }
+    });
 
 
     @Override
@@ -68,17 +85,55 @@ public class MyWordItemRecyclerViewAdapter extends RecyclerView.Adapter<MyWordIt
         }
 
 
-        //아이템에 클릭 리스너 세팅
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener onWordClickListener = new View.OnClickListener() {
+
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View v) {
 
+                //댓글 달기 버튼 혹은 댓글 갯수를 클릭했다면 댓글 액티비티로 이동시킨다.
 
+                int clickedViewId = v.getId();
+
+                if (clickedViewId == holder.imgSoundWord.getId() ){
+
+                    //발음 관련 변수들 초기화
+
+
+//                        Toast.makeText(context, "speak clicked "+item.getTitle(), Toast.LENGTH_SHORT).show();
+
+                    String text = item.nameWord;
+//                        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+
+
+                    //발음 실행. 주의사항 : 롤리팝 버전 이상에서만 가능. 추가 코드 필요
+
+                    String utteranceId = this.hashCode() + "";
+                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId);
+                }
             }
-        });
-    }
+        };
 
+        holder.imgSoundWord.setOnClickListener(onWordClickListener);
+
+
+
+
+
+
+
+
+//        //아이템에 클릭 리스너 세팅
+//
+//        holder.mView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//
+//            }
+//        });
+    }
     @Override
     public int getItemCount() {
         return mValues.size();

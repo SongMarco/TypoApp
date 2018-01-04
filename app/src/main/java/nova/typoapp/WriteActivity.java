@@ -109,6 +109,12 @@ public class WriteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_write);
         ButterKnife.bind(this);
 
+
+//        //키보드의 언어 설정 - 영어단어는 영어, 단어 뜻은 한글로
+//        editTitle.setPrivateImeOptions("defaultInputmode=english;");
+//        editContent.setPrivateImeOptions("defaultInputmode=korean;");
+
+
         intent = getIntent();
 
         if (intent.getStringExtra("title") != null) {

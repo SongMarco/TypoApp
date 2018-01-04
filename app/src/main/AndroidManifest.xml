@@ -241,13 +241,19 @@ application 태그 참고사항
         </service>
         <!-- [END firebase_iid_service] -->
 
-
         <activity
-
-            android:label="단어장"
             android:name=".wordset.WordSetActivity"
+            android:label="단어장"
+
             android:theme="@style/AppTheme.NoActionBar"
 
+
+            />
+        <activity
+
+            android:label="단어 카드"
+            android:name=".worditem.WordCardActivity"
+            android:theme="@style/AppTheme.NoActionBar"
 
             >
 

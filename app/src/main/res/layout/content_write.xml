@@ -72,7 +72,8 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="단어"
-                android:inputType="textPersonName" />
+
+                android:inputType="textVisiblePassword" />
 
             <EditText
                 android:id="@+id/editContent"
@@ -80,7 +81,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="뜻"
-                android:inputType="textPersonName" />
+                android:inputType="text" />
 
             <Button
                 android:id="@+id/buttonWrite"

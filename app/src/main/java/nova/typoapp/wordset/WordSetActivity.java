@@ -2,12 +2,14 @@ package nova.typoapp.wordset;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -29,11 +31,14 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import nova.typoapp.R;
 import nova.typoapp.retrofit.AddCookiesInterceptor;
 import nova.typoapp.retrofit.ApiService;
 import nova.typoapp.retrofit.ReceivedCookiesInterceptor;
 import nova.typoapp.worditem.MyWordItemRecyclerViewAdapter;
+import nova.typoapp.worditem.WordCardActivity;
+import nova.typoapp.worditem.WordItemContent;
 import nova.typoapp.worditem.WordItemContent.WordItem;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
@@ -80,6 +85,10 @@ public class WordSetActivity extends AppCompatActivity {
     @BindView(R.id.rvWordCardList)
     RecyclerView rvWordCardList;
 
+    @BindView(R.id.cvWordCard)
+    CardView cvWordCard;
+
+
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +106,10 @@ public class WordSetActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("단어장");
 
+
+
+        //리사이클러뷰의 스크롤 기능 해제 - NestedScrollView 안에 있으므로.
+        rvWordCardList.setNestedScrollingEnabled(false);
 
         //인텐트에서 단어장 정보를 가져와 세팅한다
 
@@ -135,6 +148,41 @@ public class WordSetActivity extends AppCompatActivity {
 
 
     }
+
+
+    //단어 카드를 보러가자
+    @OnClick(R.id.cvWordCard)
+    void onClick(){
+
+//        Toast.makeText(this, "단어 카드를 보러갑니다", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, WordCardActivity.class);
+
+        //어떤 데이터를 번들로?
+
+        //단어장 데이터를 번들로 보내라. - 어레이 리스트!
+
+        ArrayList<WordItem> bundleItems = new ArrayList<WordItem>();
+
+        bundleItems.addAll(WordItemContent.ITEMS);
+
+        intent.putParcelableArrayListExtra("bundleItems", bundleItems);
+
+
+
+
+
+        startActivity(intent);
+
+
+    }
+
+
+
+
+
+
+
+
 
 
     @Override

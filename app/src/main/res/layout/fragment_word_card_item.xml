@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:layout_margin="@dimen/text_margin">
+
+
+    <FrameLayout
+        android:id="@+id/frameBackward"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvCardWordName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Banana"
+                android:textAlignment="center"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tvCardWordMean"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="바나나"
+                android:textAlignment="center"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/frameForwardCard"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <ImageView
+                android:id="@+id/imgSoundCard"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="right"
+
+                android:layout_margin="@dimen/margin_balloon"
+                app:srcCompat="@drawable/ic_volume_up_black_24dp" />
+
+            <ImageView
+                android:id="@+id/imgWordCard"
+                android:layout_width="200dp"
+                android:layout_height="130dp"
+
+                android:layout_gravity="center"
+
+                android:layout_margin="@dimen/margin_balloon"
+                app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
+        </LinearLayout>
+
+    </FrameLayout>
+
+
+</android.support.v7.widget.CardView>
