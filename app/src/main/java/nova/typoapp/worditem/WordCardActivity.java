@@ -43,6 +43,7 @@ public class WordCardActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
 
+        // 액티비티를 건너올 때 받은 아이템 리스트를 받아 저장한다.
         ArrayList<WordItem> gotItems = new ArrayList<>();
         gotItems = getIntent().getParcelableArrayListExtra("bundleItems");
 
@@ -59,6 +60,9 @@ public class WordCardActivity extends AppCompatActivity {
         rvWordCard.setLayoutManager( new LinearLayoutManager(this ));
 
         rvWordCard.setAdapter(wordCardAdapter);
+
+
+
 
 
     }

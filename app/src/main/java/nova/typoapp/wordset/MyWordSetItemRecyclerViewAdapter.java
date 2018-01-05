@@ -53,7 +53,7 @@ public class MyWordSetItemRecyclerViewAdapter extends RecyclerView.Adapter<MyWor
 
         holder.tvNameSetOwner.setText(item.nameWordSetOwner);
 
-        holder.tvNumWords.setText( "단어 수 "+item.numWords);
+        holder.tvNumWords.setText( item.numWords+" 단어");
 
         // 프로필 이미지의 유무에 따라 프로필 이미지뷰 세팅. 없으면 -> 기본 세팅
 

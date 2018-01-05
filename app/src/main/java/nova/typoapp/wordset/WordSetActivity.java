@@ -40,6 +40,7 @@ import nova.typoapp.worditem.MyWordItemRecyclerViewAdapter;
 import nova.typoapp.worditem.WordCardActivity;
 import nova.typoapp.worditem.WordItemContent;
 import nova.typoapp.worditem.WordItemContent.WordItem;
+import nova.typoapp.wordpuzzle.WordPuzzleActivity;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -87,6 +88,9 @@ public class WordSetActivity extends AppCompatActivity {
 
     @BindView(R.id.cvWordCard)
     CardView cvWordCard;
+
+    @BindView(R.id.cvWordPuzzle)
+    CardView cvWordPuzzle;
 
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -152,7 +156,7 @@ public class WordSetActivity extends AppCompatActivity {
 
     //단어 카드를 보러가자
     @OnClick(R.id.cvWordCard)
-    void onClick(){
+    void onClickCard(){
 
 //        Toast.makeText(this, "단어 카드를 보러갑니다", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, WordCardActivity.class);
@@ -167,14 +171,30 @@ public class WordSetActivity extends AppCompatActivity {
 
         intent.putParcelableArrayListExtra("bundleItems", bundleItems);
 
+        startActivity(intent);
+    }
 
+    //단어 카드를 보러가자
+    @OnClick(R.id.cvWordPuzzle)
+    void onClickPuzzle(){
 
+//        Toast.makeText(this, "단어 카드를 보러갑니다", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, WordPuzzleActivity.class);
 
+        //어떤 데이터를 번들로?
+
+        //단어장 데이터를 번들로 보내라. - 어레이 리스트!
+
+        ArrayList<WordItem> bundleItems = new ArrayList<WordItem>();
+
+        bundleItems.addAll(WordItemContent.ITEMS);
+
+        intent.putParcelableArrayListExtra("bundleItems", bundleItems);
 
         startActivity(intent);
-
-
     }
+
+
 
 
 

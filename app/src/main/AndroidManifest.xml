@@ -244,22 +244,18 @@ application 태그 참고사항
         <activity
             android:name=".wordset.WordSetActivity"
             android:label="단어장"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".worditem.WordCardActivity"
+            android:label="단어 카드"
+            android:theme="@style/AppTheme.NoActionBar" />
 
+        <activity
+            android:label="단어 퍼즐"
+            android:name=".wordpuzzle.WordPuzzleActivity"
             android:theme="@style/AppTheme.NoActionBar"
-
 
             />
-        <activity
-
-            android:label="단어 카드"
-            android:name=".worditem.WordCardActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-
-            >
-
-
-
-        </activity>
     </application>
 
 </manifest>
