@@ -5,8 +5,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -81,7 +81,7 @@ public class WordPuzzleActivity extends AppCompatActivity
 
 
     public static ArrayList<WordItem> listPickedItem= new ArrayList<>();
-    public static ArrayList<View> listPickedView = new ArrayList<>();
+
 
     public static ArrayList<MyWordPuzzleAdapter.ViewHolder> listPickedViewHolder = new ArrayList<>();
 
@@ -212,23 +212,28 @@ public class WordPuzzleActivity extends AppCompatActivity
         super.onStop();
 
 
-        WordPuzzleActivity.countPickedCards = 0;
-        countCorrectItems = 0;
-        WordPuzzleActivity.listPickedItem.clear();
-        WordPuzzleActivity.listPickedView.clear();
-        WordPuzzleActivity.listPickedViewHolder.clear();
 
-        gotItemsCopy.clear();
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
 
+        Toast.makeText(this, "onDestroy", Toast.LENGTH_SHORT).show();
+        WordPuzzleActivity.countCorrectItems = 0;
+        WordPuzzleActivity.countPickedCards = 0;
+        WordPuzzleActivity.listPickedItem.clear();
+        WordPuzzleActivity.listPickedViewHolder.clear();
+        WordPuzzleActivity.gotItemsCopy.clear();
+
+    }
 
     /*
-        좌측 상단의 뒤로가기 버튼을 세팅하기 위한 코드
-        뒤로가기 버튼을 누르면, 이전 액티비티로 돌아가게 된다.
-         */
+            좌측 상단의 뒤로가기 버튼을 세팅하기 위한 코드
+            뒤로가기 버튼을 누르면, 이전 액티비티로 돌아가게 된다.
+             */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

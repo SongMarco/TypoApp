@@ -10,9 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nova.typoapp.R;
+import nova.typoapp.worditem.WordItemContent.WordItem;
 
 import static nova.typoapp.wordpuzzle.WordPuzzleActivity.gotItemsCopy;
 
@@ -82,7 +85,15 @@ public class WordPuzzlePlayFragment extends Fragment {
        final View view = inflater.inflate(R.layout.fragment_word_puzzle, container, false);
         ButterKnife.bind(this,view);
 
+        ArrayList<WordItem> playItems = new ArrayList<>(gotItemsCopy);
 
+
+        MyWordPuzzleAdapter puzzleAdapter = new MyWordPuzzleAdapter(playItems);
+
+        GridLayoutManager mLayoutManager = new GridLayoutManager(getActivity(),3);
+
+        rvWordPuzzle.setAdapter(puzzleAdapter);
+        rvWordPuzzle.setLayoutManager(mLayoutManager);
 
 
 
@@ -113,25 +124,37 @@ public class WordPuzzlePlayFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        MyWordPuzzleAdapter puzzleAdapter = new MyWordPuzzleAdapter(gotItemsCopy);
 
-        GridLayoutManager mLayoutManager = new GridLayoutManager(getActivity(),3);
-
-        rvWordPuzzle.setAdapter(puzzleAdapter);
-        rvWordPuzzle.setLayoutManager(mLayoutManager);
     }
 
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
+    public void onPause() {
+//        Toast.makeText(getContext(), "onPause", Toast.LENGTH_SHORT).show();
+        super.onPause();
+    }
 
+    @Override
+    public void onStop() {
+//        Toast.makeText(getContext(), "onStop", Toast.LENGTH_SHORT).show();
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+//        Toast.makeText(getContext(), "onDestroy", Toast.LENGTH_SHORT).show();
+        super.onDestroy();
 
 
 
     }
 
+    @Override
+    public void onDetach() {
+        super.onDetach();
+//        Toast.makeText(getContext(), "onDetach", Toast.LENGTH_SHORT).show();
+        mListener = null;
+    }
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

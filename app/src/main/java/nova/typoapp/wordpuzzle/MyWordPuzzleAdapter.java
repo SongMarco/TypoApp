@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -157,12 +158,14 @@ public class MyWordPuzzleAdapter extends RecyclerView.Adapter<MyWordPuzzleAdapte
                                 fragmentTransaction.replace(R.id.containerFragmentPuzzle, endFragment); // Activity 레이아웃의 View ID
                                 fragmentTransaction.commit();
 
+
+                                //답을 다 맞췄으므로 스태틱 변수를 초기화(안하면 리스트가 중복됨)
                                 WordPuzzleActivity.countCorrectItems = 0;
+                                WordPuzzleActivity.countPickedCards = 0;
+                                WordPuzzleActivity.listPickedItem.clear();
+                                WordPuzzleActivity.listPickedViewHolder.clear();
 
-
-
-
-
+                                Collections.shuffle(WordPuzzleActivity.gotItemsCopy);
 
 
                             }
@@ -189,11 +192,15 @@ public class MyWordPuzzleAdapter extends RecyclerView.Adapter<MyWordPuzzleAdapte
 
                         //아래 코드에 의해, 선택한 아이템이 초기화되고,
                         //색칠된 뷰가 원상복구된다.
-                        for(int i = 0; i < 2; i++){
 
-                            WordPuzzleActivity.listPickedViewHolder.get(i).framePuzzle.setBackground(null);
 
-                        }
+                            for(int i = 0; i <  WordPuzzleActivity.listPickedViewHolder.size(); i++){
+
+                                WordPuzzleActivity.listPickedViewHolder.get(i).framePuzzle.setBackground(null);
+
+                            }
+
+
                         WordPuzzleActivity.countPickedCards = 0;
                         WordPuzzleActivity.listPickedItem.clear();
                         WordPuzzleActivity.listPickedViewHolder.clear();
