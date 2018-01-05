@@ -1,7 +1,9 @@
 package nova.typoapp.wordpuzzle;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -94,6 +96,7 @@ public class MyWordPuzzleAdapter extends RecyclerView.Adapter<MyWordPuzzleAdapte
 
 
         View.OnClickListener mPuzzleClickListener = new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View view) {
 
@@ -126,11 +129,20 @@ public class MyWordPuzzleAdapter extends RecyclerView.Adapter<MyWordPuzzleAdapte
 //                            Toast.makeText(view.getContext(), "정답!", Toast.LENGTH_SHORT).show();
 
 
+                            //영어 발음을 재생한다.
+
+
+                            String text = item.nameWord;
+//                        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+
+                            //발음 실행. 주의사항 : 롤리팝 버전 이상에서만 가능. 추가 코드 필요
+
+                            String utteranceId = this.hashCode() + "";
+                            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId);
 
 
 
-
-                            //색칠이 되면 애니메이션을 재생
+                           // 카드가 사라지는 애니메이션을 재생
                             for(int i = 0; i < 2; i++){
 
                                 Animation animFadeOut = AnimationUtils.loadAnimation(view.getContext(), R.anim.card_fade_out);
