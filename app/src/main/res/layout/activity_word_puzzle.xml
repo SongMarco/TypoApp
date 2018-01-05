@@ -25,13 +25,11 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rvWordPuzzle"
+    <FrameLayout
+        android:id="@+id/containerFragmentPuzzle"
         android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
+    </FrameLayout>
 
-        android:layout_height="match_parent"
-        tools:layoutManager="android.support.v7.widget.GridLayoutManager"
-        tools:listitem="@layout/fragment_puzzle_item"
-        tools:spanCount="3" />
 </LinearLayout>

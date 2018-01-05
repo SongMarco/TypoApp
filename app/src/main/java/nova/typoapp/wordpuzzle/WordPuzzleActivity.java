@@ -1,11 +1,12 @@
 package nova.typoapp.wordpuzzle;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,25 +59,38 @@ import nova.typoapp.worditem.WordItemContent.WordItem;
 
 
 
+
  */
 
 
 
 
 
-public class WordPuzzleActivity extends AppCompatActivity {
+public class WordPuzzleActivity extends AppCompatActivity
+
+        implements WordPuzzleStartFragment.OnFragmentInteractionListener,
+        WordPuzzlePlayFragment.OnFragmentInteractionListener,
+        WordPuzzleEndFragment.OnFragmentInteractionListener
+{
 
 
-    @BindView(R.id.rvWordPuzzle)
-    RecyclerView rvWordPuzzle;
 
 
     public static int countPickedCards = 0;
+    public static int countCorrectItems = 0;
+
 
     public static ArrayList<WordItem> listPickedItem= new ArrayList<>();
     public static ArrayList<View> listPickedView = new ArrayList<>();
 
     public static ArrayList<MyWordPuzzleAdapter.ViewHolder> listPickedViewHolder = new ArrayList<>();
+
+
+
+    @BindView(R.id.containerFragmentPuzzle)
+    FrameLayout containerFragmentPuzzle;
+
+    public static ArrayList<WordItem> gotItemsCopy = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,8 +98,6 @@ public class WordPuzzleActivity extends AppCompatActivity {
         setContentView(R.layout.activity_word_puzzle);
 
         ButterKnife.bind(this);
-
-
 
         //상단 툴바를 세팅한다.
         Toolbar toolbarComment = (Toolbar) findViewById(R.id.toolbarWordPuzzle);
@@ -95,25 +107,43 @@ public class WordPuzzleActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("단어 퍼즐");
 
 
+
+        //프래그먼트를 세팅한다.
+
+        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+
+        WordPuzzleStartFragment startFragment = new WordPuzzleStartFragment();
+        Bundle bundle = new Bundle();
+        startFragment.setArguments(bundle);
+
+        android.support.v4.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.containerFragmentPuzzle, startFragment); // Activity 레이아웃의 View ID
+        fragmentTransaction.commit();
+
+
         // 액티비티를 건너올 때 받은 아이템 리스트를 받아 저장한다.
         ArrayList<WordItem> gotItems = new ArrayList<>();
         gotItems = getIntent().getParcelableArrayListExtra("bundleItems");
 
-        // gotItems 의 사이즈가 9보다 크면, 9개가 되도록 줄여야 한다.(화면이 넘쳐버림)
-
-
         /*
+        gotItems 의 사이즈가 9보다 크면, 9개가 되도록 줄여야 한다.(화면이 넘쳐버림)
 
-        줄이는 방법을 랜덤하게 하기 위해 셔플을 먼저 해준다.
+        제외할 아이템을 랜덤하게 정하기 위해 셔플을 하고,
+        subList 를 추출한다.
         gotItems
-                 */
+        */
 
         if(gotItems.size() > 9){
+            //리스트를 셔플한다.
             Collections.shuffle(gotItems);
+
+            //리스트를 9개까지 추출한다. 여기서 subLIst(0,9)는 인덱스 0~8까지의 9개를 의미한다.(9는 제외됨에 유의, 자바 문법)
 
             gotItems = new ArrayList<WordItem>(gotItems.subList(0,9));
 
         }
+
+
 
 
 
@@ -127,7 +157,7 @@ public class WordPuzzleActivity extends AppCompatActivity {
 //
 //        }
 
-        ArrayList<WordItem> gotItemsCopy = new ArrayList<>();
+
 
         //gotItemsCopy 에 gotItem 을 deep Copy 한다. - 어레이 리스트와, 그 안에 있는 아이템 모두 딥 카피 해야함
 
@@ -159,31 +189,19 @@ public class WordPuzzleActivity extends AppCompatActivity {
         }
 
 
-        MyWordPuzzleAdapter puzzleAdapter = new MyWordPuzzleAdapter(gotItemsCopy);
 
-        GridLayoutManager mLayoutManager = new GridLayoutManager(this,3);
-
-        rvWordPuzzle.setLayoutManager(mLayoutManager);
-        rvWordPuzzle.setAdapter(puzzleAdapter);
+        //static 한 아이템 어레이를 만들었다. 이 변수는 액티비티에서 나가면 초기화되며,
+        //액티비티에 들어오면 미리 세팅 되있다가, 퍼즐을 플레이할 때 어댑터에 세팅된다.
+        // static ㅎ ㅏ므로 초기화로 인한 오류가 없는지 확인할 것.
 
 
-
-
-        // 이미지 리스트와 뜻 리스트를 만든다.
-
-
-        //단어 뜻과 이미지를 분리한다.
-
-
-
-
-        //단어 리스트에 대한 리사이클러뷰를 세팅한다.
 
 
 
 
 
     }
+
 
 
 
@@ -195,9 +213,34 @@ public class WordPuzzleActivity extends AppCompatActivity {
 
 
         WordPuzzleActivity.countPickedCards = 0;
+        countCorrectItems = 0;
         WordPuzzleActivity.listPickedItem.clear();
         WordPuzzleActivity.listPickedView.clear();
         WordPuzzleActivity.listPickedViewHolder.clear();
+
+        gotItemsCopy.clear();
+
+    }
+
+
+
+
+    /*
+        좌측 상단의 뒤로가기 버튼을 세팅하기 위한 코드
+        뒤로가기 버튼을 누르면, 이전 액티비티로 돌아가게 된다.
+         */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
 
     }
 }

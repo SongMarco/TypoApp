@@ -1,5 +1,6 @@
 package nova.typoapp.wordpuzzle;
 
+import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,7 +13,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -113,35 +113,82 @@ public class MyWordPuzzleAdapter extends RecyclerView.Adapter<MyWordPuzzleAdapte
                     픽한 카드가 2개가 되면 정답을 검증하고,
                     픽한 카드를 새었던 변수들을 초기화한다.
                      */
+
+                    //todo 뷰 색칠을 먼저 하고 애니메이션을 재생하고 싶다.
                     if( WordPuzzleActivity.countPickedCards == 2){
 
 
-                        //선택한 아이템의 뜻을 비교해서 맞으면 정답, 틀리면 오답이다.
+                        //선택한 두 퍼즐 아이템의 뜻을 비교해서 맞으면 정답, 틀리면 오답이다.
                         if(Objects.equals(WordPuzzleActivity.listPickedItem.get(0).meanWord, WordPuzzleActivity.listPickedItem.get(1).meanWord)){
 
-                            //답을 맞췄다. 두 아이템의 뷰를 안보이게 한다.
+                            //답을 맞췄다. 사라지는 애니메이션을 재생하고 두 아이템의 뷰를 안보이게 한다.
 //                            Toast.makeText(view.getContext(), "정답!", Toast.LENGTH_SHORT).show();
 
+
+
+
+
+
+                            //색칠이 되면 애니메이션을 재생
                             for(int i = 0; i < 2; i++){
 
-                                Animation fade_out = AnimationUtils.loadAnimation(view.getContext(), R.anim.card_fade_out);
-
-                                WordPuzzleActivity.listPickedViewHolder.get(i).mView.startAnimation(fade_out);
+                                Animation animFadeOut = AnimationUtils.loadAnimation(view.getContext(), R.anim.card_fade_out);
+                                WordPuzzleActivity.listPickedViewHolder.get(i).mView.startAnimation(animFadeOut);
                                 WordPuzzleActivity.listPickedViewHolder.get(i).mView.setVisibility(View.INVISIBLE);
 
                             }
 
+                            //정답 갯수를 증가시키고, 정답 갯수가 문제 수와 같아지면 퍼즐을 종료한다.
+                            WordPuzzleActivity.countCorrectItems++;
 
-                            //답을 틀렸다.
+                            Log.e("puzzle", "onClick: correctitems = "+WordPuzzleActivity.countCorrectItems+"// gotItemSize = "+ WordPuzzleActivity.gotItemsCopy.size()/2);
+
+                            //정답을 다 맞췄으면 퍼즐 완료 화면으로 프래그먼트를 바꾼다.
+                            if(  WordPuzzleActivity.countCorrectItems == WordPuzzleActivity.gotItemsCopy.size()/2  ){
+
+                                WordPuzzleActivity wordPuzzleActivity =  (WordPuzzleActivity) view.getContext();
+                                android.support.v4.app.FragmentManager fragmentManager = wordPuzzleActivity.getSupportFragmentManager();
+
+                                WordPuzzleEndFragment endFragment = new WordPuzzleEndFragment();
+                                Bundle bundle = new Bundle();
+                                endFragment.setArguments(bundle);
+
+                                android.support.v4.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                                fragmentTransaction.replace(R.id.containerFragmentPuzzle, endFragment); // Activity 레이아웃의 View ID
+                                fragmentTransaction.commit();
+
+                                WordPuzzleActivity.countCorrectItems = 0;
+
+
+
+
+
+
+
+                            }
+
+
                         }
+                        //답을 틀렸다. 오답 애니메이션을 재생
                         else{
-                            Toast.makeText(view.getContext(), "오답!", Toast.LENGTH_SHORT).show();
+
+                            for(int i = 0; i < 2; i++){
+
+                                Animation animWrong = AnimationUtils.loadAnimation(view.getContext(), R.anim.card_wrong);
+
+                                WordPuzzleActivity.listPickedViewHolder.get(i).mView.startAnimation(animWrong);
+
+
+                            }
+
+
+//                            Toast.makeText(view.getContext(), "오답!", Toast.LENGTH_SHORT).show();
                         }
 
 
 
                         //아래 코드에 의해, 선택한 아이템이 초기화되고,
-                        //색칠된 뷰가 원상복구된다. - 비동기 태스크에서 사용할 것
+                        //색칠된 뷰가 원상복구된다.
                         for(int i = 0; i < 2; i++){
 
                             WordPuzzleActivity.listPickedViewHolder.get(i).framePuzzle.setBackground(null);
@@ -157,6 +204,7 @@ public class MyWordPuzzleAdapter extends RecyclerView.Adapter<MyWordPuzzleAdapte
 
                     Log.e("countPickedCards", "onClick: picked ="+WordPuzzleActivity.countPickedCards );
                 }
+
                 //아래 상황은, 선택한 아이템을 다시 클릭했을 대 발생한다.
                 // 스태틱 변수들을 초기화해주고, 색칠한 것을 원상복구한다.
                 else{
@@ -229,6 +277,8 @@ public class MyWordPuzzleAdapter extends RecyclerView.Adapter<MyWordPuzzleAdapte
         }
 
     }
+
+
 
 
 
