@@ -1062,8 +1062,9 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
 
-                    Toast.makeText(mContext, "selected item = "+arrayAdapter.getItem(which), Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(mContext, "selected item = "+arrayAdapter.getItem(which), Toast.LENGTH_SHORT).show();
 
+                    Toast.makeText(mContext, arrayAdapter.getItem(which)+"에 단어가 추가되었습니다.", Toast.LENGTH_SHORT).show();
                     String nameWordSet = arrayAdapter.getItem(which);
 
 
@@ -1150,6 +1151,9 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
             //서버로 데이터 전송이 완료되었다.
             //단어장 데이터를 갱신한다.
+
+            MainActivity activity = (MainActivity) mContext;
+            activity.updateWordSet();
 
 
         }

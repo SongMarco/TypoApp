@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -464,7 +463,7 @@ public class NewsFeedFragment extends Fragment {
                             //todo 이 부분을 주석처리하면 페이징이 작동하지 않는다. - 시연할 때 보여주기
                             LoadMoreFeedTask loadMoreFeedTask = new LoadMoreFeedTask();
 
-                            Toast.makeText(getContext(), "페이징 작동", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(getContext(), "페이징 작동", Toast.LENGTH_SHORT).show();
 //                            Log.e("paging", "onLoadMore: "+NewsFeedContent.ITEMS.get(position-1).getFeedID() );
                             loadMoreFeedTask.execute( NewsFeedContent.ITEMS.get(position-1).getFeedID() );
 

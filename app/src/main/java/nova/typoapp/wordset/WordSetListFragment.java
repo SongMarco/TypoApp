@@ -176,6 +176,13 @@ public class WordSetListFragment extends Fragment {
     }
 
 
+    public void updateRecyclerView(){
+
+        rvWordSetAdapter.notifyDataSetChanged();
+
+    }
+
+
     @OnClick(R.id.cvAddWordSet)
     public void clickAddSet(){
 
@@ -506,6 +513,11 @@ public class WordSetListFragment extends Fragment {
 
         }
 
+    }
+
+    public void updateWordSet(){
+        GetWordSetListTask getWordSetListTask = new GetWordSetListTask();
+        getWordSetListTask.execute();
     }
 
 

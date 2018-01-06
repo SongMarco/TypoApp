@@ -149,8 +149,15 @@ public class WordSetActivity extends AppCompatActivity {
         }
 
 
+        GetWordListTask getWordListTask = new GetWordListTask();
+        getWordListTask.execute();
 
 
+    }
+
+    public int getIdWordSet(){
+
+        return idWordSet;
     }
 
 
@@ -209,8 +216,6 @@ public class WordSetActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        GetWordListTask getWordListTask = new GetWordListTask();
-        getWordListTask.execute();
 
 
 
@@ -218,6 +223,12 @@ public class WordSetActivity extends AppCompatActivity {
     }
 
 
+    public void updateWordList(){
+        GetWordListTask getWordListTask = new GetWordListTask();
+        getWordListTask.execute();
+
+
+    }
 
 
 
@@ -333,6 +344,11 @@ public class WordSetActivity extends AppCompatActivity {
             //기존의 리스트를 클리어, 리스트를 업데이트한다.
             ITEMS.clear();
             ITEMS.addAll(productItems);
+
+            //단어 갯수도 업데이트!
+
+            int numWords = ITEMS.size();
+            tvNumWordsInActivity.setText(numWords + " 단어");
 
 
             for (int j = 0; j < ITEMS.size(); j++) {

@@ -132,11 +132,12 @@ public class MyWordPuzzleAdapter extends RecyclerView.Adapter<MyWordPuzzleAdapte
                             //영어 발음을 재생한다.
 
 
-                            String text = item.nameWord;
+
 //                        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
 
                             //발음 실행. 주의사항 : 롤리팝 버전 이상에서만 가능. 추가 코드 필요
-
+                            String text = WordPuzzleActivity.listPickedItem.get(0).nameWord;
+                            Log.e("speech", "onClick: "+text );
                             String utteranceId = this.hashCode() + "";
                             tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId);
 
@@ -171,13 +172,19 @@ public class MyWordPuzzleAdapter extends RecyclerView.Adapter<MyWordPuzzleAdapte
                                 fragmentTransaction.commit();
 
 
-                                //답을 다 맞췄으므로 스태틱 변수를 초기화(안하면 리스트가 중복됨)
+                                //답을 다 맞췄으므로 스태틱 변수를 초기화(안하면 리스트가 중복됨), 타이머를 정지하고 안보이게.
                                 WordPuzzleActivity.countCorrectItems = 0;
                                 WordPuzzleActivity.countPickedCards = 0;
                                 WordPuzzleActivity.listPickedItem.clear();
                                 WordPuzzleActivity.listPickedViewHolder.clear();
 
                                 Collections.shuffle(WordPuzzleActivity.gotItemsCopy);
+
+                                ((WordPuzzleActivity) view.getContext()).tvPuzzleTime.setVisibility(View.GONE);
+
+                                WordPuzzleActivity activity = (WordPuzzleActivity)view.getContext();
+                                activity.stopTimer();
+
 
 
                             }

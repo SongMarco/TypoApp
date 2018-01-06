@@ -139,6 +139,12 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    public void updateWordSet(){
+
+
+        mSectionsPagerAdapter.wordSetFragment.updateWordSet();
+    }
+
     /*
     더보기 메뉴
 
@@ -453,6 +459,8 @@ public class MainActivity extends AppCompatActivity
             return 3;
         }
     }
+
+
 
 
     //@@@@@ 중요@@@@@ onResume에서 페이저 어댑터에 notifyDataSetChanged를 호출한다.

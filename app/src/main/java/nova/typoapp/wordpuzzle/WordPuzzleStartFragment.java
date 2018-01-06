@@ -7,6 +7,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.util.Collections;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -96,6 +99,17 @@ public class WordPuzzleStartFragment extends Fragment {
         android.support.v4.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.containerFragmentPuzzle, playFragment); // Activity 레이아웃의 View ID
         fragmentTransaction.commit();
+
+        Collections.shuffle(WordPuzzleActivity.gotItemsCopy);
+
+
+        TextView tvTimer = (TextView) getActivity().findViewById(R.id.tvPuzzleTime);
+        tvTimer.setVisibility(View.VISIBLE);
+
+
+
+
+
 
     }
 

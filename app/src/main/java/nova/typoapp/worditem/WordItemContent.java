@@ -27,6 +27,8 @@ public class WordItemContent {
 
         int idWord;
 
+
+
         public String UrlWordImg;
 
         public String nameWord;

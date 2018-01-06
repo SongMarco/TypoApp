@@ -10,12 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nova.typoapp.R;
-import nova.typoapp.worditem.WordItemContent.WordItem;
 
 import static nova.typoapp.wordpuzzle.WordPuzzleActivity.gotItemsCopy;
 
@@ -85,23 +82,42 @@ public class WordPuzzlePlayFragment extends Fragment {
        final View view = inflater.inflate(R.layout.fragment_word_puzzle, container, false);
         ButterKnife.bind(this,view);
 
-        ArrayList<WordItem> playItems = new ArrayList<>(gotItemsCopy);
 
+        MyWordPuzzleAdapter puzzleAdapter =new MyWordPuzzleAdapter(gotItemsCopy);
 
-        MyWordPuzzleAdapter puzzleAdapter = new MyWordPuzzleAdapter(playItems);
-
-        GridLayoutManager mLayoutManager = new GridLayoutManager(getActivity(),3);
+//        for(int i = 0; i < gotItemsCopy.size(); i ++){
+//
+//            gotItemsCopy.get(i).getItemInfo();
+//
+//        }
+        rvWordPuzzle.setLayoutManager(new GridLayoutManager(getActivity(),3));
 
         rvWordPuzzle.setAdapter(puzzleAdapter);
-        rvWordPuzzle.setLayoutManager(mLayoutManager);
 
+        if(gotItemsCopy.size() != 0){
+            //퍼즐 액티비티를 호출하여, 타이머 스레드를 실행한다.
+            WordPuzzleActivity activity = (WordPuzzleActivity)getActivity();
+
+            activity.runTimer();
+
+        }
 
 
 
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
+
+
+
+
+
+
+
+
+
+
+
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -123,6 +139,8 @@ public class WordPuzzlePlayFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
+//        ArrayList<WordItem> playItems = new ArrayList<>(gotItemsCopy);
 
 
     }
@@ -148,6 +166,7 @@ public class WordPuzzlePlayFragment extends Fragment {
 
 
     }
+
 
     @Override
     public void onDetach() {

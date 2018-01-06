@@ -1,5 +1,9 @@
 package nova.typoapp.worditem;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.RequiresApi;
@@ -14,15 +18,26 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import nova.typoapp.R;
+import nova.typoapp.retrofit.AddCookiesInterceptor;
+import nova.typoapp.retrofit.ApiService;
+import nova.typoapp.retrofit.ReceivedCookiesInterceptor;
 import nova.typoapp.worditem.WordItemContent.WordItem;
+import nova.typoapp.wordset.WordSetActivity;
+import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Retrofit;
 
 import static com.facebook.FacebookSdk.getApplicationContext;
+import static nova.typoapp.retrofit.ApiService.API_URL;
 
 /**
  * Created by Administrator on 2018-01-03.
@@ -119,6 +134,71 @@ public class MyWordItemRecyclerViewAdapter extends RecyclerView.Adapter<MyWordIt
 
 
 
+        //단어장 내부의 단어를 롱클릭하여 삭제.
+        View.OnLongClickListener longClickListener = new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+//                Toast.makeText(holder.mView.getContext(), "삭제합니다", Toast.LENGTH_SHORT).show();
+
+
+                final Context context = holder.mView.getContext();
+
+                //다이얼로그 띄우기
+
+                //단어장 삭제를 눌렀다.
+
+                AlertDialog.Builder deleteConfirmBuilder = new AlertDialog.Builder(context)
+                        .setMessage("단어를 단어장에서 삭제하시겠습니까?")
+                        .setPositiveButton("삭제", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                //삭제를 클릭했다. 삭제를 진행하는 태스크를 실행한다.
+
+//                                DeleteSetTask deleteSetTask = new DeleteSetTask(context);
+//                                deleteSetTask.execute(item.idWordSet);
+
+
+
+
+                                int idWordSetInActivity;
+
+                                WordSetActivity activity = (WordSetActivity) holder.mView.getContext();
+                                idWordSetInActivity= activity.getIdWordSet();
+
+
+                                DeleteWordInSetTask deleteWordInSetTask = new DeleteWordInSetTask(holder.mView.getContext(), idWordSetInActivity ,item.nameWord, item.idWord);
+                                deleteWordInSetTask.execute();
+
+
+
+                            }
+                        })
+                        .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                AlertDialog deleteConfirmDialog = deleteConfirmBuilder.create();
+                deleteConfirmDialog.show();
+
+
+
+
+
+                return false;
+            }
+        };
+
+
+        holder.mView.setOnLongClickListener(longClickListener);
+
+
+
+
 
 
 
@@ -134,6 +214,13 @@ public class MyWordItemRecyclerViewAdapter extends RecyclerView.Adapter<MyWordIt
 //            }
 //        });
     }
+
+
+
+
+
+
+
     @Override
     public int getItemCount() {
         return mValues.size();
@@ -171,4 +258,101 @@ public class MyWordItemRecyclerViewAdapter extends RecyclerView.Adapter<MyWordIt
         }
 
     }
+
+
+
+    public class DeleteWordInSetTask extends AsyncTask<Integer, String, String> {
+
+        private Context mContext;
+
+
+
+        int idWordSet;
+        String nameWord;
+        int idWord;
+
+
+        String json_result;
+        // context를 가져오는 생성자. 이를 통해 메인 액티비티의 함수에 접근할 수 있다.
+
+
+        public DeleteWordInSetTask(Context context        ) {
+            mContext = context;
+        }
+
+        public DeleteWordInSetTask(Context mContext, int idWordSet, String nameWord, int idWord) {
+            this.mContext = mContext;
+            this.idWordSet = idWordSet;
+            this.nameWord = nameWord;
+            this.idWord = idWord;
+        }
+
+        @Override
+        protected String doInBackground(Integer... integers) {
+
+            //region//단어장 삭제하기 - DB상에서 단어장을 삭제한다.
+
+
+            //region//글 삭제하기 - DB상에서 뉴스피드 글을 삭제한다.
+            //레트로핏 기초 컴포넌트 만드는 과정. 자주 복붙할 것.
+            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(new ReceivedCookiesInterceptor(mContext))
+                    .addInterceptor(new AddCookiesInterceptor(mContext))
+                    .addInterceptor(httpLoggingInterceptor)
+                    .build();
+
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(API_URL)
+                    .client(okHttpClient)
+                    .build();
+
+            ApiService apiService = retrofit.create(ApiService.class);
+//            Log.e("myimg", "doInBackground: " + uploadImagePath);
+
+
+            // 레트로핏 콜 객체를 만든다. 파라미터로 게시물의 ID값, 게시물의 타입을 전송한다.
+
+             Call<ResponseBody> comment = apiService.deleteWordInSet(idWord, idWordSet);
+
+
+            try {
+
+                json_result = comment.execute().body().string();
+                return json_result;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            return null;
+        }
+
+        @Override
+
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+
+
+            //삭제가 완료되었다. 여기서 새로고침을 진행하자
+            //단어장 액티비티를 불러오고, 단어장 액티비티의 updateWordList를 콜한다.
+            //이 함수는 프래그먼트를 가져와서 프래그먼트 내부의 새로고침 함수를 다시 콜한다. -> 새로고침 됨.
+
+            WordSetActivity activity = (WordSetActivity) mContext;
+            activity.updateWordList();
+
+
+
+            Log.e("wow", result);
+
+
+        }
+
+    }
+
+
 }

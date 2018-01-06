@@ -15,6 +15,13 @@
 
     </string-array>
 
+
+    <string-array name="edit_set">
+        <item>단어장 이름 수정</item>
+        <item>단어장 삭제</item>
+
+    </string-array>
+
     <string-array name="edit_another">
         <item>신고하기</item>
 

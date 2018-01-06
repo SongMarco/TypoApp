@@ -7,7 +7,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import nova.typoapp.R;
@@ -63,6 +65,17 @@ public class WordPuzzleEndFragment extends Fragment {
         }
     }
 
+
+
+
+
+    @BindView(R.id.tvPuzzleRecord)
+    TextView tvPuzzleRecord;
+
+
+
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -71,6 +84,12 @@ public class WordPuzzleEndFragment extends Fragment {
 
         ButterKnife.bind(this, view);
 
+
+        WordPuzzleActivity activity = (WordPuzzleActivity)getActivity();
+
+        String puzzleRecord = activity.getPuzzleRecord();
+
+        tvPuzzleRecord.setText(puzzleRecord);
 
         // Inflate the layout for this fragment
         return view;
@@ -89,6 +108,19 @@ public class WordPuzzleEndFragment extends Fragment {
         android.support.v4.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.containerFragmentPuzzle, playFragment); // Activity 레이아웃의 View ID
         fragmentTransaction.commit();
+
+
+        //타이머를 보이게 하고,
+        TextView tvTimer = (TextView) getActivity().findViewById(R.id.tvPuzzleTime);
+        tvTimer.setVisibility(View.VISIBLE);
+
+
+        //퍼즐 액티비티를 호출하여, 타이머 스레드를 실행한다.
+        WordPuzzleActivity activity = (WordPuzzleActivity)getActivity();
+
+        activity.runTimer();
+
+
 
     }
 

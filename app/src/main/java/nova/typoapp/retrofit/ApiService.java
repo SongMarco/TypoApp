@@ -195,6 +195,23 @@ public interface ApiService {
     @POST("deleteSubComment.php")
     Call<ResponseBody> deleteSubComment(@Field("commentID") int commentID);
 
+
+    //단어장 삭제하기
+    @FormUrlEncoded
+    @POST("wordset/deleteWordSet.php")
+    Call<ResponseBody> deleteWordSet(@Field("setId") int setId);
+
+    //단어장 내부의 단어 삭제하기
+    @FormUrlEncoded
+    @POST("wordset/deleteWordInSet.php")
+    Call<ResponseBody> deleteWordInSet(@Field("idWord") int idWord , @Field("idWordSet") int idWordSet );
+
+    //단어장 단어장 수정하기
+    @FormUrlEncoded
+    @POST("wordset/editWordSet.php")
+    Call<ResponseBody> editWordSet(@Field("setId") int setId,@Field("nameWordSet") String nameWordSet       );
+
+
     //게시글에 좋아요 적용하기(이미 좋아요 적용되있으면 좋아요 해제, 좋아하지 않으면 좋아요 적용)
     @FormUrlEncoded
     @POST("likeFeed.php")

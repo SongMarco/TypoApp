@@ -6,10 +6,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
-import android.widget.Toast;
+import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -80,6 +84,12 @@ public class WordPuzzleActivity extends AppCompatActivity
     public static int countCorrectItems = 0;
 
 
+    //1초
+    int timerSec;
+    //0.1초
+    int timerdeciSec;
+
+
     public static ArrayList<WordItem> listPickedItem= new ArrayList<>();
 
 
@@ -90,7 +100,15 @@ public class WordPuzzleActivity extends AppCompatActivity
     @BindView(R.id.containerFragmentPuzzle)
     FrameLayout containerFragmentPuzzle;
 
-    public static ArrayList<WordItem> gotItemsCopy = new ArrayList<>();
+
+    //퍼즐의 타이머를 위한 텍스트뷰. - 처음에는 보이지 않다가, 게임을 시작하면 보이게 된다.
+    @BindView(R.id.tvPuzzleTime)
+    TextView tvPuzzleTime;
+
+    public static ArrayList<WordItem> gotItemsCopy;
+
+
+    TimerTask timerTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,8 +122,7 @@ public class WordPuzzleActivity extends AppCompatActivity
 
         setSupportActionBar(toolbarComment);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("단어 퍼즐");
-
+        getSupportActionBar().setTitle("카드 매칭");
 
 
         //프래그먼트를 세팅한다.
@@ -133,15 +150,8 @@ public class WordPuzzleActivity extends AppCompatActivity
         gotItems
         */
 
-        if(gotItems.size() > 9){
-            //리스트를 셔플한다.
-            Collections.shuffle(gotItems);
 
-            //리스트를 9개까지 추출한다. 여기서 subLIst(0,9)는 인덱스 0~8까지의 9개를 의미한다.(9는 제외됨에 유의, 자바 문법)
-
-            gotItems = new ArrayList<WordItem>(gotItems.subList(0,9));
-
-        }
+        gotItemsCopy  = new ArrayList<>();
 
 
 
@@ -149,54 +159,67 @@ public class WordPuzzleActivity extends AppCompatActivity
 
 
 
+            if(gotItems.size() > 9){
+                //리스트를 셔플한다.
+                Collections.shuffle(gotItems);
+
+                //리스트를 9개까지 추출한다. 여기서 subLIst(0,9)는 인덱스 0~8까지의 9개를 의미한다.(9는 제외됨에 유의, 자바 문법)
+
+                gotItems = new ArrayList<WordItem>(gotItems.subList(0,9));
+
+            }
 
 
-//        for(int i = 0; i < gotItems.size(); i ++){
-//
-//            gotItems.get(i).getItemInfo();
-//
-//        }
+            //gotItemsCopy 에 gotItem 을 deep Copy 한다. - 어레이 리스트와, 그 안에 있는 아이템 모두 딥 카피 해야함
 
+            for(int i = 0; i < gotItems.size(); i++){
 
+                gotItemsCopy.add(new WordItem(gotItems.get(i)) );
 
-        //gotItemsCopy 에 gotItem 을 deep Copy 한다. - 어레이 리스트와, 그 안에 있는 아이템 모두 딥 카피 해야함
+            }
 
-        for(int i = 0; i < gotItems.size(); i++){
+            //단어 이미지와 뜻을 따로 세팅하기 위해 카피한 세트의 imgUrl은 비워둔다.
+            // 이렇게 하면 어댑터에서 img url이 비었다면 단어의 텍스트를 보여준다.
+            for(int i = 0; i < gotItems.size(); i ++){
 
-            gotItemsCopy.add(new WordItem(gotItems.get(i)) );
+                gotItemsCopy.get(i).UrlWordImg = "";
 
-        }
+            }
 
-        //단어 이미지와 뜻을 따로 세팅하기 위해 카피한 세트의 imgUrl은 비워둔다.
-        // 이렇게 하면 어댑터에서 img url이 비었다면 단어의 텍스트를 보여준다.
-        for(int i = 0; i < gotItems.size(); i ++){
-
-            gotItemsCopy.get(i).UrlWordImg = "";
-
-        }
-
-        gotItemsCopy.addAll(gotItems);
+            gotItemsCopy.addAll(gotItems);
 
 //        Log.e("wow", "onCreate: after Shuffle ######" );
 
 
-        Collections.shuffle(gotItemsCopy);
+            Collections.shuffle(gotItemsCopy);
 
-        for(int i = 0; i < gotItems.size(); i ++){
+            for(int i = 0; i < gotItems.size(); i ++){
 
-            gotItemsCopy.get(i).getItemInfo();
+                gotItemsCopy.get(i).getItemInfo();
 
-        }
-
-
-
-        //static 한 아이템 어레이를 만들었다. 이 변수는 액티비티에서 나가면 초기화되며,
-        //액티비티에 들어오면 미리 세팅 되있다가, 퍼즐을 플레이할 때 어댑터에 세팅된다.
-        // static ㅎ ㅏ므로 초기화로 인한 오류가 없는지 확인할 것.
+            }
 
 
 
+            //static 한 아이템 어레이를 만들었다. 이 변수는 액티비티에서 나가면 초기화되며,
+            //액티비티에 들어오면 미리 세팅 되있다가, 퍼즐을 플레이할 때 어댑터에 세팅된다.
+            // static ㅎ ㅏ므로 초기화로 인한 오류가 없는지 확인할 것.
 
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+
+    public void setCopyList(){
 
 
 
@@ -213,7 +236,6 @@ public class WordPuzzleActivity extends AppCompatActivity
 
 
 
-
     }
 
     @Override
@@ -221,12 +243,19 @@ public class WordPuzzleActivity extends AppCompatActivity
         super.onDestroy();
 
 
-        Toast.makeText(this, "onDestroy", Toast.LENGTH_SHORT).show();
+        //액티비티를 나가면 관련 스태틱 변수들 초기화
+
+//        Toast.makeText(this, "onStop", Toast.LENGTH_SHORT).show();
         WordPuzzleActivity.countCorrectItems = 0;
         WordPuzzleActivity.countPickedCards = 0;
         WordPuzzleActivity.listPickedItem.clear();
         WordPuzzleActivity.listPickedViewHolder.clear();
-        WordPuzzleActivity.gotItemsCopy.clear();
+//        WordPuzzleActivity.gotItemsCopy.clear();
+
+        stopTimer();
+
+
+
 
     }
 
@@ -245,7 +274,134 @@ public class WordPuzzleActivity extends AppCompatActivity
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+
+    }
+
+    @Override
     public void onFragmentInteraction(Uri uri) {
 
     }
+
+    public void runTimer(){
+
+        startTimer();
+
+    }
+
+    public void stopTimer(){
+
+        if(stopwatchTimer != null){
+
+
+            stopwatchTimer.cancel();
+            stopwatchTimer.purge();
+            stopwatchTimer = null;
+        }
+
+    }
+
+
+
+    Timer stopwatchTimer;
+
+    public long startTime = 0;
+    public void startTimer() {
+        stopwatchTimer = new Timer();
+
+        startTime = System.currentTimeMillis();
+        stopwatchTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        TextView timerTextView = (TextView) findViewById(R.id.tvPuzzleTime);
+                        timerTextView.setText(stopwatch());
+                    }
+                });
+
+            }
+        }, 0, 10);
+    }
+
+    // Returns the combined string for the stopwatch, counting in tenths of seconds.
+    public String stopwatch() {
+        long nowTime = System.currentTimeMillis();
+        long cast = nowTime - startTime;
+        Date date = new Date(cast);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("s.S");
+        return simpleDateFormat.format(date);
+    }
+//
+//
+//    public class TimerTask extends AsyncTask<String, String, String> {
+//
+//        //onPre 에서 타이머 변수를 초기화
+//        @Override
+//        protected void onPreExecute() {
+//            super.onPreExecute();
+//
+//
+//            Toast.makeText(WordPuzzleActivity.this, "running", Toast.LENGTH_SHORT).show();
+//            timerdeciSec = 0;
+//            timerSec = 0;
+//
+//
+//        }
+//
+//
+//        //타이머가 정지될 때까지 타이머를 돌림.
+//        @Override
+//        protected String doInBackground(String... params) {
+//            while (!isCancelled() ) {
+//
+//                    //0.1초를 대기한다
+//                    try {
+//                        Thread.sleep(100);
+//                    } catch (Exception e1) {
+//                        System.out.println(e1);
+//                    }
+//
+//                    timerdeciSec++;
+//                    //0.1초가 지났으니 0.1초를 증가시킨다.
+//
+//                    //1초단위가 되면 0.1초 단위를 0으로 하고, 초를 증가시킨다.
+//                    if (timerdeciSec == 10) {
+//                        timerdeciSec = 0;
+//                        timerSec++;
+//                    }
+//
+//                    this.publishProgress(timerSec+"."+timerdeciSec);
+//
+//            }
+//
+//            return timerSec+"."+timerdeciSec;
+//        }
+//
+//        @Override
+//        protected void onProgressUpdate(String... values) {
+//            super.onProgressUpdate(values);
+//            TextView tvTimer = (TextView)findViewById(R.id.tvPuzzleTime);
+//            tvTimer.setText(values[0]);
+//        }
+//
+//        @Override
+//        protected void onCancelled() {
+//            super.onCancelled();
+//
+//            Toast.makeText(WordPuzzleActivity.this, "타이머 정지됨", Toast.LENGTH_SHORT).show();
+//
+//
+//        }
+//    }
+
+
+    public String getPuzzleRecord(){
+
+        return tvPuzzleTime.getText().toString();
+    }
+
 }

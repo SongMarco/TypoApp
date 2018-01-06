@@ -128,13 +128,13 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="@dimen/margin_border"
-                    app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
+                    app:srcCompat="?android:attr/actionModeCopyDrawable" />
 
                 <TextView
                     android:id="@+id/textView6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="단어 카드" />
+                    android:text="단어 카드로 학습" />
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
@@ -161,13 +161,13 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_margin="@dimen/margin_border"
-                    app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
+                    app:srcCompat="@android:drawable/ic_menu_day" />
 
                 <TextView
                     android:id="@+id/textView6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="카드 맞추기" />
+                    android:text="카드 매칭 게임" />
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
@@ -178,7 +178,8 @@
             android:layout_height="match_parent"
 
             android:layout_margin="@dimen/margin_balloon"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:visibility="gone">
 
 
             <LinearLayout
@@ -219,7 +220,8 @@
             android:layout_height="match_parent"
 
             android:layout_margin="@dimen/margin_balloon"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:visibility="gone">
 
 
             <LinearLayout
@@ -251,7 +253,8 @@
             android:layout_height="match_parent"
 
             android:layout_margin="@dimen/margin_balloon"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:visibility="gone">
 
 
             <LinearLayout
@@ -283,7 +286,8 @@
             android:layout_height="match_parent"
 
             android:layout_margin="@dimen/margin_balloon"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:visibility="gone">
 
 
             <LinearLayout
