@@ -230,7 +230,7 @@ public class MyWordSetItemRecyclerViewAdapter extends RecyclerView.Adapter<MyWor
                                                     @Override
                                                     public void onClick(DialogInterface dialog, int which) {
 
-                                                        Toast.makeText(context, "삭제 ㄱㄱ = " + item.nameWordSet, Toast.LENGTH_SHORT).show();
+//                                                        Toast.makeText(context, "삭제 ㄱㄱ = " + item.nameWordSet, Toast.LENGTH_SHORT).show();
                                                         DeleteSetTask deleteSetTask = new DeleteSetTask(context);
                                                         deleteSetTask.execute(item.idWordSet);
 
