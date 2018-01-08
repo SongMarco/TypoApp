@@ -36,12 +36,12 @@
 
 
                 android:layout_gravity="center"
+                android:layout_margin="@dimen/text_margin"
                 android:layout_weight="0"
-                android:text="0.0초"
+                android:text="0.0"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:visibility="visible"
-                android:layout_margin="@dimen/text_margin"/>
+                android:visibility="gone" />
         </LinearLayout>
 
 

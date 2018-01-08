@@ -53,11 +53,15 @@
 
             <ImageView
                 android:id="@+id/imgSoundCard"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="right"
 
+
+                android:padding="@dimen/margin_border"
                 android:layout_margin="@dimen/margin_balloon"
+
+                android:tint="@color/fontGrey"
                 app:srcCompat="@drawable/ic_volume_up_black_24dp" />
 
             <ImageView

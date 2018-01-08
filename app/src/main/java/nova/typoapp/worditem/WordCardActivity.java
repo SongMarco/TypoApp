@@ -53,7 +53,7 @@ public class WordCardActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbarComment);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("단어 카드");
+        getSupportActionBar().setTitle("낱말 카드");
 
         MyWordCardAdapter wordCardAdapter = new MyWordCardAdapter(gotItems);
 

@@ -118,7 +118,7 @@ public class WordPuzzleEndFragment extends Fragment {
         //퍼즐 액티비티를 호출하여, 타이머 스레드를 실행한다.
         WordPuzzleActivity activity = (WordPuzzleActivity)getActivity();
 
-        activity.runTimer();
+        activity.startTimer();
 
 
 
