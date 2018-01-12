@@ -23,6 +23,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
         ndk {
             abiFilters "armeabi", "armeabi-v7a", "x86", "mips"
         }
@@ -84,9 +85,12 @@ dependencies {
     // 문자 인식 라이브러리 테저랙트
     compile 'com.rmtheis:tess-two:8.0.0'
 
-
-
-
+    // ndk 이용한 스캔 라이브러리
     compile project(path: ':scanlibrary')
+
+    //구글 비전 api 로 문자 인식을 사용하기 위한 종속
+    compile 'com.google.api-client:google-api-client-android:1.20.0' exclude module: 'httpclient'
+    compile 'com.google.http-client:google-http-client-gson:1.20.0' exclude module: 'httpclient'
+    compile 'com.google.apis:google-api-services-vision:v1-rev2-1.21.0'
 }
 apply plugin: 'com.google.gms.google-services'
