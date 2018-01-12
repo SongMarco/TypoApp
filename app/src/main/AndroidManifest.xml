@@ -249,13 +249,11 @@ application 태그 참고사항
             android:name=".worditem.WordCardActivity"
             android:label="단어 카드"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
-            android:label="단어 퍼즐"
             android:name=".wordpuzzle.WordPuzzleActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-
-            />
+            android:label="단어 퍼즐"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".wordset.AddWordSetOCRActivity"></activity>
     </application>
 
 </manifest>

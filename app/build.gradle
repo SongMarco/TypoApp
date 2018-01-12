@@ -76,5 +76,12 @@ dependencies {
     compile 'com.google.firebase:firebase-core:11.8.0'
     compile 'com.google.firebase:firebase-messaging:11.8.0'
     compile 'com.squareup.okhttp3:okhttp:3.8.0'
+
+    // 문자 인식 라이브러리 테저랙트
+    compile 'com.rmtheis:tess-two:8.0.0'
+
+
+
+
 }
 apply plugin: 'com.google.gms.google-services'

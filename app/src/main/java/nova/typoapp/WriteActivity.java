@@ -11,8 +11,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -21,6 +21,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -37,6 +38,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import java.io.File;
 import java.io.IOException;
@@ -211,28 +216,40 @@ public class WriteActivity extends AppCompatActivity {
     }
 
 
+    //다이얼로그에서 사진 촬영 선택
     private void captureCamera() {
+
+        // 외장 메모리의 상태를 가져옴
         String state = Environment.getExternalStorageState();
-        // 외장 메모리 검사
+
+        // 외장 메모리의 장착 상태를 검사
         if (Environment.MEDIA_MOUNTED.equals(state)) {
+
+            //사진 촬영을 위한 인텐트 생성
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
+
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+
+                //촬영한 이미지를 담기 위한 파일 생성
                 File photoFile = null;
                 try {
+                    //사진 파일 생성
                     photoFile = createImageFile();
                 } catch (IOException ex) {
                     Log.e("captureCamera Error", ex.toString());
                 }
                 if (photoFile != null) {
-                    // getUriForFile의 두 번째 인자는 Manifest provier의 authorites와 일치해야 함
+                    // getUriForFile의 두 번째 인자는 App Manifest file provider 의 authorities 와 일치해야 한다. 오타 주의
 
                     Uri providerURI = FileProvider.getUriForFile(this, getPackageName(), photoFile);
                     imageUri = providerURI;
 
-                    // 인텐트에 전달할 때는 FileProvier의 Return값인 content://로만!!, providerURI의 값에 카메라 데이터를 넣어 보냄
+                    // 인텐트에 전달할 때는 FileProvider 의 Return 값인 content://로만!!, providerURI 의 값에 카메라 데이터를 넣어 보냄
+                    // 인텐트에 엑스트라로, 촬영한 이미지가 저장될 경로를 추가해준다.
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, providerURI);
 
+                    // 사진 촬영 앱이 실행되며 촬영 시작 -> 종료시 onActivityResult 로 이동.
                     startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
                 }
             }
@@ -242,19 +259,25 @@ public class WriteActivity extends AppCompatActivity {
         }
     }
 
+    //새 사진 파일을 생성하는 메소드.
     public File createImageFile() throws IOException {
-        // Create an image file name
+        // 이미지 파일 이름 생성
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + ".jpg";
+
         File imageFile = null;
         File storageDir = new File(Environment.getExternalStorageDirectory() + "/Pictures", "jamsya");
 
+        // storageDir 디렉토리가 존재하지 않으면 새로 생성
         if (!storageDir.exists()) {
             Log.i("mCurrentPhotoPath1", storageDir.toString());
             storageDir.mkdirs();
         }
 
+        // 이미지 파일을 저장 디렉토리에 생성
         imageFile = new File(storageDir, imageFileName);
+
+        // 이미지의 경로를 이 파일의 경로로 지정 -> 사진 파일의 경로 지정 완료.
         cameraPhotoPath = imageFile.getAbsolutePath();
 
         return imageFile;
@@ -269,10 +292,14 @@ public class WriteActivity extends AppCompatActivity {
         startActivityForResult(intent, REQUEST_TAKE_ALBUM);
     }
 
+
+    //사진을 파일로 저장함
     private void galleryAddPic() {
         Log.i("galleryAddPic", "Call");
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         // 해당 경로에 있는 파일을 객체화(새로 파일을 만든다는 것으로 이해하면 안 됨)
+
+        //ㅋ
         File f = new File(cameraPhotoPath);
         Uri contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
@@ -300,45 +327,53 @@ public class WriteActivity extends AppCompatActivity {
         startActivityForResult(cropIntent, REQUEST_IMAGE_CROP);
     }
 
+
+    // 사진을 찍거나 갤러리로 간 후
+    // 돌아왔을 때 진행하는 작업들
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        // 리퀘스트 코드에 따라 분기
         switch (requestCode) {
+
+            //사진을 찍었던 경우
             case REQUEST_TAKE_PHOTO:
+
+                //정상적으로 사진을 촬영하였음
                 if (resultCode == Activity.RESULT_OK) {
                     try {
                         Log.i("REQUEST_TAKE_PHOTO", "OK");
+
+                        // 촬영한 사진을 파일로 저장함
                         galleryAddPic();
 
+                        // 이미지의 경로는 사진파일이 저장된 경로다. - createImageFile() 메소드에서 생성됨
                         String imagePath = cameraPhotoPath;
 
-                        // 비트맵의 사이즈를 줄여서 디코딩하기! -> 인 1/샘플사이즈 만큼 축소시켜서 디코딩한다!
-                        // 아웃오브메모리 해결!, 사진은 어차피 용량이 클테니까 반드시 4분의1로 축소시켰다. -> 사실은 try/catch로 OOM을 캐치해서 고칠 수도 있어야 하겠다.
-                        // @@@@@ 황금 코드~
-                        BitmapFactory.Options options = new BitmapFactory.Options();
-                        options.inSampleSize = 4;
-                        Bitmap src = BitmapFactory.decodeFile(cameraPhotoPath, options);
+                        Glide.with(this).load(imagePath)
 
-                        Log.e("img", "onActivityResult: " + cameraPhotoPath);
-                        Bitmap image = Bitmap.createScaledBitmap(src, src.getWidth(), src.getHeight(), true);
+                                //글라이드에서 이미지 로딩이 완료될 경우 발생하는 이벤트.
+                                .listener(new RequestListener<Drawable>() {
 
-                        // 이미지를 상황에 맞게 회전시킨다
-                        ExifInterface exif = new ExifInterface(imagePath);
-                        int exifOrientation = exif.getAttributeInt(
-                                ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                                    //로딩 실패
+                                    @Override
+                                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                        Toast.makeText(WriteActivity.this, "이미지를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show();
+                                        return false;
+                                    }
+
+                                    //로딩 성공 -> 힌트용 이미지뷰를 보이지 않도록 처리
+                                    @Override
+                                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+
+                                        findViewById(R.id.layoutAddImage).setVisibility(View.GONE);
+                                        return false;
+                                    }
+                                })
+                                .into(imageViewAdd);
 
 
-                        int exifDegree = exifOrientationToDegrees(exifOrientation);
 
-
-                        image = rotate(image, exifDegree);
-
-
-//                        Log.e("myimg", "onActivityResult-default drawable:: "+imageViewAdd.getDrawable().toString() );
-                        imageViewAdd.setImageBitmap(image);
-
-                        if (imageViewAdd.getDrawable() != null) {
-                            findViewById(R.id.layoutAddImage).setVisibility(View.GONE);
-                        }
 
                         Log.e("myimg", "onActivityResult: " + imageViewAdd.getDrawable().toString());
 
@@ -347,12 +382,19 @@ public class WriteActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         Log.e("REQUEST_TAKE_PHOTO", e.toString());
                     }
-                } else {
+                }
+
+                // 사진 촬영을 취소한 경우
+                else {
                     Toast.makeText(WriteActivity.this, "사진찍기를 취소하였습니다.", Toast.LENGTH_SHORT).show();
                 }
                 break;
 
+
+                //갤러리에서 사진을 가져오려 한 경우
             case REQUEST_TAKE_ALBUM:
+
+                //정상적으로 사진을 가져왔을 경우
                 if (resultCode == Activity.RESULT_OK) {
 
                     if (data.getData() != null) {
@@ -362,54 +404,43 @@ public class WriteActivity extends AppCompatActivity {
                             photoURI = data.getData();
                             albumURI = Uri.fromFile(albumFile);
 
+                            //이미지 크롭을 하지 않으므로 주석처리
 //                            cropImage();
 
 
                             //그냥 getPath하면 작동하지 않으나 해당 함수를 사용 하면 작동한다@@@
                             pickPhotoPath = getRealPathFromURI(this, photoURI);
 
-//                            galleryAddPic();
-//                            imageViewAdd.setImageURI(photoURI);
 
-                            // 비트맵의 사이즈를 줄여서 디코딩하기! -> 인 1/샘플사이즈 만큼 축소시켜서 디코딩한다!
-                            // 아웃오브메모리 해결!
-                            // @@@@@ 황금 코드~
-                            Bitmap resized;
-                            try {
+                            Glide.with(this).load(pickPhotoPath)
+                                    //글라이드에서 이미지 로딩이 완료될 경우 발생하는 이벤트.
+                                    .listener(new RequestListener<Drawable>() {
 
-                                BitmapFactory.Options options = new BitmapFactory.Options();
-                                Bitmap src = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
-                                resized = Bitmap.createBitmap(src);
-                            } catch (OutOfMemoryError e) {
+                                        //로딩 실패
+                                        @Override
+                                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                            Toast.makeText(WriteActivity.this, "이미지를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show();
+                                            return false;
+                                        }
 
-                                Toast.makeText(this, "메모리가 부족하여 이미지를 축소하였습니다.", Toast.LENGTH_SHORT).show();
-                                BitmapFactory.Options options = new BitmapFactory.Options();
-                                options.inSampleSize = 4;
-                                Bitmap src = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoURI);
-                                resized = Bitmap.createScaledBitmap(src, src.getWidth() / 4, src.getHeight() / 4, true);
-                            }
+                                        //로딩 성공 -> 힌트용 이미지뷰를 보이지 않도록 처리
+                                        @Override
+                                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
 
-//                            Bitmap src = BitmapFactory.decodeFile(imagePath , options);
+                                            findViewById(R.id.layoutAddImage).setVisibility(View.GONE);
+                                            return false;
+                                        }
+                                    })
+                                    .into(imageViewAdd);
 
-
-                            // 이미지를 상황에 맞게 회전시킨다
-                            ExifInterface exif = new ExifInterface(pickPhotoPath);
-                            int exifOrientation = exif.getAttributeInt(
-                                    ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-                            int exifDegree = exifOrientationToDegrees(exifOrientation);
-
-                            resized = rotate(resized, exifDegree);
-
-
-                            imageViewAdd.setImageBitmap(resized);
-                            if (imageViewAdd.getDrawable() != null) {
-                                findViewById(R.id.layoutAddImage).setVisibility(View.GONE);
-                            }
 
                             Log.e("img", "real photo path: " + pickPhotoPath);
 
 
-                        } catch (Exception e) {
+                        }
+
+                        // 정상적으로 갤러리에서 사진을 가져오지 못함
+                        catch (Exception e) {
 
                             Log.e("TAKE_ALBUM_SINGLE ERROR", e.toString());
                         }

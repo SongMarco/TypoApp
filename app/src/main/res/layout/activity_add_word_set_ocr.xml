@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v4.widget.NestedScrollView
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+
+    >
+
+
+
+
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="nova.typoapp.wordset.AddWordSetOCRActivity">
+
+    <ImageView
+        android:id="@+id/imgAddWordSetCam"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_gravity="center"
+
+        app:srcCompat="@android:drawable/ic_menu_report_image" />
+
+    <TextView
+        android:id="@+id/tvOcrContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="인식한 문자가 이곳에 채워집니다."
+        android:textAlignment="center"
+        android:textColor="@color/colorAccent"
+        android:textSize="16sp" />
+</LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>
