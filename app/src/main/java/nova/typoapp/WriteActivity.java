@@ -266,7 +266,9 @@ public class WriteActivity extends AppCompatActivity {
         String imageFileName = "JPEG_" + timeStamp + ".jpg";
 
         File imageFile = null;
-        File storageDir = new File(Environment.getExternalStorageDirectory() + "/Pictures", "jamsya");
+
+        //@@@ 주의사항 :: 아래 파일의 경로가 provider_paths.xml 의 child 여야함. 다르면 illegalArgumentException 뜬다.
+        File storageDir = new File(Environment.getExternalStorageDirectory() + "/Pictures/TypoApp", "cameraImg");
 
         // storageDir 디렉토리가 존재하지 않으면 새로 생성
         if (!storageDir.exists()) {

@@ -32,6 +32,8 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.scanlibrary.ScanActivity;
+import com.scanlibrary.ScanConstants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -114,6 +116,9 @@ public class WordSetListFragment extends Fragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private static final String TAG = "WordSetListFragment";
+
+    //사진 스캔을 위한 리퀘스트 코드
+    static final int REQUEST_CODE = 99;
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
@@ -336,13 +341,31 @@ public class WordSetListFragment extends Fragment {
                         // The 'which' argument contains the index position
                         // of the selected item
 
+                        Intent intent;
+
                         switch (which) {
                             case 0:
-                                getAlbum();
+
+
+                                //갤러리 액티비티로 넘어간다.
+                                //갤러리에서 사진을 가져와서 적당히 잘라 스캔하게 된다.
+
+                                intent = new Intent(getActivity() , ScanActivity.class);
+
+                                intent.putExtra(ScanConstants.OPEN_INTENT_PREFERENCE, ScanConstants.OPEN_MEDIA);
+
+                                startActivityForResult(intent, REQUEST_CODE);
 
                                 break;
                             case 1:
-                                captureCamera();
+
+                                //사진 촬영 액티비티로 넘어간다.
+                                //사진을 촬영하면 그 사진을 적당히 잘라 스캔하게 된다.
+                                intent = new Intent(getActivity() , ScanActivity.class);
+
+                                intent.putExtra(ScanConstants.OPEN_INTENT_PREFERENCE, ScanConstants.OPEN_CAMERA);
+
+                               startActivityForResult(intent, REQUEST_CODE);
 
                                 break;
 
@@ -358,6 +381,9 @@ public class WordSetListFragment extends Fragment {
 
 
     }
+
+
+
 
 
 
@@ -525,126 +551,30 @@ public class WordSetListFragment extends Fragment {
 
     // 사진을 찍거나 갤러리로 간 후
     // 돌아왔을 때 진행하는 작업들
+
+    // 스캔 라이브러리 액티비티에서 돌아왔다.
+    // 반듯해진 사진을 이미지 뷰에 세팅하여 작업을 마치게 된다.
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-        // 리퀘스트 코드에 따라 분기
-        switch (requestCode) {
-
-            //사진을 찍었던 경우
-            case REQUEST_TAKE_PHOTO:
-
-                //정상적으로 사진을 촬영하였음
-                if (resultCode == Activity.RESULT_OK) {
-                    try {
-                        Log.i("REQUEST_TAKE_PHOTO", "OK");
+        // 리퀘스트 코드, 액티비티에서 반환한 결과값이 정상이면 이미지뷰 세팅
+        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
 
 
-                        // 크롭한 이미지를 저장할 경로를 만든다.
-                        albumFile = null;
-                        albumFile = createImageFile();
-                        albumURI = Uri.fromFile(albumFile);
+            // uri 를 번들에서 가져온다.
+            Uri uri = data.getExtras().getParcelable(ScanConstants.SCANNED_RESULT);
 
-                        // 촬영한 사진의 uri 를 가져온다.
-                        photoURI = imageUri;
+            // 문자 인식 액티비티로 이동하여, 문자 인식을 준비한다.
+            Intent intent = new Intent(getActivity() , AddWordSetOCRActivity.class);
 
+            intent.putExtra("imgUri", uri.toString());
 
-                        // 이미지 크롭을 진행한다.
-                        cropImage(photoURI, albumURI);
+            startActivity(intent);
 
-//                        // 촬영한 사진을 파일로 저장함
-//                        galleryAddPic();
-//
-//                        // 이미지의 경로는 사진파일이 저장된 경로다. - createImageFile() 메소드에서 생성됨
-//                        String imagePath = cameraPhotoPath;
-
-
-//                        //
-//                        Intent intent = new Intent(getActivity(), AddWordSetOCRActivity.class);
-//
-//                        //이미지의 경로를 인텐트 엑스트라에 저장. -> AddWordSetOCRActivity 에서 글라이드로 이미지뷰를 세팅하는데 이용함.
-//                        intent.putExtra("imagePath", imagePath);
-//
-//                        startActivity(intent);
-
-                    } catch (Exception e) {
-                        Log.e("REQUEST_TAKE_PHOTO", e.toString());
-                    }
-                }
-
-                // 사진 촬영을 취소한 경우
-                else {
-                    Toast.makeText(getActivity(), "사진찍기를 취소하였습니다.", Toast.LENGTH_SHORT).show();
-                }
-                break;
-
-
-            //갤러리에서 사진을 가져오려 한 경우
-            case REQUEST_TAKE_ALBUM:
-
-                //정상적으로 사진을 가져왔을 경우
-                if (resultCode == Activity.RESULT_OK) {
-
-                    if (data.getData() != null) {
-                        try {
-                            albumFile = null;
-                            albumFile = createImageFile();
-                            photoURI = data.getData();
-                            albumURI = Uri.fromFile(albumFile);
-
-                            //이미지 크롭을 하지 않으므로 주석처리
-                            cropImage(photoURI, albumURI);
-
-
-                            //그냥 getPath하면 작동하지 않으나 해당 함수를 사용 하면 작동한다@@@
-                            pickPhotoPath = getRealPathFromURI(getActivity(), photoURI);
-
-//                            Intent intent = new Intent(getActivity(), AddWordSetOCRActivity.class);
-//
-//                            //이미지의 경로를 인텐트 엑스트라에 저장. -> AddWordSetOCRActivity 에서 글라이드로 이미지뷰를 세팅하는데 이용함.
-//                            intent.putExtra("imagePath", pickPhotoPath);
-//
-//                            startActivity(intent);
-
-
-                            Log.e("img", "real photo path: " + pickPhotoPath);
-
-
-                        }
-
-                        // 정상적으로 갤러리에서 사진을 가져오지 못함
-                        catch (Exception e) {
-
-                            Log.e("TAKE_ALBUM_SINGLE ERROR", e.toString());
-                        }
-                    }
-                }
-                break;
-
-            case REQUEST_IMAGE_CROP:
-                if (resultCode == Activity.RESULT_OK) {
-
-                    galleryAddPic();
-                    // 이미지의 경로는 사진파일이 저장된 경로다. - createImageFile() 메소드에서 생성됨
-                    String imagePath = cameraPhotoPath;
-
-                    //
-                    Intent intent = new Intent(getActivity(), AddWordSetOCRActivity.class);
-
-                    //이미지의 경로를 인텐트 엑스트라에 저장. -> AddWordSetOCRActivity 에서 글라이드로 이미지뷰를 세팅하는데 이용함.
-                    intent.putExtra("imagePath", imagePath);
-
-                    startActivity(intent);
-//
-//                    imageViewAdd.setImageURI(albumURI);
-//                    Log.e("img", "onActivityResult: " + albumURI.toString());
-
-
-                }
-                break;
         }
-    }
 
+    }
 
 
     //getPath로 얻어지지 않는 진짜 파일의 패스를 얻어오는 메소드
