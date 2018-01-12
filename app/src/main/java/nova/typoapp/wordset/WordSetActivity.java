@@ -202,16 +202,30 @@ public class WordSetActivity extends AppCompatActivity {
     }
 
 
-
-
-
-
-
-
-
-
-
-
+//
+//    // 스캔 라이브러리 액티비티에서 돌아왔다.
+//    // 반듯해진 사진을 이미지 뷰에 세팅하여 작업을 마치게 된다.
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//        // 리퀘스트 코드, 액티비티에서 반환한 결과값이 정상이면 이미지뷰 세팅
+//        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+//
+//
+//            // uri 를 번들에서 가져온다.
+//            Uri uri = data.getExtras().getParcelable(ScanConstants.SCANNED_RESULT);
+//
+//            // 문자 인식 액티비티로 이동하여, 문자 인식을 준비한다.
+//            Intent intent = new Intent(this , AddWordSetOCRActivity.class);
+//
+//            intent.putExtra("imgUri", uri);
+//
+//            startActivity(intent);
+//
+//        }
+//
+//    }
     @Override
     protected void onResume() {
         super.onResume();

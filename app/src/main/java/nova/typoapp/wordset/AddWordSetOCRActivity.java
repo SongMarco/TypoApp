@@ -6,6 +6,7 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -38,8 +39,9 @@ public class AddWordSetOCRActivity extends AppCompatActivity {
     //문자 인식을 적용할 이미지뷰
     @BindView(R.id.imgAddWordSetCam)
     ImageView imgAddWordSetCam;
+    ProgressDialog progressDialog;
 
-
+    Uri imgUri;
     String imagePath;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +52,12 @@ public class AddWordSetOCRActivity extends AppCompatActivity {
         final Context context = this;
         imagePath = getIntent().getStringExtra("imagePath");
 
+        imgUri = Uri.parse(getIntent().getStringExtra("imgUri"));
+
+
+
         Glide.with(this)
-                .load(imagePath)
+                .load(imgUri)
 
 //               글라이드에서 이미지 로딩이 완료될 경우 발생하는 이벤트.
                 .listener(new RequestListener<Drawable>() {
@@ -66,6 +72,10 @@ public class AddWordSetOCRActivity extends AppCompatActivity {
                     //문자 이미지 로딩 성공 -> 문자 인식 기능 수행
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+
+                         progressDialog = new ProgressDialog(AddWordSetOCRActivity.this);
+                         progressDialog.setMessage("문자를 인식하는 중입니다...");
+                         progressDialog.show();
 
                         OcrTask ocrTask = new OcrTask();
                         ocrTask.execute();
@@ -90,13 +100,12 @@ public class AddWordSetOCRActivity extends AppCompatActivity {
 
 
 
-        ProgressDialog progressDialog = new ProgressDialog(getApplicationContext());
+
 
         @Override
         protected void onPreExecute() {
 
 
-//            progressDialog.show();
 
 
         }
