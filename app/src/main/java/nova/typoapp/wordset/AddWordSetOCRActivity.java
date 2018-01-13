@@ -243,6 +243,7 @@ public class AddWordSetOCRActivity extends AppCompatActivity {
 
         }
 
+        //1234
         //false 조건을 모두 거쳐와도 문제가 없다면 true 반환.
         return true;
     }
