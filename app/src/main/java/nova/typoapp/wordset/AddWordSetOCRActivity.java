@@ -3,9 +3,7 @@ package nova.typoapp.wordset;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -14,6 +12,7 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,19 +36,20 @@ import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
-import com.googlecode.tesseract.android.TessBaseAPI;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import nova.typoapp.MainActivity;
 import nova.typoapp.R;
 
@@ -70,10 +70,17 @@ public class AddWordSetOCRActivity extends AppCompatActivity {
 
     @BindView(R.id.tvOcrContent)
     TextView tvOcrContent;
+
+    @BindView(R.id.btnMakeWordSet)
+    Button btnMakeWordSet;
+
+
     ProgressDialog progressDialog;
 
     Uri imgUri;
     String imagePath;
+
+    Bitmap image; // 문자 인식을 위한 비트맵 이미지
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,77 +127,124 @@ public class AddWordSetOCRActivity extends AppCompatActivity {
     }
 
 
-    Bitmap image; // 문자 인식을 위한 비트맵 이미지
-    String datapath; // 언어 트레이닝 데이터 경로
-    private TessBaseAPI mTess; //Tess API reference
+    String wordSet; // 인식한 문자의 스트링
+    String[] arrWord;
 
-    //서버에서 단어장을 추가하도록 하는 태스크
-    public class OcrTask extends AsyncTask<Integer, String, String> {
+    ArrayList<String> listWord;
+    HashSet<String> distinctData;
+
+    //인식한 문자는 텍스트뷰에 들어있다. 이를 스트링으로 전환
+    @OnClick(R.id.btnMakeWordSet)
+    public void clickMakeWord() {
 
 
-        @Override
-        protected void onPreExecute() {
+        //텍스트뷰의 내용을 스트링으로 전환
+        wordSet = tvOcrContent.getText().toString();
 
+        //정규식 패턴 정의 - 알파벳과 ' 으로 이루어진 단어 (ex) didn't, abstract 등
+        Pattern pattern = Pattern.compile("[a-zA-Z']+");
 
+        //알파벳을 가진 단어만 추출
+        Matcher matcher = pattern.matcher(wordSet);
+
+        listWord = new ArrayList<>();
+
+        //matcher -> list 변환. 영어로만 이루어진 세트 추출 완료.
+        while (matcher.find()) {
+            listWord.add(matcher.group());
         }
 
-        @Override
-        protected String doInBackground(Integer... integers) {
+        //이제 쓸모없는 단어들을 제외해야 한다.
+        // 리스트를 돌며 특정 조건 하에 있는 스트링을 삭제하는 코드
+        for (Iterator<String> iter = listWord.iterator(); iter.hasNext(); ) {
 
-            // 이미지 디코딩을 위한 초기화.
-            // 문자 인식 메소드를 이용하려면 이미지의 비트맵이 필요하다. - 먼저 이미지의 비트맵을 가져온다.
-            image = ((BitmapDrawable) imgAddWordSetCam.getDrawable()).getBitmap();
+            // 먼저 스트링 요소를 꺼내본다.
+            String strElement = iter.next();
 
 
+            //꺼낸 스트링 요소가 단어장에 부적합하다면
+            if (!isWord(strElement)) {
 
-            return null;
+                //스트링 요소를 삭제한다.
+                iter.remove();
+            }
         }
 
-        @Override
 
-        protected void onPostExecute(String result) {
+        //대문자 소문자가 섞인 단어들을 변환
+        for (int i = 0; i < listWord.size(); i++) {
+            //리스트의 스트링을 가져와 소문자로 변환
+            String lowerCase = listWord.get(i).toLowerCase();
 
-            super.onPostExecute(result);
-
-            progressDialog.dismiss();
-
+            //소문자 변환한 단어를 원래 단어와 교체
+            listWord.set(i, lowerCase);
         }
+
+
+        //중복된 단어를 제거해야 한다.
+
+        //임시 어레이리스트를 하나 더 만들고, 아이템을 중복되지 않게 추가해나간다.
+
+        //임시 어레이리스트
+        ArrayList<String> tempList = new ArrayList<>();
+
+        //원본 리스트의 크기만큼 반복
+        for (int i = 0; i < listWord.size(); i++) {
+
+            //tempList에 본래 리스트에서 가져온 단어가 포함되지 않았다면 추가한다. -> 중복 제거됨
+            if(!tempList.contains(listWord.get(i) )  )
+                tempList.add(listWord.get(i));
+        }
+
+        //tempList로 복사. -> 문장에서 단어의 순서를 유지하면서 단어가 중복되지 않게 만들어졌음
+        listWord = new ArrayList<>(tempList);
+
+
+
+        for (int i = 0; i < listWord.size(); i++) {
+
+            Log.e(TAG, "clickMakeWord: " + listWord.get(i));
+        }
+
+        //해쉬셋 확인
+
 
     }
 
 
-    //언어 트레이닝 데이터를 복사한다.
-    private void copyFiles() {
-        try {
-            //파일의 경로를 세팅
-            String filepath = datapath + "/tessdata/eng.traineddata";
+    // 단어장에 들어갈 단어인지 아닌지를 판별하는 메소드
+    // 들어갈 수 있으면 true, 들어갈 수 없으면 false 반환 - a, the, to 등
+    public boolean isWord(String word) {
 
-            // Assets 디렉토리에 파일을 넣기 위해 AssetManager 세팅
-            AssetManager assetManager = getAssets();
 
-            // 트레이닝 데이터의 본래 파일을 인풋스트림에서 가져온다.
-            InputStream instream = assetManager.open("tessdata/eng.traineddata");
+        //먼저 두 글자 이하의 단어를 제거한다.
+        if (word.length() <= 2) {
 
-            // 복사할 파일의 경로로 아웃풋 스트림을 내보낸다.
-            OutputStream outstream = new FileOutputStream(filepath);
-            byte[] buffer = new byte[1024];
-            int read;
-
-            // 인풋스트림 -> 아웃풋 스트림으로 파일 복사 수행
-            while ((read = instream.read(buffer)) != -1) {
-                outstream.write(buffer, 0, read);
-            }
-
-            // 복사 완료시 아웃풋 스트림을 flush (출력) 하여 파일 복사 완료
-            outstream.flush();
-            outstream.close();
-            instream.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            return false;
         }
+
+        //세 글자 이상인 단어 중 쓸모없는 단어
+        Set<String> setNotWord = new HashSet<String>();
+        setNotWord.add("the");
+        setNotWord.add("didn't");
+        setNotWord.add("don't");
+        setNotWord.add("can't");
+        setNotWord.add("for");
+        setNotWord.add("was");
+        setNotWord.add("their");
+        setNotWord.add("our");
+        setNotWord.add("and");
+
+        //해쉬 셋 안의 금지된 단어와 비교, 같은 케이스가 나오면 false 반환
+        for (String badWord : setNotWord) {
+
+            // equalsIgnoreCase 를 이용, 스트링 값을 대소문자 구분없이 비교.
+            if (word.equalsIgnoreCase(badWord) || word.contains("'")) return false;
+
+        }
+
+        //false 조건을 모두 거쳐와도 문제가 없다면 true 반환.
+        return true;
     }
 
 
@@ -327,7 +381,7 @@ public class AddWordSetOCRActivity extends AppCompatActivity {
 
 
     private String convertResponseToString(BatchAnnotateImagesResponse response) {
-        String message = "문자 인식 결과:\n\n";
+        String message = "";
 
         List<EntityAnnotation> labels = response.getResponses().get(0).getTextAnnotations();
         if (labels != null) {
@@ -338,7 +392,6 @@ public class AddWordSetOCRActivity extends AppCompatActivity {
         return message;
 
     }
-
 
 
 }
