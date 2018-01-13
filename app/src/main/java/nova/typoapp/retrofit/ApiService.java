@@ -5,6 +5,8 @@ package nova.typoapp.retrofit;
  */
 
 
+import java.util.ArrayList;
+
 import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -54,6 +56,8 @@ public interface ApiService {
     @FormUrlEncoded
     @POST("getMoreFeed.php")
     Call<ResponseBody> getMoreFeed(@Field("lastFeedNum") int lastFeedNum);
+
+
 
 
 
@@ -111,7 +115,17 @@ public interface ApiService {
 
 
 
+    // 문자 인식으로 단어장을 만들 때, 인식한 문자 리스트로 단어장을 세팅하는 메소드
+    @FormUrlEncoded
+    @POST("wordset/checkWordExistInServer.php")
+    Call<ResponseBody> checkWordExistInServer(@Field("listWord[]") ArrayList<String> listWord );
 
+
+
+    // 서버에 Ocr 단어장 리스트를 업로드하는 메소드
+    @FormUrlEncoded
+    @POST("wordset/uploadOcrSet.php")
+    Call<ResponseBody> uploadOcrSet(@Field("listWord[]") ArrayList<String> listWord );
 
 
 

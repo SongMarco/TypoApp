@@ -75,10 +75,8 @@ application 태그 참고사항
         -->
 
         <provider
-
             android:name="android.support.v4.content.FileProvider"
             android:authorities="nova.typoapp"
-
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -255,7 +253,21 @@ application 태그 참고사항
             android:name=".wordpuzzle.WordPuzzleActivity"
             android:label="단어 퍼즐"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".wordset.AddWordSetOCRActivity"></activity>
+        <activity
+            android:name=".wordsetocr.AddWordSetOCRActivity"
+            android:label="사진에서 단어장 추가"
+
+
+
+            />
+
+
+        <activity
+            android:name=".wordsetocr.OCRSelectWordActivity"
+            android:label="추가할 단어 선택"
+            android:theme="@style/AppTheme.NoActionBar"
+
+            />
     </application>
 
 </manifest>

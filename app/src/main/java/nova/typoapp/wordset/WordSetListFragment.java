@@ -54,6 +54,7 @@ import nova.typoapp.retrofit.AddCookiesInterceptor;
 import nova.typoapp.retrofit.ApiService;
 import nova.typoapp.retrofit.ReceivedCookiesInterceptor;
 import nova.typoapp.wordset.WordSetContent.WordSetItem;
+import nova.typoapp.wordsetocr.AddWordSetOCRActivity;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;

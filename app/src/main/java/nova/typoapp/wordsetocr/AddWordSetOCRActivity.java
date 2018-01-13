@@ -1,8 +1,9 @@
-package nova.typoapp.wordset;
+package nova.typoapp.wordsetocr;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -52,6 +53,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import nova.typoapp.MainActivity;
 import nova.typoapp.R;
+import nova.typoapp.wordset.PackageManagerUtils;
 
 public class AddWordSetOCRActivity extends AppCompatActivity {
 
@@ -206,9 +208,17 @@ public class AddWordSetOCRActivity extends AppCompatActivity {
             Log.e(TAG, "clickMakeWord: " + listWord.get(i));
         }
 
-        //해쉬셋 확인
 
+        // 단어장에 들어갈 기본 단어 리스트 세팅이 완료되었다.
+        // 단어장에 들어갈 단어를 선택하는 액티비티로 넘어간다.
 
+        Intent intent = new Intent(AddWordSetOCRActivity.this, OCRSelectWordActivity.class);
+
+        //인텐트에 번들로 단어 어레이리스트를 추가한다.
+        intent.putStringArrayListExtra("listWord", listWord);
+
+        startActivity(intent);
+        finish();
     }
 
 
@@ -234,6 +244,7 @@ public class AddWordSetOCRActivity extends AppCompatActivity {
         setNotWord.add("their");
         setNotWord.add("our");
         setNotWord.add("and");
+        setNotWord.add("she");
 
         //해쉬 셋 안의 금지된 단어와 비교, 같은 케이스가 나오면 false 반환
         for (String badWord : setNotWord) {

@@ -104,7 +104,6 @@ public class NewsFeedFragment extends Fragment {
         refreshOneFeedTask.execute();
 
 
-
     }
 
 
@@ -115,8 +114,6 @@ public class NewsFeedFragment extends Fragment {
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
-
-
 
 
     }
@@ -144,7 +141,7 @@ public class NewsFeedFragment extends Fragment {
         }
     });
 
-    public void scrollToTop(){
+    public void scrollToTop() {
 
         LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerViewNewsFeed
                 .getLayoutManager();
@@ -174,19 +171,16 @@ public class NewsFeedFragment extends Fragment {
         });
 
 
-
-
-
         // 프래그먼트의 액티비티를 가져와서, 메인일 경우 새로고침을 진행.(게시물을 10 개 가져온다.)
         // 메인이 아니라 알림에서 접근한 경우 그에 맞게 asyncTask를 돌린다.(알림 받은 게시물만 한 개 불러온다.)
-        if(getActivity().getClass().getSimpleName().equals( MainActivity.class.getSimpleName() )){
+        if (getActivity().getClass().getSimpleName().equals(MainActivity.class.getSimpleName())) {
 
             RefreshFeedTask refreshFeedTask = new RefreshFeedTask();
             refreshFeedTask.execute();
 //            Toast.makeText(getContext(), "메인에서 들어옴", Toast.LENGTH_SHORT).show();
         }
 
-        if(  getActivity().getClass().getSimpleName().equals( NoticeClickedActivity.class.getSimpleName() )){
+        if (getActivity().getClass().getSimpleName().equals(NoticeClickedActivity.class.getSimpleName())) {
 
 //            Toast.makeText(getContext(), "알림에서 들어옴", Toast.LENGTH_SHORT).show();
 
@@ -207,7 +201,6 @@ public class NewsFeedFragment extends Fragment {
 
 
         //왜 on Create 에서 새로고침을 하는가? onResume에서 하면 어떻게되는데?
-
 
 
         recyclerViewNewsFeed.setItemAnimator(null);
@@ -243,7 +236,7 @@ public class NewsFeedFragment extends Fragment {
 //        Toast.makeText(getActivity(), "onPause", Toast.LENGTH_SHORT).show();
         super.onPause();
 
-        Log.e("refresh", "onPause called" );
+        Log.e("refresh", "onPause called");
 //        // save RecyclerView state
 //        mBundleRecyclerViewState = new Bundle();
 //        Parcelable listState = recyclerViewNewsFeed.getLayoutManager().onSaveInstanceState();
@@ -256,7 +249,6 @@ public class NewsFeedFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
 
 
     }
@@ -274,6 +266,7 @@ public class NewsFeedFragment extends Fragment {
     public class RefreshFeedTask extends AsyncTask<Void, String, String> {
 
         List<FeedItem> productItems = new ArrayList<FeedItem>();
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -325,15 +318,13 @@ public class NewsFeedFragment extends Fragment {
             // 보낼 때 feedIDFromFcm + 1로 세팅해서 보낸다면?
             //이게 간단히 구현되고 좋군!
             int feedIDFromFcmPlusOne;
-            if(feedIDFromFcm != -1){
-                feedIDFromFcmPlusOne = feedIDFromFcm+1;
-            }
-            else{
+            if (feedIDFromFcm != -1) {
+                feedIDFromFcmPlusOne = feedIDFromFcm + 1;
+            } else {
                 feedIDFromFcmPlusOne = feedIDFromFcm;
             }
 
             retrofitCall = apiService.getMoreFeed(feedIDFromFcmPlusOne);
-
 
 
             //여기서 새로고침 하지 않고,
@@ -450,7 +441,7 @@ public class NewsFeedFragment extends Fragment {
 //                    }
 //                }).start();
 
-                if(myNewsFeedRecyclerViewAdapter.getEndlessScrollListener() == null){
+                if (myNewsFeedRecyclerViewAdapter.getEndlessScrollListener() == null) {
                     myNewsFeedRecyclerViewAdapter.setEndlessScrollListener(new MyNewsFeedRecyclerViewAdapter.EndlessScrollListener() {
                         @Override
                         public boolean onLoadMore(int position) {
@@ -465,7 +456,7 @@ public class NewsFeedFragment extends Fragment {
 
 //                            Toast.makeText(getContext(), "페이징 작동", Toast.LENGTH_SHORT).show();
 //                            Log.e("paging", "onLoadMore: "+NewsFeedContent.ITEMS.get(position-1).getFeedID() );
-                            loadMoreFeedTask.execute( NewsFeedContent.ITEMS.get(position-1).getFeedID() );
+                            loadMoreFeedTask.execute(NewsFeedContent.ITEMS.get(position - 1).getFeedID());
 
                             return false;
 
@@ -492,6 +483,7 @@ public class NewsFeedFragment extends Fragment {
 
         Context mContext = getContext();
         List<FeedItem> productItems = new ArrayList<FeedItem>();
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -526,7 +518,7 @@ public class NewsFeedFragment extends Fragment {
             //feedID를 가져온다. (해당 글의 댓글을 가져오기 위함)
             Call<ResponseBody> retrofitCall;
 
-            Log.e("feedIDFromFcm", "inTask: "+feedIDFromFcmInNoticeClicked );
+            Log.e("feedIDFromFcm", "inTask: " + feedIDFromFcmInNoticeClicked);
             retrofitCall = apiService.getFeedInfo(feedIDFromFcmInNoticeClicked);
 
             try {
@@ -636,11 +628,10 @@ public class NewsFeedFragment extends Fragment {
 //                }).start();
 
 
-                if(myNewsFeedRecyclerViewAdapter.getEndlessScrollListener() == null){
+                if (myNewsFeedRecyclerViewAdapter.getEndlessScrollListener() == null) {
                     myNewsFeedRecyclerViewAdapter.setEndlessScrollListener(new MyNewsFeedRecyclerViewAdapter.EndlessScrollListener() {
                         @Override
                         public boolean onLoadMore(int position) {
-
 
                             // 아래의 LoadMoreFeedTask 태스크에서 리사이클러뷰를 이어붙이게 된다.
                             // notifyDataSetChanged 를 LoadMoreFeedTask 태스크의 postExecute 에서 해주어야,
@@ -691,10 +682,7 @@ public class NewsFeedFragment extends Fragment {
 
         // context를 가져오는 생성자. 이를 통해 메인 액티비티의 함수에 접근할 수 있다.
 
-
-
         ProgressDialog asyncDialog = new ProgressDialog(context);
-
 
         /*
         onPre 에서 로딩 중임을 다이얼로그로 표시해준다.
@@ -716,7 +704,6 @@ public class NewsFeedFragment extends Fragment {
          */
         @Override
         protected String doInBackground(Integer... integers) {
-
 
 
             Log.e("refresh", "doInBackground: refresh called");
@@ -829,7 +816,6 @@ public class NewsFeedFragment extends Fragment {
 //            asyncDialog.dismiss();
 
             myNewsFeedRecyclerViewAdapter.notifyDataSetChanged();
-
 
 
         }

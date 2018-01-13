@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+
+    android:layout_marginBottom="@dimen/margin_balloon"
+    android:layout_marginEnd="@dimen/margin_balloon"
+    android:layout_marginStart="@dimen/margin_balloon">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+
+        android:layout_margin="@dimen/margin_border"
+
+        >
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:layout_gravity="center">
+
+            <ImageView
+                android:id="@+id/imgWordOcr"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+
+
+                android:layout_gravity="center"
+
+
+                android:layout_weight="0.5"
+
+
+                android:scaleType="fitXY"
+
+                app:srcCompat="@android:drawable/ic_menu_report_image" />
+
+            <TextView
+                android:id="@+id/tvRequestImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center"
+                android:text="터치하여 이미지 추가"
+                android:textAlignment="center"
+                android:textSize="10sp"
+                android:visibility="visible" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/margin_right_item"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvNameWordOcr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/margin_border"
+
+
+                android:layout_weight="0"
+                android:text="banana" />
+
+            <TextView
+                android:id="@+id/tvMeanWordOcr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/margin_border"
+
+                android:layout_weight="0"
+
+                android:text="바나나" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imgDelWord"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/margin_balloon"
+
+
+            android:layout_weight="0"
+
+            android:tint="@color/fontGrey"
+            app:srcCompat="@android:drawable/ic_delete" />
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>
