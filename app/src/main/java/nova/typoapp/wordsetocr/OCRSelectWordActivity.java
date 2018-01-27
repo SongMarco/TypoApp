@@ -80,8 +80,11 @@ import static nova.typoapp.retrofit.ApiService.API_URL;
  필요 없는 단어를 단어장에서 제외할 수 있다.
 
 
+
+
   */
 
+//todo 특이점 : 다른 액티비티와 달리, callback interface 를 통해 어댑터와 소통한다.
 public class OCRSelectWordActivity extends AppCompatActivity implements OCRWordSetRecyclerViewAdapter.CallbackInterface {
 
 

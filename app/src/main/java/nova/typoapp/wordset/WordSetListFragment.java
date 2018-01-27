@@ -334,9 +334,11 @@ public class WordSetListFragment extends Fragment {
         checkPermission();
 
 
+
+        // 사진 촬영 / 갤러리를 선택하는 다이얼로그를 띄운다.
+
         new android.app.AlertDialog.Builder(wordSetActivity)
 
-//                .setTitle("업로드 방식 선택")
                 .setItems(R.array.image_way, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // The 'which' argument contains the index position

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<android.support.v7.widget.CardView xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+
+
+    android:layout_marginStart="@dimen/margin_balloon"
+    android:layout_marginEnd="@dimen/margin_balloon"
+    android:layout_marginBottom="@dimen/margin_balloon"
+    >
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvNumMembers"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="@dimen/margin_border"
+
+                    android:layout_weight="0"
+
+                    android:text="5 명" />
+
+                <ImageView
+                    android:id="@+id/imgGroupOwner"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_margin="@dimen/margin_border"
+                    android:layout_weight="0"
+
+
+                    android:scaleType="center"
+
+                    app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
+
+                <TextView
+                    android:id="@+id/tvNameGroupOwner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="@dimen/margin_border"
+                    android:layout_weight="1"
+                    android:text="운영자 이름" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvGroupName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_border"
+                android:text="그룹 이름"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imgEditGroup"
+
+            android:layout_width="30dp"
+
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+
+            android:layout_marginRight="@dimen/margin_balloon"
+
+
+            android:layout_weight="0"
+            android:tint="@color/transGrey"
+            app:srcCompat="@drawable/ic_more_vert_black_48dp" />
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>
+

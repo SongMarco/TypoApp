@@ -108,6 +108,19 @@ public interface ApiService {
     Call<ResponseBody> addWordSet(@Field("nameWordSet") String nameWordSet);
 
 
+
+    //그룹을 추가하는 메소드
+    @FormUrlEncoded
+    @POST("group/addGroup.php")
+    Call<ResponseBody> addGroup(@Field("nameGroup") String nameGroup);
+
+    //그룹 리스트를 가져오는 메소드
+    //그룹 탭을 눌렀을 때 / 혹은 그룹을 추가하여 새로고침이 필요할 때 사용
+    //세션을 통해 그룹의 정보를 가져올 수 있으므로, 파라미터를 세팅하지 않아도 ok
+    @POST("group/getGroupList.php")
+    Call<ResponseBody> getGroupList();
+
+
     //단어 게시물을 단어장에 추가하는 메소드
     @FormUrlEncoded
     @POST("wordset/addWordToSet.php")

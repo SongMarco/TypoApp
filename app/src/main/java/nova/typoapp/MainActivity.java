@@ -24,6 +24,7 @@ import com.facebook.login.LoginManager;
 import java.util.HashSet;
 import java.util.Set;
 
+import nova.typoapp.group.GroupFragment;
 import nova.typoapp.newsfeed.NewsFeedContent;
 import nova.typoapp.notificationlist.NoticeContent;
 import nova.typoapp.notificationlist.NoticeItemFragment;
@@ -53,9 +54,10 @@ public class MainActivity extends AppCompatActivity
         WebFragment.OnFragmentInteractionListener,
         BlankFragment.OnFragmentInteractionListener,
         NoticeItemFragment.OnListFragmentInteractionListener,
-        WordSetListFragment.OnListFragmentInteractionListener
+        WordSetListFragment.OnListFragmentInteractionListener,
+        GroupFragment.OnFragmentInteractionListener
 
-        {
+{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -69,9 +71,10 @@ public class MainActivity extends AppCompatActivity
     //페이저 어댑터는 뷰페이저에 사용되는 어댑터이다. 각 프래그먼트 객체를 불러올 때 사용한다.
 //            위의 기본 주석에 따르면, FragmentPagerAdapter 어댑터는 모든 페이지를 메모리에 올려두는데,
 //            메모리가 부족해질 경우 FragmentStatePagerAdapter 어댑터를 쓰라고 언급하고 있다.
-            //아래의 SectionsPagerAdapter 어댑터는 메인 액티비티에서 FragmentPagerAdapter 를 상속하여
-            //만든 커스텀 어댑터다.
-    private SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());;
+    //아래의 SectionsPagerAdapter 어댑터는 메인 액티비티에서 FragmentPagerAdapter 를 상속하여
+    //만든 커스텀 어댑터다.
+    private SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+    ;
 
     public static int feedIDFromFcm = -1;
 
@@ -99,6 +102,8 @@ public class MainActivity extends AppCompatActivity
         /*
         The {@link ViewPager} that will host the section contents.
          */
+
+        //탭 레이아웃 초기화
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayoutMain);
         ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -113,7 +118,6 @@ public class MainActivity extends AppCompatActivity
             public void onTabReselected(TabLayout.Tab tab) {
 
 
-
                 if (tab.getPosition() == 0) {
 
 //                Toast.makeText(context, "update called", Toast.LENGTH_SHORT).show();
@@ -121,7 +125,7 @@ public class MainActivity extends AppCompatActivity
 
                     //'영어단어' 페이지를 한 번 더 클릭할 경우, 맨 위로 스크롤해주는 기능이다.
                     //와! 이렇게 현재 프래그먼트를 가져올 수 있구나! - 새로고침에서도 써먹을 수 있겠어.
-                  mSectionsPagerAdapter.newsFeedFragment.scrollToTop();
+                    mSectionsPagerAdapter.newsFeedFragment.scrollToTop();
 
                 }
 
@@ -131,15 +135,15 @@ public class MainActivity extends AppCompatActivity
         //만약 인텐트에서 feedID 값이 세팅된다면 알림을 통해 / 혹은 외부에서 접근한 것이다.
         //feedIDFromFcm 값이 -1이 아니게 될 것이고, 그렇게 되면 프래그먼트에서 해당 게시물부터 페이징이 가능해진다.
         //newFeedFragment 의 refresh Task 참고
-        if(getIntent().getIntExtra("feedIDFromFcm", -1 ) != -1){
+        if (getIntent().getIntExtra("feedIDFromFcm", -1) != -1) {
 
-            feedIDFromFcm = getIntent().getIntExtra("feedIDFromFcm", -1 );
+            feedIDFromFcm = getIntent().getIntExtra("feedIDFromFcm", -1);
         }
 
 
     }
 
-    public void updateWordSet(){
+    public void updateWordSet() {
 
 
         mSectionsPagerAdapter.wordSetFragment.updateWordSet();
@@ -159,8 +163,6 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-
-
     /*
     옵션 아이템을 클릭하면 취하는 행동
 
@@ -175,14 +177,13 @@ public class MainActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
 
 
-
         Intent intent;
 
 
         //선택한 아이템에서 id를 취하여, 조건문으로 아이템에 맞게 행동한다.
         int id = item.getItemId();
 
-        switch(id){
+        switch (id) {
             case R.id.action_search:
 
 
@@ -190,9 +191,6 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
 
                 break;
-
-
-
 
 
             //설정 아이템 클릭 -> 설정 액티비티로 이동(미구현, 토스트만 표시)
@@ -214,8 +212,8 @@ public class MainActivity extends AppCompatActivity
             case R.id.action_logout:
 
                 //
-                SharedPreferences prefLogin = getSharedPreferences( getString(R.string.key_pref_Login) , Activity.MODE_PRIVATE);
-                Set<String> preferences = prefLogin.getStringSet("Cookie" , new HashSet<String>() );
+                SharedPreferences prefLogin = getSharedPreferences(getString(R.string.key_pref_Login), Activity.MODE_PRIVATE);
+                Set<String> preferences = prefLogin.getStringSet("Cookie", new HashSet<String>());
 
 
                 //페이스북 로그인 한 계정 로그아웃처리하기.
@@ -234,7 +232,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 //일반계정 로그아웃처리하기
-                else if( !preferences.isEmpty() ){
+                else if (!preferences.isEmpty()) {
 
                     Toast.makeText(MainActivity.this, "로그아웃되었습니다.", Toast.LENGTH_SHORT).show();
 
@@ -263,9 +261,6 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-
-
-
     /*
     필수로 implement해야하는 메소드이며, 프래그먼트의
     의사소통에 사용된다.
@@ -274,20 +269,20 @@ public class MainActivity extends AppCompatActivity
     public void onListFragmentInteraction(NewsFeedContent.FeedItem item) {
 
     }
+
     @Override
     public void onListFragmentInteraction(NoticeContent.NoticeItem item) {
 
     }
+
     @Override
     public void onFragmentInteraction(Uri uri) {
 
     }
+    @Override
+    public void onListFragmentInteraction(WordSetContent.WordSetItem item) {
 
-
-            @Override
-            public void onListFragmentInteraction(WordSetContent.WordSetItem item) {
-
-            }
+    }
 
 
 
@@ -337,7 +332,6 @@ public class MainActivity extends AppCompatActivity
 //    }
 
 
-
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -378,7 +372,7 @@ public class MainActivity extends AppCompatActivity
         public int getItemPosition(Object object) {
 
 //            Toast.makeText(MainActivity.this, "getItemPos Called", Toast.LENGTH_SHORT).show();
-            Log.e("refresh", "getItemPosition: getItemPos called" );
+            Log.e("refresh", "getItemPosition: getItemPos called");
 
             //리프레시 하는 경우 : 댓글 달고 올때, 프로필 고쳤을 때, 수정삭제했을때
 
@@ -416,11 +410,13 @@ public class MainActivity extends AppCompatActivity
          */
 
         NewsFeedFragment newsFeedFragment = new NewsFeedFragment();
-        WebFragment webFragment = new WebFragment();
 
         NoticeItemFragment noticeItemFragment = new NoticeItemFragment();
 
         WordSetListFragment wordSetFragment = new WordSetListFragment();
+
+        //클래스 채팅방을 위한 프래그먼트
+        GroupFragment groupFragment = new GroupFragment();
 
         @Override
         public Fragment getItem(int position) {
@@ -432,7 +428,7 @@ public class MainActivity extends AppCompatActivity
                 case 0:
 
 
-                    Log.e("refresh", "getItem: called" );
+                    Log.e("refresh", "getItem: called");
 //                    return ListFragment.newInstance(position);
                     return newsFeedFragment;
 
@@ -444,6 +440,9 @@ public class MainActivity extends AppCompatActivity
                 case 2:
                     return noticeItemFragment;
 
+                case 3:
+                    return groupFragment;
+
 
                 default:
                     return null;
@@ -451,16 +450,19 @@ public class MainActivity extends AppCompatActivity
 
         }
 
+
+
+        // 페이지 갯수를 얻는 메소드.
+        // @@@ 탭을 추가하려는 경우 이 값을 바꿔야 한다.
+        // 갯수가 틀릴 경우 페이지가 제대로 표시되지 않는다.
         @Override
         public int getCount() {
 
 
-            // Show 3 total pages.
-            return 3;
+            // Show 4 total pages.
+            return 4;
         }
     }
-
-
 
 
     //@@@@@ 중요@@@@@ onResume에서 페이저 어댑터에 notifyDataSetChanged를 호출한다.
@@ -494,7 +496,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public SectionsPagerAdapter  getPagerAdapter(){
+    public SectionsPagerAdapter getPagerAdapter() {
 
         return mSectionsPagerAdapter;
 
