@@ -13,7 +13,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:focusableInTouchMode="true"
+        >
 
 
         <android.support.v7.widget.CardView
@@ -24,8 +26,10 @@
 
             android:layout_margin="@dimen/margin_balloon"
 
-            android:focusableInTouchMode="true">
+            >
 
+            <!--아래 속성이 있으면 액티비티 이동 후 터치를 두번 해야 함-->
+            <!---->
 
             <TextView
                 android:id="@+id/textView5"

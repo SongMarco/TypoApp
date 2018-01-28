@@ -6,6 +6,11 @@
     <string name="tab_text_3">알림</string>
     <string name="tab_chat">그룹</string>
 
+    <string name="tab_group_info">정보</string>
+    <string name="tab_group_wordSet">단어장</string>
+    <string name="tab_group_chat">채팅</string>
+
+
     <string name="action_settings">설정</string>
     <string name="action_profile">프로필 보기</string>
     <string name="action_logout">로그아웃</string>
@@ -71,7 +76,9 @@
 
     <string name="facebook_app_id">367488190367299</string>
 
-    <string name="hello_blank_fragment">Hello this is chat fragment</string>
+    <string name="hello_blank_fragment">Hello this is blank fragment</string>
+
+    <string name="hello_info_fragment">Hello this is info fragment</string>
 
     <bool name="called">true</bool>
     <bool name="not_called">false</bool>

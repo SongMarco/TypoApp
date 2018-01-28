@@ -16,12 +16,12 @@
 
         <LinearLayout
 
-            android:id="@+id/email_login_form"
+            android:id="@+id/layout_write"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:orientation="vertical"
 
             >
 

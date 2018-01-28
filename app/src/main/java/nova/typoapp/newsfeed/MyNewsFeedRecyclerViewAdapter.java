@@ -467,19 +467,9 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
                         //단어장 리스트를 열어야 한다.
 
-
-
-
-
                         //어댑터에 단어장 이름을 세팅하는 비동기 태스크를 실행한다.
-
                         GetWordSetListTaskInDialog getWordSetListTaskInDialog = new GetWordSetListTaskInDialog(context , item.feedID, item.title  );
                         getWordSetListTaskInDialog.execute();
-
-
-
-
-
 
                     }
 

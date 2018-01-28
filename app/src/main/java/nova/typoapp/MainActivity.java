@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity
     //아래의 SectionsPagerAdapter 어댑터는 메인 액티비티에서 FragmentPagerAdapter 를 상속하여
     //만든 커스텀 어댑터다.
     private SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-    ;
+
 
     public static int feedIDFromFcm = -1;
 
@@ -283,54 +283,6 @@ public class MainActivity extends AppCompatActivity
     public void onListFragmentInteraction(WordSetContent.WordSetItem item) {
 
     }
-
-
-
-
-
-    /*
-    PlaceHolderFragment 는 빈화면에서 사용되는 프래그먼트이다.
-    현재는 뷰페이저의 getItem 을 통해 프레그먼트를 가져오므로,
-
-    해당 코드들을 주석처리해도 정상 작동함을 확인했다.
-    만약의 경우를 위해 삭제하지는 않았다. 필요시 기능을 확인하고 삭제 후 테스트해보라.
-     */
-
-//    /**
-//     * A placeholder fragment containing a simple view.
-//     */
-//    public static class PlaceholderFragment extends Fragment {
-//        /**
-//         * The fragment argument representing the section number for this
-//         * fragment.
-//         */
-//        private static final String ARG_SECTION_NUMBER = "section_number";
-//
-//        public PlaceholderFragment() {
-//        }
-//
-//        /**
-//         * Returns a new instance of this fragment for the given section
-//         * number.
-//         */
-//        public static PlaceholderFragment newInstance(int sectionNumber) {
-//            PlaceholderFragment fragment = new PlaceholderFragment();
-//            Bundle args = new Bundle();
-//            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-//            fragment.setArguments(args);
-//            return fragment;
-//        }
-//
-//        @Override
-//        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                                 Bundle savedInstanceState) {
-//            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-//
-//
-//            return rootView;
-//        }
-//    }
-
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to

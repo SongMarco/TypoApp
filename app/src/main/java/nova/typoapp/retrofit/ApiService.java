@@ -92,6 +92,13 @@ public interface ApiService {
     @POST("wordset/getWordSetList.php")
     Call<ResponseBody> getWordSetList();
 
+    //그룹에서 단어장 리스트를 가져오는 메소드
+    //그룹 id를 서버에 보내어, 그룹에 속한 단어장을 가져온다.
+    @FormUrlEncoded
+    @POST("group/getGroupWordSet.php")
+    Call<ResponseBody> getGroupWordSet(@Field("idGroup") int idGroup);
+
+
 
     //단어장에 단어들을 세팅하는 메소드
     //서버에 단어장 id를 보내고, 단어-단어장 db 에서 단어들을 가져온다.
@@ -108,11 +115,18 @@ public interface ApiService {
     Call<ResponseBody> addWordSet(@Field("nameWordSet") String nameWordSet);
 
 
+    //단어장을 그룹에 추가하는 메소드
+    //단어장 제목을 서버로 보낸다.
+    @FormUrlEncoded
+    @POST("group/addGroupWordSet.php")
+    Call<ResponseBody> addGroupWordSet(@Field("nameWordSet") String nameWordSet , @Field("idGroup") int idGroup);
+
+
 
     //그룹을 추가하는 메소드
     @FormUrlEncoded
     @POST("group/addGroup.php")
-    Call<ResponseBody> addGroup(@Field("nameGroup") String nameGroup);
+    Call<ResponseBody> addGroup(@Field("nameGroup") String nameGroup, @Field("contentGroup") String contentGroup, @Field("imgUrlGroup") String imgUrlGroup );
 
     //그룹 리스트를 가져오는 메소드
     //그룹 탭을 눌렀을 때 / 혹은 그룹을 추가하여 새로고침이 필요할 때 사용

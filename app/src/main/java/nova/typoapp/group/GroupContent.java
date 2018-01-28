@@ -14,19 +14,6 @@ public class GroupContent {
      */
     public static List<GroupItem> ITEMS = new ArrayList<>();
 
-    /**
-     * A map of sample (dummy) items, by ID.
-     */
-
-
-    private static void addItem(GroupItem item) {
-        ITEMS.add(item);
-    }
-
-
-    /**
-     * A dummy item representing a piece of content.
-     */
 
     public static class GroupItem {
 
@@ -34,10 +21,12 @@ public class GroupContent {
 
         String nameGroup;
 
+        String contentGroup;
+
 
         String emailGroupOwner;
         String nameGroupOwner;
-        String UrlOwnerProfileImg;
+        String UrlGroupImg;
 
 
         int numGroupMembers;
@@ -45,12 +34,13 @@ public class GroupContent {
         String dateGroupMade;
 
 
-        public GroupItem(int idGroup, String nameGroup, String emailGroupOwner, String nameGroupOwner, String urlOwnerProfileImg, int numGroupMembers, String dateGroupMade) {
+        public GroupItem(int idGroup, String nameGroup, String contentGroup, String emailGroupOwner, String nameGroupOwner, String urlGroupImg, int numGroupMembers, String dateGroupMade) {
             this.idGroup = idGroup;
             this.nameGroup = nameGroup;
+            this.contentGroup = contentGroup;
             this.emailGroupOwner = emailGroupOwner;
             this.nameGroupOwner = nameGroupOwner;
-            UrlOwnerProfileImg = urlOwnerProfileImg;
+            UrlGroupImg = urlGroupImg;
             this.numGroupMembers = numGroupMembers;
             this.dateGroupMade = dateGroupMade;
         }

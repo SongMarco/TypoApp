@@ -1,8 +1,7 @@
 package nova.typoapp.group;
 
 import android.content.Context;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -61,21 +60,21 @@ public class MyGroupRecyclerViewAdapter extends RecyclerView.Adapter<MyGroupRecy
 
         holder.tvGroupName.setText(item.nameGroup);
 
-        holder.tvNameGroupOwner.setText(item.nameGroupOwner);
+        holder.tvNameGroupOwner.setText("운영자 : "+item.nameGroupOwner);
 
         holder.tvNumMembers.setText(item.numGroupMembers + " 명");
 
         // 프로필 이미지의 유무에 따라 프로필 이미지뷰 세팅. 없으면 -> 기본 세팅
 
-        if (item.UrlOwnerProfileImg != null && !item.UrlOwnerProfileImg.equals("")) {
+        if (item.UrlGroupImg != null && !item.UrlGroupImg.equals("")) {
 
             //리퀘스트 옵션에서 에러 발생시 예외처리문 추가. 에러 생김 -> 기본 프로필로 세팅해줌
             RequestOptions requestOptions = new RequestOptions()
                     .error(R.drawable.com_facebook_profile_picture_blank_square);
 
-            Glide.with(holder.mView).load(item.UrlOwnerProfileImg)
+            Glide.with(holder.mView).load(item.UrlGroupImg)
                     .apply(requestOptions)
-                    .into(holder.imgGroupOwner);
+                    .into(holder.imgGroup);
         }
 
         final int viewId = holder.mView.getId();
@@ -89,22 +88,24 @@ public class MyGroupRecyclerViewAdapter extends RecyclerView.Adapter<MyGroupRecy
                 if (idClicked == holder.mView.getId()) {
 
 
-                Toast.makeText(view.getContext(), "아이템 클릭 : "+item.nameGroup, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(view.getContext(), "아이템 클릭 : "+item.nameGroup, Toast.LENGTH_SHORT).show();
 
-//                    Intent intent = new Intent(view.getContext(), WordSetActivity.class);
-//
-//                    intent.putExtra("nameWordSet", item.nameWordSet);
-//                    intent.putExtra("nameWordSetOwner", item.nameWordSetOwner);
-//
-//                    intent.putExtra("numWords", item.numWords);
-//
-//                    intent.putExtra("UrlOwnerProfileImg", item.UrlOwnerProfileImg);
-//
-//
-//                    intent.putExtra("idWordSet", item.idWordSet);
-//
-//
-//                    view.getContext().startActivity(intent);
+                    Intent intent = new Intent(view.getContext(), GroupActivity.class);
+
+                    intent.putExtra("idGroup",item.idGroup);
+
+                    intent.putExtra("nameGroup", item.nameGroup);
+                    intent.putExtra("contentGroup", item.contentGroup);
+                    intent.putExtra("UrlGroupImg", item.UrlGroupImg);
+
+                    intent.putExtra("numGroupMembers", item.numGroupMembers);
+
+
+
+
+
+                    // 그룹 액티비티를 시작한다.
+                    view.getContext().startActivity(intent);
 
                 }
 
@@ -285,8 +286,8 @@ public class MyGroupRecyclerViewAdapter extends RecyclerView.Adapter<MyGroupRecy
         @BindView(R.id.tvNumMembers)
         TextView tvNumMembers;
 
-        @BindView(R.id.imgGroupOwner)
-        ImageView imgGroupOwner;
+        @BindView(R.id.imgGroup)
+        ImageView imgGroup;
 
         @BindView(R.id.tvGroupName)
         TextView tvGroupName;
@@ -302,8 +303,7 @@ public class MyGroupRecyclerViewAdapter extends RecyclerView.Adapter<MyGroupRecy
             mView = view;
 
 
-            imgGroupOwner.setBackground(new ShapeDrawable(new OvalShape()));
-            imgGroupOwner.setClipToOutline(true);
+
 
         }
 

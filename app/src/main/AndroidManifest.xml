@@ -255,16 +255,19 @@ application 태그 참고사항
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".wordsetocr.AddWordSetOCRActivity"
-            android:label="사진에서 단어장 추가"
-
-
-
-            />
-
-
+            android:label="사진에서 단어장 추가" />
         <activity
             android:name=".wordsetocr.OCRSelectWordActivity"
             android:label="추가할 단어 선택"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".group.AddGroupActivity"
+            android:label="그룹 추가"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+
+            android:name=".group.GroupActivity"
+            android:label="그룹"
             android:theme="@style/AppTheme.NoActionBar"
 
             />

@@ -1,22 +1,18 @@
 package nova.typoapp.group;
 
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
@@ -107,12 +103,9 @@ public class GroupFragment extends Fragment {
     @BindView(R.id.rvGroup)
     RecyclerView rvGroup;
 
-
-
-
-    String nameGroup;  // 추가할 그룹의 이름
-
     MyGroupRecyclerViewAdapter groupRecyclerViewAdapter = new MyGroupRecyclerViewAdapter(GroupContent.ITEMS);
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -129,6 +122,8 @@ public class GroupFragment extends Fragment {
         getGroupTask.execute();
 
 
+
+
         return view;
     }
 
@@ -137,92 +132,8 @@ public class GroupFragment extends Fragment {
     @OnClick(R.id.cvAddGroup)
     public void clickAddSet() {
 
-//        Toast.makeText(getActivity(), "세트 추가 클릭", Toast.LENGTH_SHORT).show();
-
-
-        //그룹 추가를 위해 필요한 다이얼로그를 세팅한다.
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("그룹 추가");       // 제목 설정
-        //        builder.setMessage("");   // 내용 설정
-
-
-        // 그룹 이름을 입력받는 에딧텍스트 삽입하기
-        final EditText etGroupName = new EditText(getActivity());
-
-        // 사용자에게 단어장 이름을 입력하도록 요구
-        etGroupName.setHint(R.string.hint_etGroupName);
-
-
-        // 그룹 이름 입력을 위한 에딧 텍스트를 세팅하기 위해,
-        // 먼저 리니어 레이아웃을 세팅
-        LinearLayout layout = new LinearLayout(getActivity());
-        layout.setOrientation(LinearLayout.VERTICAL);
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(60, 0, 60, 0);
-
-        // 준비된 리니어 레이아웃에 에딧 텍스트를 추가
-        layout.addView(etGroupName, params);
-
-
-        // 리니어 레이아웃을 다이얼로그에 세팅
-        builder.setView(layout);
-
-        // 확인 버튼 설정 : 확인을 누르면 새 그룹이 추가된다.
-        builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Log.v(TAG, "Yes Btn Click"); 테스트용 로그
-
-
-                // 에딧텍스트에 제목 입력을 했다면 서버로 그룹 이름 정보를 보내고, DB에 그룹 정보를 저장한다.
-                if (etGroupName.getText() != null && !etGroupName.getText().toString().equals("")) {
-
-
-                    Toast.makeText(getActivity(), "그룹 이름 : "+etGroupName.getText().toString(), Toast.LENGTH_SHORT).show();
-
-
-                    nameGroup = etGroupName.getText().toString();
-                    Log.v(TAG, "nameGroup = " + nameGroup);
-
-
-                    // 서버로 입력 정보를 보내는 asyncTask 를 실행
-                    AddGroupTask addGroupTask = new AddGroupTask();
-                    addGroupTask.execute();
-
-
-
-
-                }
-                // 에딧 텍스트에 단어장 이름을 입력하지 않았다면 에러 메시지를 출력하여 예외처리
-                else {
-                    Toast.makeText(getActivity(), "에러 : 그룹 이름을 입력하지 않으셨네요!", Toast.LENGTH_SHORT).show();
-                }
-
-                //필요한 동작을 완료했으므로 다이얼로그를 닫는다.
-                dialog.dismiss();
-
-            }
-        });
-
-// 중립 버튼 설정 : 사용자가 그룹 생성을 취소할 때 누르게 되며, 다이얼로그를 그냥 닫는다.
-        builder.setNeutralButton("취소", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                dialog.dismiss();
-
-            }
-        });
-
-
-        //다이얼로그 설정 완료. 화면에 다이얼로그를 띄운다.
-        builder.show();
-
+        Intent intent = new Intent(getContext(), AddGroupActivity.class);
+        startActivity(intent);
 
     }
 
@@ -273,7 +184,6 @@ public class GroupFragment extends Fragment {
                     .addInterceptor(httpLoggingInterceptor)
                     .build();
 
-
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(API_URL)
                     .client(okHttpClient)
@@ -281,7 +191,6 @@ public class GroupFragment extends Fragment {
 
             ApiService apiService = retrofit.create(ApiService.class);
 //            Log.e("myimg", "doInBackground: " + uploadImagePath);
-
 
             // 레트로핏 콜 객체를 만든다. 파라미터로 게시물의 ID값, 게시물의 타입을 전송한다.
 
@@ -312,6 +221,8 @@ public class GroupFragment extends Fragment {
 
                     String nameGroup = jObject.getString("name_group");
 
+                    String contentGroup = jObject.getString("content_group");
+
                     String emailGroupOwner = jObject.getString("email_group_owner");
 
                     String nameGroupOwner = jObject.getString("name_group_owner");
@@ -321,16 +232,19 @@ public class GroupFragment extends Fragment {
                     String dateGroupMade = jObject.getString("date_group_made");
 
 
+
+
+
                     String profileUrl = "";
-                    if (!jObject.getString("profile_url_owner").equals("")) {
-                        profileUrl = jObject.getString("profile_url_owner");
+                    if (!jObject.getString("img_url_group").equals("")) {
+                        profileUrl = jObject.getString("img_url_group");
                     }
 
 
 
                     //그룹 아이템 객체 생성자를 통해 아이템에 그룹 데이터를 담는다.
                     Log.e(TAG, "doInBackground: " + nameGroup + numGroupMembers + nameGroupOwner);
-                    GroupItem productGroupItem = new GroupItem(idGroup, nameGroup, emailGroupOwner, nameGroupOwner, profileUrl, numGroupMembers, dateGroupMade);
+                    GroupItem productGroupItem = new GroupItem(idGroup, nameGroup, contentGroup,emailGroupOwner, nameGroupOwner, profileUrl, numGroupMembers, dateGroupMade);
 
                     //그룹 아이템을 그룹 아이템 리스트에 추가한다.
                     productItems.add(productGroupItem);
@@ -380,107 +294,6 @@ public class GroupFragment extends Fragment {
         }
 
     }
-
-    //서버에서 단어장을 추가하도록 하는 태스크
-    public class AddGroupTask extends AsyncTask<Integer, String, String> {
-
-        String json_result;
-        private Context mContext = getContext();
-
-
-        @Override
-        protected String doInBackground(Integer... integers) {
-
-            //region//글 삭제하기 - DB상에서 뉴스피드 글을 삭제한다.
-            //레트로핏 기초 컴포넌트 만드는 과정. 자주 복붙할 것.
-            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
-            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-
-            OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                    .addInterceptor(new ReceivedCookiesInterceptor(mContext))
-                    .addInterceptor(new AddCookiesInterceptor(mContext))
-                    .addInterceptor(httpLoggingInterceptor)
-                    .build();
-
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(API_URL)
-                    .client(okHttpClient)
-                    .build();
-
-            ApiService apiService = retrofit.create(ApiService.class);
-//            Log.e("myimg", "doInBackground: " + uploadImagePath);
-
-
-            // 레트로핏 콜 객체를 만든다. 파라미터로 게시물의 ID값, 게시물의 타입을 전송한다.
-
-            Call<ResponseBody> comment = apiService.addGroup(nameGroup);
-
-            try {
-
-                json_result = comment.execute().body().string();
-                return json_result;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-            return null;
-        }
-
-        @Override
-
-        protected void onPostExecute(String result) {
-
-            super.onPostExecute(result);
-
-            //서버로 데이터 전송이 완료되었다.
-            //단어장 데이터를 갱신한다.
-
-            GetGroupTask getGroupTask = new GetGroupTask();
-            getGroupTask.execute();
-
-
-        }
-
-
-
-
-
-
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

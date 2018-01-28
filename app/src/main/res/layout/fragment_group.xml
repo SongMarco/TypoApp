@@ -22,8 +22,8 @@
 
             android:layout_margin="@dimen/margin_balloon"
 
-            android:focusableInTouchMode="true">
-
+           >
+            <!--android:focusableInTouchMode="true"-->
 
             <TextView
                 android:id="@+id/tvAddGroup"

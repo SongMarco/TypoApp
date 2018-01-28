@@ -318,7 +318,7 @@ public class MyWordSetItemRecyclerViewAdapter extends RecyclerView.Adapter<MyWor
     }
 
 
-        public class DeleteSetTask extends AsyncTask<Integer, String, String> {
+        public static class DeleteSetTask extends AsyncTask<Integer, String, String> {
 
             private Context mContext;
 
@@ -380,7 +380,7 @@ public class MyWordSetItemRecyclerViewAdapter extends RecyclerView.Adapter<MyWor
 
 
 
-    public class EditSetTask extends AsyncTask<Integer, String, String> {
+    public static class EditSetTask extends AsyncTask<Integer, String, String> {
 
         private Context mContext;
 

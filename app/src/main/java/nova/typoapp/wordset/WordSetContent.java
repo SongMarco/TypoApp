@@ -35,13 +35,13 @@ public class WordSetContent {
         public  String content;
 
 
-        int idWordSet;
+        public int idWordSet;
 
         public String nameWordSet;
         public int numWords;
         public String nameWordSetOwner;
 
-        String UrlOwnerProfileImg;
+        public String UrlOwnerProfileImg;
 
 
         public WordSetItem(int idWordSet, String nameWordSet, int numWords, String nameWordSetOwner, String urlOwnerProfileImg) {

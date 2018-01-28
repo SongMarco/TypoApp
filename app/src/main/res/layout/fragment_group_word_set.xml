@@ -1,0 +1,61 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context="nova.typoapp.groupWordSet.GroupWordSetFragment">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cvAddGroupWs"
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content"
+
+        android:layout_margin="@dimen/margin_balloon"
+
+        >
+
+        <!--아래 속성이 있으면 액티비티 이동 후 터치를 두번 해야 함-->
+        <!---->
+
+        <TextView
+            android:id="@+id/tvAddGroupWs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0"
+            android:text="내 단어장 공유하기"
+            android:textSize="20sp" />
+
+        <ImageView
+            android:id="@+id/imgAddGroupWs"
+            app:srcCompat="@color/cardview_shadow_end_color"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center|start"
+
+            android:layout_margin="@dimen/margin_border"
+
+            android:layout_weight="0"
+
+            android:tint="@color/colorAccent" />
+
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/rvGroupWordSet"
+        android:name="nova.typoapp.wordset.WordSetItemFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        app:layoutManager="LinearLayoutManager"
+        tools:context="nova.typoapp.wordset.WordSetListFragment"
+        tools:listitem="@layout/fragment_wordset_item"
+
+        />
+
+
+</LinearLayout>

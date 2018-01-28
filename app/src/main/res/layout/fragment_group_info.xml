@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+
+            >
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/cvGroupImg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_border"
+                android:clickable="true"
+
+                android:focusable="true">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <ImageView
+                        android:id="@+id/imgGroupInfo"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_gravity="center"
+                        android:layout_margin="@dimen/margin_border"
+                        android:scaleType="center"
+                        app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
+
+                    <Button
+                        android:id="@+id/button3"
+                        style="?android:attr/borderlessButtonStyle"
+                        android:layout_width="match_parent"
+
+
+                        android:layout_height="30dp"
+
+                        android:layout_gravity="bottom|end"
+                        android:layout_margin="@dimen/margin_border"
+                        android:background="@drawable/buttonshape"
+                        android:clickable="false"
+                        android:drawableLeft="@android:drawable/ic_menu_manage"
+                        android:padding="@dimen/margin_border"
+                        android:text="수정"
+                        android:visibility="gone" />
+                </FrameLayout>
+
+
+            </android.support.v7.widget.CardView>
+
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/groupName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:layout_weight="0"
+            android:gravity="center"
+            android:text="그룹명"
+            android:textAlignment="center"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/margin_border">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/groupContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="그룹 설명"
+                    android:textSize="18sp"
+                    android:layout_margin="@dimen/margin_balloon"/>
+
+
+            </LinearLayout>
+
+
+        </android.support.v7.widget.CardView>
+
+
+        <Button
+            android:id="@+id/btnApplyGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/margin_border"
+            android:layout_weight="0"
+            android:text="가입 신청" />
+
+
+        <android.support.v7.widget.CardView
+
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_border">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvListMember"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/margin_border"
+                    android:text="회원 : 5명"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
+
+                <View
+                    android:id="@+id/lineView33"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+
+
+                    android:background="@color/borderGrey" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rvGroupMember"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    tools:listitem="@layout/fragment_likeritem" />
+            </LinearLayout>
+
+
+        </android.support.v7.widget.CardView>
+
+
+
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>
