@@ -35,6 +35,7 @@ public class LauncherActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_launcher);
 
 
 
@@ -46,7 +47,7 @@ public class LauncherActivity extends AppCompatActivity {
 
 
 
-        setContentView(R.layout.activity_launcher);
+
 
 
         //페이스북 로그인이 된 상태에서 앱을 켰다. 메인 액티비티로 보낸다.

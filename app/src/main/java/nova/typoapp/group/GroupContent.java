@@ -33,8 +33,9 @@ public class GroupContent {
 
         String dateGroupMade;
 
+        boolean isMemberGroup; // 그룹에 확인했는지를 결정하는 변수. true -> 가입됨
 
-        public GroupItem(int idGroup, String nameGroup, String contentGroup, String emailGroupOwner, String nameGroupOwner, String urlGroupImg, int numGroupMembers, String dateGroupMade) {
+        public GroupItem(int idGroup, String nameGroup, String contentGroup, String emailGroupOwner, String nameGroupOwner, String urlGroupImg, int numGroupMembers, String dateGroupMade, boolean isMemberGroup) {
             this.idGroup = idGroup;
             this.nameGroup = nameGroup;
             this.contentGroup = contentGroup;
@@ -43,6 +44,7 @@ public class GroupContent {
             UrlGroupImg = urlGroupImg;
             this.numGroupMembers = numGroupMembers;
             this.dateGroupMade = dateGroupMade;
+            this.isMemberGroup = isMemberGroup;
         }
 
     }

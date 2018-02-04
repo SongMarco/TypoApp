@@ -17,20 +17,13 @@
 
 
         <FrameLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
 
             >
 
-            <android.support.v7.widget.CardView
-                android:id="@+id/cvGroupImg"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_border"
-                android:clickable="true"
 
-                android:focusable="true">
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -38,54 +31,44 @@
 
                     <ImageView
                         android:id="@+id/imgGroupInfo"
-                        android:layout_width="150dp"
+                        android:layout_width="match_parent"
                         android:layout_height="150dp"
                         android:layout_gravity="center"
                         android:layout_margin="@dimen/margin_border"
-                        android:scaleType="center"
+                        android:scaleType="fitCenter"
                         app:srcCompat="@drawable/com_facebook_profile_picture_blank_square" />
 
                     <Button
-                        android:id="@+id/button3"
+                        android:id="@+id/buttonApplyGroup"
                         style="?android:attr/borderlessButtonStyle"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
 
 
-                        android:layout_height="30dp"
-
+                        android:layout_height="wrap_content"
                         android:layout_gravity="bottom|end"
+
                         android:layout_margin="@dimen/margin_border"
-                        android:background="@drawable/buttonshape"
+
+                        android:background="@color/transGrey"
                         android:clickable="false"
-                        android:drawableLeft="@android:drawable/ic_menu_manage"
-                        android:padding="@dimen/margin_border"
-                        android:text="수정"
-                        android:visibility="gone" />
+
+
+                        android:text="가입하기"
+
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
                 </FrameLayout>
-
-
-            </android.support.v7.widget.CardView>
+            <!--android:drawableLeft="@android:drawable/ic_menu_manage"-->
 
 
         </FrameLayout>
-
-        <TextView
-            android:id="@+id/groupName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:layout_weight="0"
-            android:gravity="center"
-            android:text="그룹명"
-            android:textAlignment="center"
-            android:textSize="22sp"
-            android:textStyle="bold" />
 
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="@dimen/margin_border">
+            android:layout_marginTop="@dimen/text_margin"
+           >
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -93,12 +76,35 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/groupName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:layout_weight="0"
+                    android:gravity="center"
+                    android:text="그룹명"
+                    android:textAlignment="center"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:layout_margin="@dimen/margin_border"/>
+
+                <View
+                    android:id="@+id/lineView34"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+
+
+                    android:background="@color/borderGrey" />
+
+                <TextView
                     android:id="@+id/groupContent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/margin_balloon"
                     android:text="그룹 설명"
-                    android:textSize="18sp"
-                    android:layout_margin="@dimen/margin_balloon"/>
+                    android:textAlignment="viewStart"
+                    android:textSize="18sp" />
 
 
             </LinearLayout>
@@ -107,35 +113,26 @@
         </android.support.v7.widget.CardView>
 
 
-        <Button
-            android:id="@+id/btnApplyGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="@dimen/margin_border"
-            android:layout_weight="0"
-            android:text="가입 신청" />
-
-
         <android.support.v7.widget.CardView
-
-
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_border">
+
+            android:layout_marginTop="@dimen/margin_balloon"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/tvListMember"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/margin_border"
-                    android:text="회원 : 5명"
-                    android:textAlignment="center"
+                    android:layout_margin="@dimen/margin_balloon"
+                    android:text="회원 5"
+                    android:textAlignment="viewStart"
                     android:textSize="18sp" />
 
                 <View
@@ -153,10 +150,7 @@
                     android:layout_height="match_parent"
                     tools:listitem="@layout/fragment_likeritem" />
             </LinearLayout>
-
-
         </android.support.v7.widget.CardView>
-
 
 
     </LinearLayout>

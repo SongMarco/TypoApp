@@ -122,6 +122,11 @@ public class GroupFragment extends Fragment {
         getGroupTask.execute();
 
 
+        //멤버 회원이면 가입버튼을 보이지 않게 한다.
+
+
+
+
 
 
         return view;
@@ -233,18 +238,19 @@ public class GroupFragment extends Fragment {
 
 
 
-
-
                     String profileUrl = "";
                     if (!jObject.getString("img_url_group").equals("")) {
                         profileUrl = jObject.getString("img_url_group");
                     }
 
 
+                    boolean isMemberGroup =  Boolean.parseBoolean( jObject.getString("isMemberGroup") );
+
+
 
                     //그룹 아이템 객체 생성자를 통해 아이템에 그룹 데이터를 담는다.
                     Log.e(TAG, "doInBackground: " + nameGroup + numGroupMembers + nameGroupOwner);
-                    GroupItem productGroupItem = new GroupItem(idGroup, nameGroup, contentGroup,emailGroupOwner, nameGroupOwner, profileUrl, numGroupMembers, dateGroupMade);
+                    GroupItem productGroupItem = new GroupItem(idGroup, nameGroup, contentGroup,emailGroupOwner, nameGroupOwner, profileUrl, numGroupMembers, dateGroupMade, isMemberGroup);
 
                     //그룹 아이템을 그룹 아이템 리스트에 추가한다.
                     productItems.add(productGroupItem);

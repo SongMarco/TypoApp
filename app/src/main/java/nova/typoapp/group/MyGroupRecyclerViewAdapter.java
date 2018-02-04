@@ -100,6 +100,8 @@ public class MyGroupRecyclerViewAdapter extends RecyclerView.Adapter<MyGroupRecy
 
                     intent.putExtra("numGroupMembers", item.numGroupMembers);
 
+                    intent.putExtra("isMemberGroup", item.isMemberGroup);
+
 
 
 

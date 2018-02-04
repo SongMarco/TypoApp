@@ -99,6 +99,20 @@ public interface ApiService {
     Call<ResponseBody> getGroupWordSet(@Field("idGroup") int idGroup);
 
 
+    //그룹에서 그룹 멤버 리스트를 가져오는 메소드
+    //그룹 id를 서버에 보내어, 그룹에 속한 멤버 리스트를 가져온다.
+    @FormUrlEncoded
+    @POST("group/getGroupMembers.php")
+    Call<ResponseBody> getGroupMembers (@Field("idGroup") int idGroup);
+
+    //그룹에 회원 가입을 하는 메소드
+    //그룹 id를 서버에 보내어, 그룹에 속한 단어장을 가져온다.
+    //서버에선 세션에 있는 회원 정보를 확인하고 그룹에 가입시킨다.
+    @FormUrlEncoded
+    @POST("group/applyGroup.php")
+    Call<ResponseBody> applyGroup (@Field("idGroup") int idGroup);
+
+
 
     //단어장에 단어들을 세팅하는 메소드
     //서버에 단어장 id를 보내고, 단어-단어장 db 에서 단어들을 가져온다.

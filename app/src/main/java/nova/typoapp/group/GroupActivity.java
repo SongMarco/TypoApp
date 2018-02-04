@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import butterknife.ButterKnife;
 import nova.typoapp.R;
+import nova.typoapp.groupChat.GroupChatFragment;
 import nova.typoapp.groupWordSet.GroupWordSetFragment;
 
 public class GroupActivity extends AppCompatActivity implements
