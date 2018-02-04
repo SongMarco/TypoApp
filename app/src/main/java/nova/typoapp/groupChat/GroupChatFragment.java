@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -19,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,7 +41,6 @@ import nova.typoapp.R;
 import nova.typoapp.groupChat.ChatTextContent.ChatItem;
 
 import static android.content.Context.ACTIVITY_SERVICE;
-import static android.content.Context.WIFI_SERVICE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -70,11 +68,13 @@ public class GroupChatFragment extends Fragment {
 
     ///////////소켓 채팅을 위한 변수들
 
-    private static final String ipText = "115.68.231.13"; // tcp 소켓을 연결할, 서버의 ip
+
+    private static final String ipText = "192.168.242.1"; // tcp 소켓을 연결할, 서버의 ip - 내부 ip. 테스트용
+//    private static final String ipText = "115.68.231.13"; // tcp 소켓을 연결할, 서버의 ip
     private static int port = 9999; // 채팅 서버의 포트
 
 
-//    private static final String ipText = "192.168.242.1"; // tcp 소켓을 연결할, 서버의 ip - 내부 ip. 테스트용
+
 //    private static int port = 9999; // 채팅 서버의 포트
 
 
@@ -213,7 +213,6 @@ public class GroupChatFragment extends Fragment {
 
                 if (hdmsg.what == 1111) {
 
-
                     try {
 
                         JSONObject jsonObject = new JSONObject(hdmsg.obj.toString());
@@ -288,8 +287,28 @@ public class GroupChatFragment extends Fragment {
     }
 
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        Toast.makeText(getContext(), "onDestroy", Toast.LENGTH_SHORT).show();
+        ChatTextContent.ITEMS.clear();
+        chatTextRvAdapter.notifyDataSetChanged();
+//        try {
+//
+//
+//
+//            socket.close();
+//
+//
+//
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
 
+    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -362,12 +381,8 @@ public class GroupChatFragment extends Fragment {
                 receive = new ReceiveThread(socket);
                 receive.start();
 
-                //mac주소를 받아오기위해 설정
-                WifiManager mng = (WifiManager) getActivity().getApplicationContext().getSystemService(WIFI_SERVICE);
-                WifiInfo info = mng.getConnectionInfo();
-                mac = info.getMacAddress();
 
-                //mac 전송
+                //사용자 이메일 전송
                 output.writeUTF(userEmail);
 
             } catch (IOException e) {
@@ -404,7 +419,7 @@ public class GroupChatFragment extends Fragment {
                         hdmsg.what = 1111;
                         hdmsg.obj = msg;
                         msghandler.sendMessage(hdmsg);
-                        Log.d(ACTIVITY_SERVICE, hdmsg.obj.toString());
+//                        Log.d(ACTIVITY_SERVICE, hdmsg.obj.toString());
                     }
                 }
             } catch (IOException e) {

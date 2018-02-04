@@ -99,10 +99,6 @@ public class ChatTextRvAdapter extends RecyclerView.Adapter<ChatTextRvAdapter.Vi
         if (item.chatWriterEmail.equals(userEmail)) {
 
 
-
-
-
-
             //말풍선을 우측으로 옮기고 색깔 변경
             holder.layoutChatBody.setGravity(Gravity.END);
 
