@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ScanLibrary</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="scanning">Scanning</string>
+    <string name="done">문자 인식하기</string>
+    <string name="scan">다음</string>
+    <string name="cantCrop">Cant crop the image, change the points</string>
+    <string name="ok">Ok</string>
+    <string name="loading">Loading</string>
+    <string name="applying_filter">Applying filter</string>
+    <string name="low_memory">Low Memory</string>
+    <string name="low_memory_message">Your phone is low on memory, you may feel some lags while editing images.</string>
+
+
+    <string name="custom_close_text">Custom Close</string>
+
+    <string name="rationale_title">권한 필요</string>
+    <string name="rationale_message">해당 컨텐츠를 이용하려면 관련 권한이 필요합니다.</string>
+    <string name="magic_color">색감 조절</string>
+    <string name="original">원본</string>
+    <string name="gray_mode">회색 모드</string>
+    <string name="BlackAndWhite">흑백 모드</string>
+
+</resources>
