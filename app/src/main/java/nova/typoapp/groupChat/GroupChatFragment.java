@@ -22,11 +22,9 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.net.Socket;
@@ -217,20 +215,22 @@ public class GroupChatFragment extends Fragment {
 
                         JSONObject jsonObject = new JSONObject(hdmsg.obj.toString());
 
+                        Log.e("jsonHere", "handleMessage: "+hdmsg.obj.toString() );
+
                         int idGroup = jsonObject.getInt("idGroup");
 
                         String chatText = jsonObject.getString("chatText");
 
-                        String chatWriterEmail = jsonObject.getString("chatWriterEmail");
+                        String userEmail = jsonObject.getString("userEmail");
 
-                        String chatWriterName = jsonObject.getString("chatWriterName");
+                        String userName = jsonObject.getString("userName");
 
                         String chatTime = jsonObject.getString("chatTime");
 
-                        String chatWriterProfile =  jsonObject.getString("chatWriterProfile");
+                        String userProfileUrl =  jsonObject.getString("userProfileUrl");
 
 
-                        ChatItem chatItem = new ChatItem(idGroup, chatText, chatWriterName , chatWriterEmail, chatWriterProfile,chatTime);
+                        ChatItem chatItem = new ChatItem(idGroup, chatText, userName , userEmail, userProfileUrl,chatTime);
 
                         //채팅 텍스트를 업데이트 한다.
                         ChatTextContent.ITEMS.add(chatItem);
@@ -350,19 +350,20 @@ public class GroupChatFragment extends Fragment {
     }
     ////////////////////// 채팅 관련 클래스들
 
+
+    //지정된 ip와 포트로 소켓을 생성하고, 스트림에서 서버와 데이터(채팅 내용, 사용자 정보, 방 정보 등)를 주고받는 스레드
     class SocketClient extends Thread {
         boolean threadAlive;
         String ip;
         String port;
 
-        //접속 정보로 보낼 맥 -> 앱에서는 이메일로 변경
-        String mac;
+        //접속 정보로 이메일로 변경
 
         //InputStream inputStream = null;
-        OutputStream outputStream = null;
-        BufferedReader br = null;
+//        OutputStream outputStream = null;
+//        BufferedReader br = null;
 
-        private DataOutputStream output = null;
+        private DataOutputStream outPutStream = null;
 
         public SocketClient(String ip, String port) {
             threadAlive = true;
@@ -375,21 +376,81 @@ public class GroupChatFragment extends Fragment {
 
             try {
                 // 연결후 바로 ReceiveThread 시작
+
+                //ip와 포트로 새 소켓을 생성
                 socket = new Socket(ip, Integer.parseInt(port));
                 //inputStream = socket.getInputStream();
-                output = new DataOutputStream(socket.getOutputStream());
+
+                //소켓에서 아웃풋스트림 생성
+                outPutStream = new DataOutputStream(socket.getOutputStream());
+
+                //서버로부터 메세지를 받기 위한 스레드 생성
                 receive = new ReceiveThread(socket);
                 receive.start();
 
 
-                //사용자 이메일 전송
-                output.writeUTF(userEmail);
+                //사용자가 접속했다는 메세지를 전송한다.
+
+                //보낼 json 메시지의 타입 -> 채팅방 접속인지, 나간 건지, 채팅인지 구별할 때 사용
+                String msgType = "joinChat";
+
+
+                // jsonObject 에 채팅 내용을 세팅한다.
+                JSONObject jsonObject = createJsonObject(idGroup, msgType, "", userEmail, userName, userProfileUrl);
+                //그룹 id -> 채팅방 구별에 사용
+
+                String jsonString = jsonObject.toString();
+
+
+                outPutStream.writeUTF(jsonString);
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
+
+
+    //서버에 보내는데 필요한 json 객체를 만드는 메소드
+    public JSONObject createJsonObject(int idGroup, String msgType, String chatText, String userEmail, String userName, String userProfileUrl){
+
+        // 아래 jsonObject 에 채팅 정보를 세팅한다.
+        JSONObject jsonObject = new JSONObject();
+
+
+        try {
+
+            //그룹 id : 채팅방 구별에 사용
+            jsonObject.put("idGroup", idGroup);
+
+            //보낼 json 메시지의 타입 -> 채팅방 접속인지, 나간 건지, 채팅인지 구별할 때 사용
+//            String msgType = "joinChat";
+            jsonObject.put("msgType", msgType);
+
+            //채팅 내용 : 메시지 타입이 채팅일 때만 사용됨
+            jsonObject.put("chatText", chatText );
+
+            //채팅 접속한 사람 이메일
+            jsonObject.put("userEmail", userEmail );
+
+            //채팅 접속자 이름
+            jsonObject.put("userName", userName );
+
+            //채팅 접속자 프로필 사진 url
+            jsonObject.put("userProfileUrl", userProfileUrl );
+
+            //채팅 접속 시간
+            jsonObject.put("chatTime", formattedDate(new Date(), "a h:mm"));
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        return jsonObject;
+    }
+
+
 
 
     // 서버로부터 메시지를 받는 스레드.
@@ -434,7 +495,7 @@ public class GroupChatFragment extends Fragment {
     //json 에는 채팅 작성자, 내용, 그룹 id(방 구분), 작성 날짜가 들어있다.
     class SendThread extends Thread {
         private Socket socket;
-        String msgChatText = etChatText.getText().toString();
+        String chatText = etChatText.getText().toString();
 
 
 
@@ -458,29 +519,35 @@ public class GroupChatFragment extends Fragment {
 
                 // jsonObject 에 채팅 내용을 세팅한다.
                 JSONObject jsonObject = new JSONObject();
-                //그룹 id -> 채팅방 구별에 사용
+
+                //그룹 id : 채팅방 구별에 사용
                 jsonObject.put("idGroup", idGroup);
 
-                //채팅 내용
-                jsonObject.put("chatText", msgChatText );
+                //보낼 json 메시지의 타입 -> 채팅방 접속인지, 나간 건지, 채팅인지 구별할 때 사용
+                String msgType = "sayChat";
+                jsonObject.put("msgType", msgType);
 
-                //채팅 작성자
-                jsonObject.put("chatWriterEmail", userEmail );
+                //채팅 내용 : 메시지 타입이 채팅일 때만 사용됨
+                jsonObject.put("chatText", chatText );
 
-                //채팅 작성자
-                jsonObject.put("chatWriterName", userName );
+                //채팅 접속한 사람 이메일
+                jsonObject.put("userEmail", userEmail );
 
-                //채팅 프로필 url
-                jsonObject.put("chatWriterProfile", userProfileUrl );
+                //채팅 접속자 이름
+                jsonObject.put("userName", userName );
 
-                //채팅 내용 작성 시간
+                //채팅 접속자 프로필 사진 url
+                jsonObject.put("userProfileUrl", userProfileUrl );
+
+                //채팅 접속 시간
                 jsonObject.put("chatTime", formattedDate(new Date(), "a h:mm"));
+
 
                 String jsonText = jsonObject.toString();
 
 
                 if (output != null) {
-                    if (msgChatText != null) {
+                    if (chatText != null) {
                         output.writeUTF(jsonText);
 
                     }
@@ -493,13 +560,6 @@ public class GroupChatFragment extends Fragment {
 
 
 
-        // 형식화된 날짜를 얻는 함수.
-        //formattedDate(new Date(), "a h:mm"); 를 하면 "오후 11:30" 형식의 데이터를 얻는다.
-        public String formattedDate(Date date, String format)
-        {
-            SimpleDateFormat toFormat = new SimpleDateFormat(format);
-            return toFormat.format(date);
-        }
     }
 
 
@@ -507,6 +567,13 @@ public class GroupChatFragment extends Fragment {
 
 
 
+    // 형식화된 날짜를 얻는 함수.
+    //formattedDate(new Date(), "a h:mm"); 를 하면 "오후 11:30" 형식의 데이터를 얻는다.
+    public String formattedDate(Date date, String format)
+    {
+        SimpleDateFormat toFormat = new SimpleDateFormat(format);
+        return toFormat.format(date);
+    }
 
 
 
