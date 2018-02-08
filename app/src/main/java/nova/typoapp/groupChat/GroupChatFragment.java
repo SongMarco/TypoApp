@@ -67,8 +67,8 @@ public class GroupChatFragment extends Fragment {
     ///////////소켓 채팅을 위한 변수들
 
 
-    private static final String ipText = "192.168.242.1"; // tcp 소켓을 연결할, 서버의 ip - 내부 ip. 테스트용
-//    private static final String ipText = "115.68.231.13"; // tcp 소켓을 연결할, 서버의 ip
+//    private static final String ipText = "192.168.242.1"; // tcp 소켓을 연결할, 서버의 ip - 내부 ip. 테스트용
+    private static final String ipText = "115.68.231.13"; // tcp 소켓을 연결할, 서버의 ip
     private static int port = 9999; // 채팅 서버의 포트
 
 
