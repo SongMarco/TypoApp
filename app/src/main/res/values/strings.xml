@@ -98,4 +98,5 @@
     <string name="hint_etGroupName">그룹 이름을 입력하세요 ...</string>
 
     <string name="action_confirm">확인</string>
+    <string name="action_exit_chat">채팅 나가기</string>
 </resources>

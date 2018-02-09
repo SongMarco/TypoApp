@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 
@@ -69,11 +70,26 @@ public class GroupActivity extends AppCompatActivity implements
             }
         });
 
+
+
         //아래 코드 대신 윗줄의 코드 추가함 -> 탭을 누를 때 반응시키기 위해.
 //        tabLayout.setupWithViewPager(mViewPager);
 
 
+    }
 
+
+    /*
+    더보기 메뉴
+
+    더보기 버튼을 클릭할 때 등장하는 메뉴들이다.
+    프로필, 설정, 로그아웃 아이템이 표시된다.(필요시 추가 가능)
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_group, menu);
+        return true;
     }
 
 
@@ -204,7 +220,30 @@ public class GroupActivity extends AppCompatActivity implements
     //뒤로가기 버튼을 눌렀을 때
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+          /*
+    옵션 아이템을 클릭하면 취하는 행동
+
+    더보기 메뉴에 나오는 프로필, 설정, 로그아웃 아이템을
+    클릭하였을 때 취할 행동을 정의한다.
+
+     */
+
         switch (item.getItemId()) {
+
+            case R.id.action_exit_chat:
+
+
+                //채팅 소켓을 닫게 한다.
+
+                mSectionsPagerAdapter.groupChatFragment.exitChat();
+
+
+                break;
+
+
+
+
             case android.R.id.home:
                 onBackPressed();
                 return true;

@@ -95,13 +95,7 @@ public class MainActivity extends AppCompatActivity
          */
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
 
-        // Set up the ViewPager with the sections adapter.
-        /*
-        The {@link ViewPager} that will host the section contents.
-         */
 
         //탭 레이아웃 초기화
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayoutMain);
@@ -124,7 +118,7 @@ public class MainActivity extends AppCompatActivity
 
 
                     //'영어단어' 페이지를 한 번 더 클릭할 경우, 맨 위로 스크롤해주는 기능이다.
-                    //와! 이렇게 현재 프래그먼트를 가져올 수 있구나! - 새로고침에서도 써먹을 수 있겠어.
+                    //와! 이렇게 현재 프래그먼트를 호출할 수 있구나! - 새로고침에서도 써먹을 수 있겠어.
                     mSectionsPagerAdapter.newsFeedFragment.scrollToTop();
 
                 }
