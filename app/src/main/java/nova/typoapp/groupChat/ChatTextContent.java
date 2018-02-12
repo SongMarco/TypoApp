@@ -19,6 +19,13 @@ import java.util.List;
 public class ChatTextContent {
 
 
+    //채팅 아이템의 타입을 나타내는 상수. 일반적으로 CHAT_TEXT 값이며,
+    //'~~가 나갔습니다' 등 공지를 나타낼 때 CHAT_NOTICE 가 쓰인다.
+    public static int CHAT_TEXT = 100;
+
+    public static int CHAT_NOTICE = 200;
+
+
 
 
     //채팅 텍스트 아이템의 리스트
@@ -31,6 +38,11 @@ public class ChatTextContent {
 
         //채팅한 그룹의 id - 채팅방 구별에 사용
         int idGroup;
+
+        //채팅 아이템의 타입. 디폴트 값으로 CHAT_TEXT 설정하고,
+        //공지일 때 수정
+        int chatItemType = CHAT_TEXT;
+
 
         //채팅 내용
         String chatText;
@@ -57,6 +69,14 @@ public class ChatTextContent {
             this.chatWriterEmail = chatWriterEmail;
             this.chatWriterProfile = chatWriterProfile;
             this.chatTime = chatTime;
+        }
+
+        public ChatItem(int idGroup, int chatItemType, String chatText, String chatWriterName, String chatWriterEmail) {
+            this.idGroup = idGroup;
+            this.chatText = chatText;
+            this.chatItemType = CHAT_NOTICE;
+            this.chatWriterName = chatWriterName;
+            this.chatWriterEmail = chatWriterEmail;
         }
     }
 }

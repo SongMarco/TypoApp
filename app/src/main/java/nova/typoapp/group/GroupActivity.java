@@ -49,7 +49,8 @@ public class GroupActivity extends AppCompatActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarGroup);
         setSupportActionBar(toolbar);
 
-        getSupportActionBar().setTitle("그룹");
+        String nameGroup = getIntent().getStringExtra("nameGroup");
+        getSupportActionBar().setTitle(nameGroup);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 

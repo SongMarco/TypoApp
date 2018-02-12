@@ -779,6 +779,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 editor.putString(getString(R.string.cookie_birthday), cookie_birthday);
                 editor.putString("cookie_profile_url", cookie_profile_url);
 
+
+
+
+
                 editor.apply();
                 Log.e(TAG, "shared: "+getSharedPreferences(getString(R.string.key_pref_Login), MODE_PRIVATE ).getAll()  ) ;
 

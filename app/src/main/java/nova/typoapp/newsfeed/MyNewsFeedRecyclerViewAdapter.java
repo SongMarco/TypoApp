@@ -181,7 +181,7 @@ public class MyNewsFeedRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             return TYPE_HEADER;
 
         else return TYPE_ITEM;
-    }
+}
 
     //헤더인지 검사하는 함수 - position == 0인지 검사
     private boolean isPositionHeader(int position) {
