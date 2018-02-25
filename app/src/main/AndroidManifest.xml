@@ -240,7 +240,14 @@ application 태그 참고사항
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
+
         <!-- [END firebase_iid_service] -->
+
+
+        <!--채팅 서비스 파트-->
+        <service android:name=".groupChat.GroupChatService" />
+
+
 
         <activity
             android:name=".wordset.WordSetActivity"

@@ -783,6 +783,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
 
+
                 editor.apply();
                 Log.e(TAG, "shared: "+getSharedPreferences(getString(R.string.key_pref_Login), MODE_PRIVATE ).getAll()  ) ;
 

@@ -3,6 +3,8 @@ package nova.typoapp;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -25,6 +27,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import nova.typoapp.group.GroupFragment;
+import nova.typoapp.groupChat.GroupChatService;
+import nova.typoapp.groupChat.groupChatSqlite.MySQLiteOpenHelper;
 import nova.typoapp.newsfeed.NewsFeedContent;
 import nova.typoapp.notificationlist.NoticeContent;
 import nova.typoapp.notificationlist.NoticeItemFragment;
@@ -78,16 +82,70 @@ public class MainActivity extends AppCompatActivity
 
     public static int feedIDFromFcm = -1;
 
+
+
+
+
     /*
     메인액티비티 초기화.
 
     뷰를 세팅할 때 버터나이프를 자주 사용하는데,
-    메인 액티비티에서는 inflate 할 뷰가 적으므로 그냥 findViewById 적용한다.
+    메인 액티비티에서는 inflate 할 뷰가 적으므로, 버터나이프를 사용하지 않고 findViewById 적용한다.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        //채팅 서비스 초기화 및 시작. - 채팅 서버와의 소켓 통신에 사용된다.
+        //자세한 내용은 groupChat 패키지의 groupChatService 참조
+        Intent intent = new Intent(
+                MainActivity.this,//현재제어권자
+                GroupChatService.class); // 이동할 컴포넌트
+        startService(intent); // 서비스 시작
+
+        //채팅 서비스 초기화 끝
+
+
+        /////////SQLite 관련 변수들
+        MySQLiteOpenHelper helper; // SQLite 조회를 도와주는 클래스. 안드로이드에서 지원함
+
+
+        String dbName = "dbChat.db"; //db 이름. 브라우저에서 조회시 해당 파일명으로 DB 조회 가능(Stetho 등)
+        int dbVersion = 2; // 데이터베이스 버전 : 앱이 바뀌면서 데이터베이스를 업그레이드할 때 필요.(DB 버전 관리)
+
+        SQLiteDatabase db; //db 객체
+        String tag = "SQLite"; // Log 에 사용할 tag
+
+        ////////SQLite 관련 변수 end
+
+        //로컬 DB(SQLite) 의 초기화
+        // SQLite OpenHelper 객체를 초기화
+        helper = new MySQLiteOpenHelper(
+                this,  // 현재 화면의 제어권자
+                dbName,// db 이름
+                null,  // 커서팩토리-null : 표준커서가 사용됨
+                dbVersion);       // 버전
+
+
+        try {
+            //openHelper 를 이용, 채팅 내용 db를 가져온다.
+            db = helper.getWritableDatabase(); // 읽고 쓸수 있는 DB
+
+//            //샘플 채팅 데이터 추가
+//            db.execSQL("insert into chatTable (idGroup, chatType, chatText, userName, userEmail) " +
+//                    "values(-1, 'sayChat', '안녕하슈', '김선달', 'jayKim@naver.com');");
+
+        }
+        //db 가져오기에서 오류가 날 경우
+        catch (SQLiteException e) {
+            //에러를 로그로 표시함
+            e.printStackTrace();
+            Log.e(tag, "데이터베이스를 얻어올 수 없음");
+        }
+        //로컬 db 초기화 끝
+
 
         /*
         툴바와 탭 레이아웃, 뷰페이저가 세팅된다.
@@ -456,5 +514,35 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
 
 //        Toast.makeText(this, "onPause Called", Toast.LENGTH_SHORT).show();
+    }
+
+
+    //뒤로가기를 두 번 누르면 앱을 종료하는 메소드 와 변수들
+
+    private final long FINISH_INTERVAL_TIME = 2000; // 앱을 해당 시간 안에 두 번 누르면 종료됨
+    private long backPressedTime = 0; // 뒤로 가기를 누른 시간
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+
+        //클릭한 시점
+        long tempTime = System.currentTimeMillis();
+
+        //두 번 클릭한 시간 간격 -> 2초 이하일 경우 앱을 종료함
+        long intervalTime = tempTime - backPressedTime;
+
+        //두번 클릭한 시간 간격이 0 이상, 2초 이하일 경우 앱 종료
+        if (0 <= intervalTime && FINISH_INTERVAL_TIME >= intervalTime) {
+            super.onBackPressed();
+        }
+        //두 번 클릭한 시간이 2초를 넘어갔을 경우/ 혹은 처음 눌렀을 경우
+        else {
+            //뒤로가기 누른 시간을 갱신하고, 종료 안내 토스트 출력
+            backPressedTime = tempTime;
+            Toast.makeText(this, "뒤로 버튼을 한 번 더 누르면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show();
+        }
+
+
     }
 }

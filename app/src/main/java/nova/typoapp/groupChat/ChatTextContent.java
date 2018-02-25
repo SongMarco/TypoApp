@@ -78,5 +78,15 @@ public class ChatTextContent {
             this.chatWriterName = chatWriterName;
             this.chatWriterEmail = chatWriterEmail;
         }
+
+        public ChatItem(int idGroup, int chatItemType, String chatText, String chatWriterName, String chatWriterEmail, String chatWriterProfile, String chatTime) {
+            this.idGroup = idGroup;
+            this.chatItemType = chatItemType;
+            this.chatText = chatText;
+            this.chatWriterName = chatWriterName;
+            this.chatWriterEmail = chatWriterEmail;
+            this.chatWriterProfile = chatWriterProfile;
+            this.chatTime = chatTime;
+        }
     }
 }

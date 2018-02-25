@@ -1,7 +1,6 @@
 package nova.typoapp;
 
 import android.app.Application;
-import android.content.Context;
 
 import com.facebook.stetho.Stetho;
 
@@ -12,14 +11,9 @@ import com.facebook.stetho.Stetho;
 
 public class MyApplication extends Application {
 
-    private static Context context;
-
     public void onCreate() {
         super.onCreate();
         Stetho.initializeWithDefaults(this);
     }
 
-    public static Context getAppContext() {
-        return MyApplication.context;
-    }
 }

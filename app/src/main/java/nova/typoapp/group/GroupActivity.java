@@ -19,10 +19,12 @@ import nova.typoapp.groupChat.GroupChatFragment;
 import nova.typoapp.groupWordSet.GroupWordSetFragment;
 
 public class GroupActivity extends AppCompatActivity implements
-
         GroupInfoFragment.OnFragmentInteractionListener,
         GroupWordSetFragment.OnFragmentInteractionListener,
         GroupChatFragment.OnFragmentInteractionListener {
+
+
+
 
 
     //페이저 어댑터는 뷰페이저에 사용되는 어댑터이다. 각 프래그먼트 객체를 불러올 때 사용한다.
@@ -70,7 +72,6 @@ public class GroupActivity extends AppCompatActivity implements
 
             }
         });
-
 
 
         //아래 코드 대신 윗줄의 코드 추가함 -> 탭을 누를 때 반응시키기 위해.
@@ -235,14 +236,12 @@ public class GroupActivity extends AppCompatActivity implements
             case R.id.action_exit_chat:
 
 
-                //채팅 소켓을 닫게 한다.
+                //프래그먼트에서 채팅을 종료하게 한다.
 
                 mSectionsPagerAdapter.groupChatFragment.exitChat();
 
 
                 break;
-
-
 
 
             case android.R.id.home:
