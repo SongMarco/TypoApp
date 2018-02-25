@@ -45,11 +45,6 @@ import static nova.typoapp.groupChat.GroupChatFragment.idGroupStatic;
 * case 1) 채팅방을 꺼둔 상태 : 채팅 서비스에서 메세지 수신, 로컬 DB 저장
 * case 2) 채팅방을 켜둔 상태일 경우 : 채팅 서비스에서 메세지 수신, 로컬 DB 저장 -> 채팅 프래그먼트의 리사이클러뷰에 채팅 메세지를 추가하여 갱신
 *
-* 필요한 것들
-*
-* 소켓 생성 / 파기는 참여한 방의 갯수를 기준으로 이뤄진다.(구현 예정)
-* 참여한 방이 0개 -> 1개로 될 경우, 소켓을 새로 만든다.
-* 반대로 1개 -> 0개로 될 경우 소켓을 파기한다.
 *
 *
 * @@ 채팅 서비스의 흐름
@@ -58,14 +53,13 @@ import static nova.typoapp.groupChat.GroupChatFragment.idGroupStatic;
 *
 * 채팅 진행 : 서비스에서 계속 소켓 통신, 채팅 프래그먼트 ui(채팅 리사이클러뷰) 업데이트 진행(otto 이벤트 버스 사용)
 *
-* 채팅 나감 : 서비스에서 해당 방에 대한 소켓 통신 종료, 참여한 방의 갯수 -1;
+* 채팅방 나감 : 서비스에서 해당 방에 대한 소켓 통신 종료
 *
 * 채팅 부재(화면 전환, onStop) : 서비스에서 계속 소켓 통신.
 *
 *
 *
 * 특이사항 / 의문사항
-*
 *
 * 채팅 프래그먼트와 어떻게 채팅 데이터를 주고 받지? otto 이벤트 버스를 사용하였다.
 * ex) 서버에서 채팅 메시지를 수신하는 이벤트 발생(post)
@@ -93,8 +87,8 @@ public class GroupChatService extends Service {
 
     IBinder mBinder = new ChatBinder(); //채팅 프래그먼트와의 바인딩에 사용되는 바인더
 
-    private static final String ipText = "192.168.242.1"; // tcp 소켓을 연결할, 서버의 ip - 내부 ip. 테스트용
-    //        private static final String ipText = "115.68.231.13"; // tcp 소켓을 연결할, 서버의 ip
+//    private static final String ipText = "192.168.242.1"; // tcp 소켓을 연결할, 서버의 ip - 내부 ip. 테스트용
+    private static final String ipText = "115.68.231.13"; // tcp 소켓을 연결할, 서버의 ip
     private static int port = 9999; // 채팅 서버의 포트
 
     @Override
@@ -110,12 +104,13 @@ public class GroupChatService extends Service {
 
 
     /*서비스가 언바인드될 때
-    * case 1 : 채팅방 프래그먼트에서 다른 화면으로 갔을 때때
+    * case 1 : 채팅방 프래그먼트에서 다른 화면으로 갔을 때
     *
     * */
     @Override
     public boolean onUnbind(Intent intent) {
 
+        // 채팅방 id를 초기화
         this.idGroup = -1;
 
         return super.onUnbind(intent);
@@ -136,7 +131,6 @@ public class GroupChatService extends Service {
         super.onCreate();
         // 서비스에서 가장 먼저 호출됨(최초에 한번만)
         Log.d("test", "서비스의 onCreate");
-//        android.os.Debug.waitForDebugger();  // this line is key
 
         //서비스가 만들어질 때, 소켓을 초기화하여 서버와 연결한다.
         //메인 스레드에서 소켓을 만들 수 없으므로, asyncTask 로 소켓 초기화(InitSocketTask 클래스에 ctrl+b를 눌러 참조)
@@ -158,8 +152,9 @@ public class GroupChatService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // 서비스가 종료될 때 실행 -> 서비스는 어지간하면 죽지 않는데, 안드로이드에서 앱을 죽일 때 죽게됨
+        // 서비스가 종료될 때 실행 -> 서비스는 어지간하면 죽지 않는데, 안드로이드에서 앱을 죽일 때(kill) 죽게됨
 
+        //
 //        // 소켓을 닫고, 채팅 메시지 수신 스레드를 null 로 만든다.
 //        try {
 //            socket.close();
@@ -208,11 +203,9 @@ public class GroupChatService extends Service {
     }
 
     //소켓이 생성될 때 서버에 유저 정보를 보내는 메소드
-    //서비스가 죽었다가 살아났을 때(앱 관리자에서 종료), 서버에 있는 채팅방에서 유저의 소켓을 갱신하기 위해 사용한다.
+    //서비스를 시작할 때 서버에 있는 채팅방에서 유저의 소켓을 갱신하기 위해 사용한다.
 
-    //모든 방을 조회해서 유저 소켓을 바꿀 필요가 없다.
-    //서버에 유저-소켓 관계의 해쉬맵을 추가하고, 소켓 연결시 이를 추가한 뒤,
-    //연결 되지 않은 유저 소켓이 있을 때 이 해쉬맵을 조회하여 수정하면 된다.
+    //서버에서 방에 있는 유저들에게 메세지를 돌릴 때 -> 유저이메일-소켓 해쉬맵을 참조해서 메세지를 보내면 된다.
     public void sendUserInfo(){
         try {
 
@@ -449,7 +442,7 @@ public class GroupChatService extends Service {
     //채팅 내용을 채팅 내역 db에 저장하는 메소드
     public void saveChat(ChatItem chatItem) {
 
-        String dbName = "dbChat.db"; //db 이름. 브라우저에서 조회시 해당 파일명으로 DB 조회 가능(Stetho 등)
+        String dbName = "dbChat.db"; //db 이름. 브라우저에서 조회시 해당 파일명으로 DB 조회 가능(Stetho 등 라이브러리를 사용하면 간편함)
         int dbVersion = 2; // 데이터베이스 버전 : 앱이 바뀌면서 데이터베이스를 업그레이드할 때 필요.(DB 버전 관리)
 
         SQLiteDatabase db; // db 객체
@@ -587,7 +580,7 @@ public class GroupChatService extends Service {
 
 
     //유저이메일-소켓 해쉬맵에 유저 소켓을 저장하기 위해 유저 이메일을 보내는 메소드
-    // 유저 이메일-소켓 해쉬맵은 유저 소켓으로 메시지를 못 보낼 때(앱을 강제종료했을 때) 사용된다.
+    // 유저 이메일-소켓 해쉬맵은 서버에서 유저 소켓으로 채팅 메시지를 보낼 때 사용된다.
     public String makeJsonInfo(String msgType, String userEmail) {
 
         JSONObject jsonObject = new JSONObject();
@@ -675,7 +668,6 @@ public class GroupChatService extends Service {
     public class InitSocketTask extends AsyncTask<Integer, String, String> {
 
 
-        // context를 가져오는 생성자. 이를 통해 메인 액티비티의 함수에 접근할 수 있다.
 
 
         @Override
