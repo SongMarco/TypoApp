@@ -46,7 +46,7 @@ import static nova.typoapp.group.GroupInfoFragment.isMemberGroup;
 import static nova.typoapp.retrofit.ApiService.API_URL;
 
 
-//메인 액티비티 - 그룹 프래그먼트에서 그룹을 클릭했을 때 나타나는 액티비티.
+//그룹 액티비티 - 그룹 프래그먼트에서 그룹을 클릭했을 때 나타나는 액티비티.
 // 그룹 관련 활동을 진행
 // 그룹 정보, 그룹 단어장, 그룹 채팅 기능 사용 가능
 public class GroupActivity extends AppCompatActivity implements
@@ -55,11 +55,7 @@ public class GroupActivity extends AppCompatActivity implements
         GroupChatFragment.OnFragmentInteractionListener {
 
 
-    //페이저 어댑터는 뷰페이저에 사용되는 어댑터이다. 각 프래그먼트 객체를 불러올 때 사용한다.
-//            위의 기본 주석에 따르면, FragmentPagerAdapter 어댑터는 모든 페이지를 메모리에 올려두는데,
-//            메모리가 부족해질 경우 FragmentStatePagerAdapter 어댑터를 쓰라고 언급하고 있다.
-    //아래의 SectionsPagerAdapter 어댑터는 메인 액티비티에서 FragmentPagerAdapter 를 상속하여
-    //만든 커스텀 어댑터다.
+    //페이저 어댑터는 뷰페이저에 사용되는 어댑터이다. 각 프래그먼트(그룹 정보 / 그룹 단어장 / 그룹 채팅) 객체를 불러올 때 사용한다.
     private SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
     public static boolean isDeleteMemberMode = false;
@@ -107,9 +103,6 @@ public class GroupActivity extends AppCompatActivity implements
         });
 
 
-        //아래 코드 대신 윗줄의 코드 추가함 -> 탭을 누를 때 반응시키기 위해.
-//        tabLayout.setupWithViewPager(mViewPager);
-
 
         //인텐트에서 채팅으로 가라는 변수가 세팅되어있다면 -> 그룹 채팅으로 세팅해줌
         if (getIntent().getBooleanExtra("goChatFragment", false)) {
@@ -118,6 +111,7 @@ public class GroupActivity extends AppCompatActivity implements
         }
 
 
+        //그룹의 멤버인지 확인하는 스태틱 변수 세팅
         isMemberGroup = getIntent().getBooleanExtra("isMemberGroup", false);
 
 
@@ -211,10 +205,8 @@ public class GroupActivity extends AppCompatActivity implements
 
     /*
       뷰페이저에 붙이는 어댑터를 정의한다.
-      뷰페이저에 어댑터를 붙이면 notifyDatasetChaged같은 메소드를 통해
+      뷰페이저에 어댑터를 붙이면 notifyDataSetChaged 같은 메소드를 통해
       뷰페이저를 새로고침 할 수 있다.
-
-      뷰페이저를 마치 커스텀뷰처럼 쓸 수 있게 해주는 어댑터로 추정된다.
        */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
@@ -300,7 +292,7 @@ public class GroupActivity extends AppCompatActivity implements
         return true;
     }
 
-    //외부 클래스에서 onPrepare 콜할 때 사용
+    //외부 클래스에서 onPrepareOptionsMenu 콜할 때 사용
     public void callOnPrepare(){
         onPrepareOptionsMenu(varMenu);
 
