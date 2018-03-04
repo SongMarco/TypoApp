@@ -63,6 +63,9 @@
 
 
     <string name="key_pref_Login">pref_login</string>
+
+    <string name="key_pref_notification">pref_notification</string>
+
     <string name="LoginToken">LoginToken</string>
 
     <string name="cookie_email">cookie_email</string>
@@ -99,4 +102,15 @@
 
     <string name="action_confirm">확인</string>
     <string name="action_exit_chat">채팅 나가기</string>
+    <string name="action_leave_group">그룹 탈퇴</string>
+
+
+    <string name="chatdb_name">dbChat.db</string>
+    <string name="action_edit_member">회원 관리</string>
+    <string name="action_give_admin">그룹장 위임</string>
+    <string name="action_delete_member">회원 삭제</string>
+    <string name="action_delete_done">삭제 완료</string>
+    <string name="action_refuse_notification">알림 거부</string>
+    <string name="action_apply_notification">알림 허용</string>
+
 </resources>

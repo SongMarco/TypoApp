@@ -106,11 +106,18 @@ public interface ApiService {
     Call<ResponseBody> getGroupMembers (@Field("idGroup") int idGroup);
 
     //그룹에 회원 가입을 하는 메소드
-    //그룹 id를 서버에 보내어, 그룹에 속한 단어장을 가져온다.
+    //그룹 id를 서버에 보내어, 그룹에 회원을 가입시킨다.
+
     //서버에선 세션에 있는 회원 정보를 확인하고 그룹에 가입시킨다.
     @FormUrlEncoded
     @POST("group/applyGroup.php")
     Call<ResponseBody> applyGroup (@Field("idGroup") int idGroup);
+
+    //그룹에서 회원을 탈퇴시키는 메소드. 회원 가입의 역과정
+    //그룹 id, 회원 이메일을 서버에 보내어 회원 탈퇴를 진행
+    @FormUrlEncoded
+    @POST("group/leaveGroup.php")
+    Call<ResponseBody> leaveGroup (@Field("idGroup") int idGroup, @Field("memberEmail") String memberEmail );
 
 
 
@@ -147,6 +154,13 @@ public interface ApiService {
     //세션을 통해 그룹의 정보를 가져올 수 있으므로, 파라미터를 세팅하지 않아도 ok
     @POST("group/getGroupList.php")
     Call<ResponseBody> getGroupList();
+
+    //그룹 id로 그룹 아이템을 json 으로 가져오는 메소드
+    //서비스의 알림 메세지에서 그룹 아이템을 가져오기 위해 사용
+    @FormUrlEncoded
+    @POST("group/getGroupWithId.php")
+    Call<ResponseBody> getGroupWithId(@Field("idGroup") int idGroup);
+
 
 
     //단어 게시물을 단어장에 추가하는 메소드

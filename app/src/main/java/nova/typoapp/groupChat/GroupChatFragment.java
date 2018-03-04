@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 
@@ -36,6 +37,8 @@ import nova.typoapp.groupChat.ChatTextContent.ChatItem;
 import nova.typoapp.groupChat.groupChatSqlite.MySQLiteOpenHelper;
 import nova.typoapp.groupChat.ottoEventBus.BusProvider;
 import nova.typoapp.groupChat.ottoEventBus.ChatRcvEvent;
+
+import static nova.typoapp.group.GroupInfoFragment.isMemberGroup;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -80,6 +83,11 @@ public class GroupChatFragment extends Fragment {
     @BindView(R.id.btnStartChat)
     Button btnStartChat;
 
+    //회원이 아닐 경우 보여지는 안내문
+    @BindView(R.id.tvNeedJoinToChat)
+    TextView tvNeedJoin;
+
+    //채팅 메세지를 보내는 버튼
     @BindView(R.id.btnSendChat)
     Button btnSendChat;
 
@@ -87,6 +95,7 @@ public class GroupChatFragment extends Fragment {
     @BindView(R.id.rvChatList)
     RecyclerView rvChatList;
 
+    //채팅 입력창 레이아웃
     @BindView(R.id.layoutChat)
     LinearLayout layoutChat;
 
@@ -99,14 +108,11 @@ public class GroupChatFragment extends Fragment {
     EditText etChatText;
 
 
-
-
     //채팅 시작을 위한 커넥션
     ConnStartChat connStartChat;
 
     //채팅 방 id
     int idGroup;
-
 
 
     /////////////////////////////////
@@ -150,6 +156,7 @@ public class GroupChatFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        idGroup = getActivity().getIntent().getIntExtra("idGroup", -1);
     }
 
 
@@ -184,9 +191,8 @@ public class GroupChatFragment extends Fragment {
         //그룹 id 를 액티비티에서 가져온다
 
         Intent intent = getActivity().getIntent();
-        idGroup = intent.getIntExtra("idGroup", -1);
-        idGroupStatic = idGroup;
 
+        idGroupStatic = idGroup;
 
 
         rvChatList.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -195,6 +201,19 @@ public class GroupChatFragment extends Fragment {
         LinearLayoutManager lm = (LinearLayoutManager) rvChatList.getLayoutManager();
 
         rvChatList.setAdapter(chatTextRvAdapter);
+
+
+        //회원 여부를 검토하여 채팅 시작 버튼을 세팅(비회원은 채팅 버튼이 안 보여 불가능)
+        setChatStartBtn();
+
+
+//
+//        //채팅 알림 메뉴를 세팅
+//        GroupActivity groupActivity = (GroupActivity)getActivity();
+//
+//
+////        groupActivity.callOnPrepare();
+
 
 
         return view;
@@ -213,7 +232,7 @@ public class GroupChatFragment extends Fragment {
 
                 //채팅 메시지의 채팅방 ID 값이 현재 채팅방 ID 값과 동일하다면
                 //-> 채팅 아이템 리스트에 추가하고, 채팅 ui를 갱신한다.
-                if(chatRcvEvent.chatItem.idGroup == idGroup){
+                if (chatRcvEvent.chatItem.idGroup == idGroup) {
                     //채팅 아이템 리스트에 추가
                     ChatTextContent.ITEMS.add(chatRcvEvent.chatItem);
 
@@ -231,9 +250,9 @@ public class GroupChatFragment extends Fragment {
 
     }
 
-    public class ConnStartChat implements ServiceConnection{
+    public class ConnStartChat implements ServiceConnection {
 
-        public ConnStartChat(){
+        public ConnStartChat() {
 
         }
 
@@ -255,9 +274,6 @@ public class GroupChatFragment extends Fragment {
 
         }
     }
-
-
-
 
 
     //채팅 시작 버튼 클릭시 발생하는 이벤트
@@ -286,6 +302,38 @@ public class GroupChatFragment extends Fragment {
         //채팅 시작 버튼을 보이지 않도록 하고, 채팅 입력 레이아웃을 보이도록 하여 채팅을 진행
         btnStartChat.setVisibility(View.GONE);
         layoutChat.setVisibility(View.VISIBLE);
+    }
+
+
+    //채팅 시작 버튼을 세팅하는 메소드
+    //그룹 회원이면 시작 버튼이 보이고, 회원이 아니면 보이지 않는다.
+    public void setChatStartBtn() {
+
+        //그룹 멤버라면 채팅 시작 버튼이 보인다.
+        if (isMemberGroup) {
+            btnStartChat.setVisibility(View.VISIBLE);
+            tvNeedJoin.setVisibility(View.GONE);
+
+
+        }
+        //그룹 멤버가 아니라면 채팅 시작 버튼이 보이지 않으며, 회원만 채팅이 가능하다는 안내문이 보인다.
+        else {
+
+
+            btnStartChat.setVisibility(View.GONE);
+            tvNeedJoin.setVisibility(View.VISIBLE);
+        }
+
+
+    }
+
+    public void hideChatStartBtn() {
+
+
+        btnStartChat.setVisibility(View.GONE);
+        tvNeedJoin.setVisibility(View.VISIBLE);
+
+
     }
 
 
@@ -375,6 +423,14 @@ public class GroupChatFragment extends Fragment {
 
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+
+
+        //채팅 아이템 중복을 막기 위해 초기화
+        ChatTextContent.ITEMS.clear();
+    }
 
     // onResume
     // 다른 액티비티로 넘어갔다가, 채팅을 하러 다시 왔을 때
@@ -384,7 +440,10 @@ public class GroupChatFragment extends Fragment {
         super.onResume();
 
         //onResume 에서는 채팅 화면이 복구됨 -> 알림 필요 없음 -> idGroupStatic 원래 값으로 복구
-        idGroupStatic = idGroup;
+
+        if(idGroupStatic == 0 || idGroupStatic == -1 ){
+            idGroupStatic = idGroup;
+        }
 
 
         String dbName = "dbChat.db"; //db 이름. 브라우저에서 조회시 해당 파일명으로 DB 조회 가능(Stetho 등)
@@ -405,7 +464,7 @@ public class GroupChatFragment extends Fragment {
 
 
         //채팅방의 채팅 내역을 db 에서 가져온다. idGroup 을 기준으로 채팅방을 구분하였다.
-        Cursor c = dbChat.rawQuery("select * from chatTable where idGroup = " + idGroup + ";", null);
+        Cursor c = dbChat.rawQuery("select * from chatTable where idGroup = " + idGroupStatic + ";", null);
 
         //불러온 채팅 내역으로부터 채팅 아이템을 추가할 아이템 리스트를 만든다.
         List<ChatItem> cloneItems = new ArrayList<>();
@@ -417,17 +476,17 @@ public class GroupChatFragment extends Fragment {
             int chatType = c.getInt(2); //채팅 메세지 타입 : 일반 채팅 / 공지사항(누가 들어오거나 나갔을 때) 구별
             String chatText = c.getString(3); // 채팅 메세지 내용
             String chatWriterName = c.getString(4); // 메세지 발신자 이름
-            String chatWriterEmail =c.getString(5); // 메세지 발신자 이메일
+            String chatWriterEmail = c.getString(5); // 메세지 발신자 이메일
             String chatWriterProfile = c.getString(6);// 메세지 발신자 프로필 url
             String chatTime = c.getString(7); // 메세지 발송 시간
 
-            ChatItem loadChatItem = new ChatItem(idGroup, chatType, chatText,chatWriterName, chatWriterEmail, chatWriterProfile, chatTime);
+            ChatItem loadChatItem = new ChatItem(idGroup, chatType, chatText, chatWriterName, chatWriterEmail, chatWriterProfile, chatTime);
 
             cloneItems.add(loadChatItem);
         }
         c.close();
 
-//        채팅 내역이 불러와짐. -> 채팅 방에 참여중 -> 채팅 내용 세팅 후 소켓 연결. 채팅모드로 사용
+        //        채팅 내역이 불러와짐. -> 채팅 방에 참여중 -> 채팅 내용 세팅 후 서비스 바인드. 채팅모드로 사용
         if (cloneItems.size() != 0) {
 
             //리사이클러뷰에 사용할 채팅 리스트에 불러온 채팅 내역을 복사
@@ -461,7 +520,7 @@ public class GroupChatFragment extends Fragment {
         else {
 
             //채팅 시작 버튼을 보이게 하고, 채팅 입력 레이아웃을 안 보이게 한다. -> 추후 생명주기, 소켓 상태에 따라 변경
-            btnStartChat.setVisibility(View.VISIBLE);
+            setChatStartBtn();
 
             layoutChat.setVisibility(View.GONE);
         }
@@ -502,15 +561,12 @@ public class GroupChatFragment extends Fragment {
         getActivity().unbindService(connStartChat);
 
 
-
-
         ChatTextContent.ITEMS.clear();
         chatTextRvAdapter.notifyDataSetChanged();
 
         btnStartChat.setVisibility(View.VISIBLE);
 
         layoutChat.setVisibility(View.GONE);
-
 
 
     }

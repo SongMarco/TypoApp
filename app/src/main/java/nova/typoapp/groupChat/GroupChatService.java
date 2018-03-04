@@ -1,16 +1,27 @@
 package nova.typoapp.groupChat;
 
+import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.SystemClock;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,14 +32,26 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import nova.typoapp.MainActivity;
 import nova.typoapp.R;
+import nova.typoapp.group.GroupActivity;
+import nova.typoapp.group.GroupContent.GroupItem;
 import nova.typoapp.groupChat.ChatTextContent.ChatItem;
 import nova.typoapp.groupChat.groupChatSqlite.MySQLiteOpenHelper;
 import nova.typoapp.groupChat.ottoEventBus.BusProvider;
 import nova.typoapp.groupChat.ottoEventBus.ChatRcvEvent;
+import nova.typoapp.retrofit.AddCookiesInterceptor;
+import nova.typoapp.retrofit.ApiService;
+import nova.typoapp.retrofit.ReceivedCookiesInterceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Retrofit;
 
 import static nova.typoapp.groupChat.ChatTextContent.CHAT_NOTICE;
 import static nova.typoapp.groupChat.GroupChatFragment.idGroupStatic;
+import static nova.typoapp.retrofit.ApiService.API_URL;
 
 
 /*
@@ -81,15 +104,18 @@ public class GroupChatService extends Service {
     DataInputStream inputStream; // 채팅 소켓의 인풋 스트림
 
 
-
-
     ReceiveThread receive; //채팅 메세지 수신 스레드
 
     IBinder mBinder = new ChatBinder(); //채팅 프래그먼트와의 바인딩에 사용되는 바인더
 
 //    private static final String ipText = "192.168.242.1"; // tcp 소켓을 연결할, 서버의 ip - 내부 ip. 테스트용
-    private static final String ipText = "115.68.231.13"; // tcp 소켓을 연결할, 서버의 ip
+        private static final String ipText = "115.68.231.13"; // tcp 소켓을 연결할, 서버의 ip
     private static int port = 9999; // 채팅 서버의 포트
+
+
+    public void setIdGroup(int idGroup) {
+        this.idGroup = idGroup;
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -118,9 +144,9 @@ public class GroupChatService extends Service {
     }
 
     //바인더 클래스
-    class ChatBinder extends Binder {
+    public class ChatBinder extends Binder {
         //바인더에서 서비스를 가져오는 메소드
-        GroupChatService getService() {
+        public GroupChatService getService() {
             return GroupChatService.this;
         }
     }
@@ -144,9 +170,11 @@ public class GroupChatService extends Service {
         // 서비스가 호출될 때마다 실행
         Log.d("test", "서비스의 onStartCommand");
 
-        return super.onStartCommand(intent, flags, startId);
+//        return super.onStartCommand(intent, flags, startId);
 
+        return START_STICKY;
     }
+
 
 
     @Override
@@ -167,6 +195,36 @@ public class GroupChatService extends Service {
 
     }
 
+
+    //작업관리자에서 앱을 종료할 때
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+
+        Log.e("restart", "onTaskRemoved:started " );
+
+        //앱을 재시작하기 위한 서비스 인텐트 만듬
+        Intent intentRestartService = new Intent(getApplicationContext(),this.getClass());
+
+        intentRestartService.setPackage(getPackageName());
+
+
+        PendingIntent restartPendingIntent =PendingIntent.getService(getApplicationContext(), 1,intentRestartService, PendingIntent.FLAG_ONE_SHOT);
+
+
+        //알람매니저로 서비스 재시작.
+        AlarmManager myAlarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+        myAlarmService.set(
+                AlarmManager.ELAPSED_REALTIME,
+                SystemClock.elapsedRealtime() + 100,
+                restartPendingIntent);
+
+
+        Log.e("restart", "onTaskRemoved:finished " );
+        super.onTaskRemoved(rootIntent);
+
+
+    }
 
     //채팅 서비스에서 유저 정보(방 id, 이름, 이메일 등)를 이용하여, 채팅을 시작하는 메소드
     public void startChat(int idGroup, String userEmail, String userName, String userProfileUrl) {
@@ -202,11 +260,30 @@ public class GroupChatService extends Service {
 
     }
 
+    //채팅을 종료했음을 알리는 메소드. 회원 강퇴시 사용
+    public void sendExitChat(String jsonExitChat){
+
+        if (!socket.isClosed()) {
+            //소켓에서 아웃풋 스트림을 가져오고, 스트림을 통해 json 채팅 나감 메시지를 서버로 전달
+            try {
+                outPutStream.writeUTF(jsonExitChat);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+
+    }
+
+
+
     //소켓이 생성될 때 서버에 유저 정보를 보내는 메소드
     //서비스를 시작할 때 서버에 있는 채팅방에서 유저의 소켓을 갱신하기 위해 사용한다.
 
     //서버에서 방에 있는 유저들에게 메세지를 돌릴 때 -> 유저이메일-소켓 해쉬맵을 참조해서 메세지를 보내면 된다.
-    public void sendUserInfo(){
+    public void sendUserInfo() {
         try {
 
             //채팅 방에 접속한 유저들에게 사용자가 채팅방에 접속했다는 메세지 전송
@@ -218,8 +295,8 @@ public class GroupChatService extends Service {
             //sharedPref 에서 유저의 이메일 정보를 가져온다.
 
             //셰어드에서 로그인토큰을 가져온다.
-            SharedPreferences pref_login = getSharedPreferences(getString(R.string.key_pref_Login) , 0);
-            userEmail = pref_login.getString("cookie_email","");
+            SharedPreferences pref_login = getSharedPreferences(getString(R.string.key_pref_Login), 0);
+            userEmail = pref_login.getString("cookie_email", "");
 
             String jsonString = makeJsonInfo(msgType, userEmail);
 
@@ -304,7 +381,6 @@ public class GroupChatService extends Service {
 
         }
 
-
         //채팅 메시지 수신 스레드 시작
         public void run() {
 
@@ -314,7 +390,6 @@ public class GroupChatService extends Service {
                 try {
                     //인풋 스트림에서 서버가 보내온 json 메세지를 읽어들인다.
                     msg = inputStream.readUTF();
-
 
 
                     JSONObject jsonObject = new JSONObject(msg.toString());
@@ -350,23 +425,36 @@ public class GroupChatService extends Service {
                     }
 
 
-
                     //채팅 내용을 채팅 내용 DB에 추가하여 저장한다. -> 이후 채팅 내역 불러오기에 사용된다.
                     saveChat(chatItem);
 
-                    //todo 현재 메세지를 수신한 채팅방에서 채팅 중이 아니라면(백그라운드 상태) -> Fcm  알림을 사용자에게 전달한다.
-                    //if(백그라운드 상태) -> 채팅방의 채팅 fcm 알림 전달
 
-                    //채팅방 화면의 그룹 id 값 != 수신한 메시지의 id값 인 경우 -> 알림 전달 필요.
-                    if(idGroupStatic != chatItem.idGroup){
+                    //알림 허용 / 거부를 체크한다.
 
-                        //클라이언트에 알림을 전달한다.
+                    //알림 거부한 방 목록이 필요하다.
+                    SharedPreferences pref_notification = getSharedPreferences(getString(R.string.key_pref_notification), Activity.MODE_PRIVATE);
 
+
+
+                    //쉐어드 프리퍼런스에서 알림 거부된 방 id를 가져와본다.(거부하지 않았다면 -1 이 나옴)
+                    int refusedIdGroup = pref_notification.getInt(String.valueOf(idGroup), -1);
+
+
+
+                    //채팅방 화면의 그룹 id 값 != 수신한 메시지의 id값 인 경우 && 알림을 허용했다면 -> 알림 전달 필요.
+                    if (idGroupStatic != chatItem.idGroup && idGroup != refusedIdGroup) {
+
+
+                        //그룹 아이템을 http 통신으로 가져온다. -> groupItemForNotice 가 세팅된다.
+                        GetGroupWithIdTask getGroupWithIdTask = new GetGroupWithIdTask(chatItem);
+                        getGroupWithIdTask.execute();
+
+                        //위의 태스크가 끝나면, 클라이언트에 알림을 전달한다.
 
 
                     }
                     //채팅방 화면의 그룹 id 값 == 수신한 메시지의 id값 인 경우 -> 알림 전달 필요없고, ui 업데이트 필요함.
-                    else{
+                    else {
                         //@@ 채팅 ui 업데이트
                         //채팅 프래그먼트의 그룹 id와, 위에서 만든 채팅 아이템의 그룹 id 가 같으면 -> 현재 채팅 중임. ui 업데이트
 
@@ -376,11 +464,6 @@ public class GroupChatService extends Service {
                         // 또한 프래그먼트가 활성화되지 않은 경우 프래그먼트로 이벤트 전달이 되지 않으므로, ui 업데이트가 되지 않는다.
                         BusProvider.getInstance().post(new ChatRcvEvent(chatItem));
                     }
-
-
-
-
-
 
 
                 } catch (IOException | JSONException e) {
@@ -393,6 +476,213 @@ public class GroupChatService extends Service {
 
 
             }
+        }
+    }
+
+
+    // 클라이언트에서 채팅 메세지 알림을 만드는 메소드
+    public void makeNotification(ChatItem chatItem, GroupItem groupItemForNotice) {
+
+        //알림이 전달되면 들어갈 화면 ( 그룹 액티비티 )
+
+        //todo 그룹 액티비티 -> 채팅 프래그먼트 호출 필요.
+        //호출에 대한 변수를 인텐트에 전달하여, 겟 아이템을 시키면 될 듯하다.
+        Intent intentGroup = new Intent(this, GroupActivity.class);
+
+        //채팅 메세지 알림을 위한 그룹 아이템. 아래의 GetGroupWithIdTask 에서 사용됨
+
+
+        //chatItem 정보를 바탕으로 그룹 아이템 정보를 http 로 가져온다.
+
+
+        //알림으로 들어간 화면에서 전달할 값 : 그룹 액티비티 초기화를 위한 변수들 (그룹 id, 그룹명 등) 전달
+        intentGroup.putExtra("idGroup", groupItemForNotice.idGroup);
+
+        intentGroup.putExtra("nameGroup", groupItemForNotice.nameGroup);
+
+        intentGroup.putExtra("contentGroup", groupItemForNotice.contentGroup);
+        intentGroup.putExtra("UrlGroupImg", groupItemForNotice.UrlGroupImg);
+
+        intentGroup.putExtra("numGroupMembers", groupItemForNotice.numGroupMembers);
+
+        intentGroup.putExtra("isMemberGroup", groupItemForNotice.isMemberGroup);
+
+
+        //그룹 액티비티 뷰페이저를 채팅 프래그먼트로 이동시키는 변수
+        intentGroup.putExtra("goChatFragment", true);
+
+
+        //알림 화면 뒤의 메인 화면
+        Intent intentMain = new Intent(this, MainActivity.class);
+
+        //메인 액티비티 뷰페이저를 그룹 프래그먼트로 이동시키는 변수
+        intentMain.putExtra("goGroupFragment", true);
+
+
+        //@@@ TaskStackBuilder 를 만들고, 위의 인텐트를 추가한다 -> 백스택에 추가됨.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+
+        //@@@ 액티비티 스택 순서 : 메인->알림. 알림에서 뒤로가기 할 경우 -> 메인으로 감
+
+        //메인 액티비티 추가
+        stackBuilder.addNextIntentWithParentStack(intentMain);
+
+        //알림 액티비티 추가
+        stackBuilder.addNextIntentWithParentStack(intentGroup);
+
+        //@@@ 액티비티 스택을 포함한 PendingIntent 를 생성한다.
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //알림 빌더를 통해 알림을 만든다.
+        //안드로이드 O 버전부터는 알림 빌더에서 알림 채널도 세팅할 것을 요구하고 있음. 아래 방식은 deprecated 임에 유의
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+
+        builder.setContentTitle(chatItem.chatWriterName) // 타이틀 : 채팅 보낸 사람의 이름 세팅
+                .setContentText(chatItem.chatText) // 서브 타이틀 : 보낸 사람의 채팅 내용 세팅
+                .setTicker(chatItem.chatText) // 티커 부분 - 굳이 필요 없음. 화면 상단에 노출되는 알림 메세지인데, 5.0 이상 버전부터는 보이지 않게 되어 있음
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
+                .setContentIntent(resultPendingIntent)
+                .setAutoCancel(true)
+                .setWhen(System.currentTimeMillis())
+                .setDefaults(Notification.DEFAULT_ALL);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            builder.setCategory(Notification.CATEGORY_MESSAGE)
+
+                    //notification 의 priority 를 설정한다.
+                    //priority 가 HIGH 이상일 경우, 현재 화면의 상단에 바로 알림을 세팅한다. - 이를 헤드업 알림이라 한다.
+                    //DEFAULT 이하일 경우, 푸시 알림 메세지 목록에 보이게 된다.
+                    .setPriority(Notification.PRIORITY_DEFAULT)
+                    .setVisibility(Notification.VISIBILITY_PUBLIC);
+        }
+
+        //알림을 클라이언트에 세팅한다.
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(1234, builder.build());
+
+
+    }
+
+    // http 통신으로 그룹 아이템 정보를 가져오는 태스크
+    class GetGroupWithIdTask extends AsyncTask<Void, Void, Void> {
+
+        Context mContext = GroupChatService.this;
+        String json_result;
+
+        int idGroup;
+        ChatItem chatItem;
+
+        GroupItem productGroupItem;
+
+
+        public GetGroupWithIdTask(ChatItem chatItem) {
+            this.chatItem = chatItem;
+            this.idGroup = chatItem.idGroup;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            //그룹 id 정보를 바탕으로, 그룹 item 정보를 가져온다.
+
+            //region//글 삭제하기 - DB상에서 뉴스피드 글을 삭제한다.
+            //레트로핏 기초 컴포넌트 만드는 과정. 자주 복붙할 것.
+            HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+            httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .addInterceptor(new ReceivedCookiesInterceptor(mContext))
+                    .addInterceptor(new AddCookiesInterceptor(mContext))
+                    .addInterceptor(httpLoggingInterceptor)
+                    .build();
+
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(API_URL)
+                    .client(okHttpClient)
+                    .build();
+
+            ApiService apiService = retrofit.create(ApiService.class);
+//            Log.e("myimg", "doInBackground: " + uploadImagePath);
+
+            // 레트로핏 콜 객체를 만든다. 파라미터로 게시물의 ID값, 게시물의 타입을 전송한다.
+
+            Call<ResponseBody> comment = apiService.getGroupWithId(idGroup);
+
+            try {
+                json_result = comment.execute().body().string();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            JSONArray jsonRes = null;
+            try {
+
+                //받아온 결과값을 jsonArray 로 만든다.
+                jsonRes = new JSONArray(json_result);
+
+
+                //jsonArray 에 담긴 아이템 정보들을 빼내어, 댓글 아이템으로 만들고, 리스트에 추가한다.
+                for (int i = 0; i < jsonRes.length(); i++) {
+
+                    //jsonArray 의 데이터를 댓글 아이템 객체에 담는다.
+                    JSONObject jObject = jsonRes.getJSONObject(i);  // JSONObject 추출
+
+//                    int idGroup = jObject.getInt("id_group");
+
+                    String nameGroup = jObject.getString("name_group");
+
+                    String contentGroup = jObject.getString("content_group");
+
+                    String emailGroupOwner = jObject.getString("email_group_owner");
+
+                    String nameGroupOwner = jObject.getString("name_group_owner");
+
+                    int numGroupMembers = jObject.getInt("num_group_members");
+
+                    String dateGroupMade = jObject.getString("date_group_made");
+
+
+                    String profileUrl = "";
+                    if (!jObject.getString("img_url_group").equals("")) {
+                        profileUrl = jObject.getString("img_url_group");
+                    }
+
+
+                    boolean isMemberGroup = Boolean.parseBoolean(jObject.getString("isMemberGroup"));
+
+
+                    //그룹 아이템 객체 생성자를 통해 아이템에 그룹 데이터를 담는다.
+                    productGroupItem = new GroupItem(idGroup, nameGroup, contentGroup, emailGroupOwner, nameGroupOwner, profileUrl, numGroupMembers, dateGroupMade, isMemberGroup);
+
+
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void avoid) {
+            super.onPostExecute(avoid);
+
+
+            //클라이언트에 알림을 전달한다.
+            makeNotification(chatItem, productGroupItem);
+
+
         }
     }
 
@@ -607,7 +897,6 @@ public class GroupChatService extends Service {
             jsonObject.put("chatTime", "");
 
 
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -664,10 +953,31 @@ public class GroupChatService extends Service {
 
     }
 
+    //채팅 종료 메시지를 보내는 메소드. 유저를 강퇴시켰을 때 사용
+    public void setExitChatMsg(String jsonMsg){
+
+        if (!socket.isClosed()) {
+            //소켓에서 아웃풋 스트림을 가져오고, 스트림을 통해 json 채팅 나감 메시지를 서버로 전달
+            try {
+                if (socket.getOutputStream() != null) {
+
+
+                    if (!socket.isClosed()) {
+                        //소켓에서 아웃풋 스트림을 가져오고, 스트림을 통해 json 채팅 나감 메시지를 서버로 전달
+                        outPutStream.writeUTF(jsonMsg);
+                    }
+
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
     //클라이언트의 소켓을 초기화하여, 서버와 연결하는 asyncTask.
     public class InitSocketTask extends AsyncTask<Integer, String, String> {
-
-
 
 
         @Override

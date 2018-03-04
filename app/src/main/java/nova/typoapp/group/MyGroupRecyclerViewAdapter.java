@@ -92,6 +92,8 @@ public class MyGroupRecyclerViewAdapter extends RecyclerView.Adapter<MyGroupRecy
 
                     Intent intent = new Intent(view.getContext(), GroupActivity.class);
 
+
+
                     intent.putExtra("idGroup",item.idGroup);
 
                     intent.putExtra("nameGroup", item.nameGroup);
@@ -101,6 +103,8 @@ public class MyGroupRecyclerViewAdapter extends RecyclerView.Adapter<MyGroupRecy
                     intent.putExtra("numGroupMembers", item.numGroupMembers);
 
                     intent.putExtra("isMemberGroup", item.isMemberGroup);
+
+
 
 
 

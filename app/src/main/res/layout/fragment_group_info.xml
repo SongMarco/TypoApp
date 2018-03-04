@@ -148,7 +148,7 @@
                     android:id="@+id/rvGroupMember"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    tools:listitem="@layout/fragment_likeritem" />
+                    tools:listitem="@layout/fragment_group_info_member_item" />
             </LinearLayout>
         </android.support.v7.widget.CardView>
 

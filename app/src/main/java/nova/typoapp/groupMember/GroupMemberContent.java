@@ -33,13 +33,17 @@ public class GroupMemberContent {
         public static class MemberItem {
 
 
-            int idGroup;  // 멤버가 속한 그룹의 id
+            public int idGroup;  // 멤버가 속한 그룹의 id
 
-            String nameMember;
 
-            String emailMember;
 
-            String imgUrlMEmber;
+            public String nameMember;
+
+            public String emailMember;
+
+            public String imgUrlMEmber;
+
+            public int levelMember; // 멤버의 등급. 1이면 회원, 2이면 운영진, 3이면 그룹장.
 
             public MemberItem(int idGroup, String nameMember, String emailMember, String imgUrlMEmber) {
                 this.idGroup = idGroup;
@@ -48,6 +52,13 @@ public class GroupMemberContent {
                 this.imgUrlMEmber = imgUrlMEmber;
             }
 
+            public MemberItem(int idGroup, String nameMember, String emailMember, String imgUrlMEmber, int levelMember) {
+                this.idGroup = idGroup;
+                this.nameMember = nameMember;
+                this.emailMember = emailMember;
+                this.imgUrlMEmber = imgUrlMEmber;
+                this.levelMember = levelMember;
+            }
         }
 
 }

@@ -8,12 +8,33 @@
     android:orientation="vertical">
 
 
-    <Button
-        android:id="@+id/btnStartChat"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:text="그룹 채팅하기" />
+        android:layout_weight="0">
+
+        <Button
+            android:id="@+id/btnStartChat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="그룹 채팅하기" />
+
+        <TextView
+            android:id="@+id/tvNeedJoinToChat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:layout_gravity="center"
+            android:background="@drawable/layout_bg"
+
+            android:padding="@dimen/margin_balloon"
+
+            android:text="그룹 회원만 채팅이 가능합니다."
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:visibility="invisible" />
+    </FrameLayout>
 
 
     <android.support.v7.widget.RecyclerView

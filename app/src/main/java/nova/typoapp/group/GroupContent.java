@@ -17,23 +17,23 @@ public class GroupContent {
 
     public static class GroupItem {
 
-        int idGroup;
+        public int idGroup;
 
-        String nameGroup;
+        public String nameGroup;
 
-        String contentGroup;
+        public String contentGroup;
 
 
         String emailGroupOwner;
         String nameGroupOwner;
-        String UrlGroupImg;
+        public String UrlGroupImg;
 
 
-        int numGroupMembers;
+        public int numGroupMembers;
 
         String dateGroupMade;
 
-        boolean isMemberGroup; // 그룹에 확인했는지를 결정하는 변수. true -> 가입됨
+        public boolean isMemberGroup; // 그룹에 확인했는지를 결정하는 변수. true -> 가입됨
 
         public GroupItem(int idGroup, String nameGroup, String contentGroup, String emailGroupOwner, String nameGroupOwner, String urlGroupImg, int numGroupMembers, String dateGroupMade, boolean isMemberGroup) {
             this.idGroup = idGroup;

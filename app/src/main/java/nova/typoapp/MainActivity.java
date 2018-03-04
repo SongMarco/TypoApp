@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import nova.typoapp.group.GroupFragment;
-import nova.typoapp.groupChat.GroupChatService;
 import nova.typoapp.groupChat.groupChatSqlite.MySQLiteOpenHelper;
 import nova.typoapp.newsfeed.NewsFeedContent;
 import nova.typoapp.notificationlist.NoticeContent;
@@ -98,14 +97,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
 
-        //채팅 서비스 초기화 및 시작. - 채팅 서버와의 소켓 통신에 사용된다.
-        //자세한 내용은 groupChat 패키지의 groupChatService 참조
-        Intent intent = new Intent(
-                MainActivity.this,//현재제어권자
-                GroupChatService.class); // 이동할 컴포넌트
-        startService(intent); // 서비스 시작
 
-        //채팅 서비스 초기화 끝
 
 
         /////////SQLite 관련 변수들
@@ -193,7 +185,29 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-    }
+
+//        //메인 액티비티 뷰페이저를 그룹 프래그먼트로 이동시키는 변수
+//        intentMain.putExtra("goGroupFragment", true);
+//
+        //인텐트에서 채팅으로 가라는 변수가 세팅되어있다면 -> 그룹 채팅으로 세팅해줌
+        if ( getIntent().getBooleanExtra("goGroupFragment", false) ){
+
+            mViewPager.setCurrentItem(3);
+        };
+
+
+
+//        //채팅 서비스 초기화 및 시작. - 채팅 서버와의 소켓 통신에 사용된다.
+//        //자세한 내용은 groupChat 패키지의 groupChatService 참조
+//        Intent intent = new Intent(
+//                MainActivity.this,//현재제어권자
+//                GroupChatService.class); // 이동할 컴포넌트
+//        startService(intent); // 서비스 시작
+
+        //채팅 서비스 초기화 끝
+
+
+    } // end of onCreate
 
     public void updateWordSet() {
 
@@ -476,6 +490,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onResume() {
         super.onResume();
+
+
 
 ////        Toast.makeText(this, "MainonResume called", Toast.LENGTH_SHORT).show();
 //        mSectionsPagerAdapter.notifyDataSetChanged();

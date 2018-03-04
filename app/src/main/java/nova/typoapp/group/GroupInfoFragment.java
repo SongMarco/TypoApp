@@ -99,7 +99,7 @@ public class GroupInfoFragment extends Fragment {
     String contentGroup;
     String UrlGroupImg;
     int numGroupMembers;
-    boolean isMemberGroup;
+    public static boolean isMemberGroup;
 
 
     @BindView(R.id.groupName)
@@ -109,7 +109,7 @@ public class GroupInfoFragment extends Fragment {
     TextView tvGroupContent;
 
     @BindView(R.id.tvListMember)
-    TextView tvListMember;
+    TextView tvNumMember;
 
     @BindView(R.id.imgGroupInfo)
     ImageView imgGroupInfo;
@@ -121,7 +121,6 @@ public class GroupInfoFragment extends Fragment {
     RecyclerView rvGroupMember;
 
 
-
     MyGroupMemberAdapter groupMemberAdapter = new MyGroupMemberAdapter(ITEMS);
 
 
@@ -130,80 +129,72 @@ public class GroupInfoFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_group_info, container, false);
-        ButterKnife.bind(this,view);
+        ButterKnife.bind(this, view);
 
 
         // 그룹 정보 프래그먼트 초기화에 필요한 변수를 그룹 액티비티에서 가져온다.
 
         Intent intent = getActivity().getIntent();
 
-        idGroup = intent.getIntExtra("idGroup",-1);
+        idGroup = intent.getIntExtra("idGroup", -1);
 
 
         nameGroup = intent.getStringExtra("nameGroup");
         contentGroup = intent.getStringExtra("contentGroup");
         UrlGroupImg = intent.getStringExtra("UrlGroupImg");
-        numGroupMembers = intent.getIntExtra("numGroupMembers",-1);
+        numGroupMembers = intent.getIntExtra("numGroupMembers", -1);
 
-        //가입 여부를 확인하는 변수
-        isMemberGroup = intent.getBooleanExtra("isMemberGroup",false);
-
-
-
-
+//        //가입 여부를 확인하는 변수
+//        isMemberGroup = intent.getBooleanExtra("isMemberGroup",false);
 
 
         // 그룹 정보 뷰를 세팅한다.
 
         tvGroupName.setText(nameGroup); //그룹명 세팅
         tvGroupContent.setText(contentGroup); //그룹 설명 세팅
-        tvListMember.setText("회원  "+numGroupMembers); //회원 수 세팅
+        tvNumMember.setText("회원  " + numGroupMembers); //회원 수 세팅
 
         Glide.with(getActivity()).load(UrlGroupImg).into(imgGroupInfo); // 그룹 이미지 세팅
 
         // 사용자가 멤버로 되어 있다면, isMemberGroup 값이 true이고, 멤버가 아니라면 false 이다.
 
         //사용자가 그룹의 멤버인 경우
-        if(isMemberGroup){
+        if (isMemberGroup) {
 
+            //가입 버튼을 보이지 않게한다.
             btnApplyGroup.setVisibility(View.GONE);
 
-        }
-        else{
 
+        }
+        //그룹 멤버가 아닌 경우
+        else {
+
+            //가입 버튼을 보이게 한다.
             btnApplyGroup.setVisibility(View.VISIBLE);
         }
 
 
-
-
-        //그룹 멤버 리스트를 가져오는 어싱크태스크 수
+        //그룹 멤버 리스트를 가져오는 어싱크태스크 수행
         new GetGroupMembersTask().execute();
-
-
-
-
-
-
-
 
 
         return view;
 
 
-
     }
 
 
+    //회원가입 버튼을 클릭함
     @OnClick(R.id.buttonApplyGroup)
-    void applyGroup(){
+    void applyGroup() {
 
+        //회원 가입 하는 태스크 시작
         new ApplyGroupTask().execute();
 
     }
 
 
-
+    //회원 가입 태스크
     public class ApplyGroupTask extends AsyncTask<Void, String, String> {
 
         String json_result;
@@ -234,7 +225,6 @@ public class GroupInfoFragment extends Fragment {
 //            Log.e("myimg", "doInBackground: " + uploadImagePath);
 
 
-
             /////@@@@@ 레트로핏 콜 객체 생성
             Call<ResponseBody> retrofitCall = apiService.applyGroup(idGroup);
 
@@ -250,7 +240,6 @@ public class GroupInfoFragment extends Fragment {
         }
 
 
-
         @Override
         protected void onPostExecute(String result) {
 
@@ -260,8 +249,10 @@ public class GroupInfoFragment extends Fragment {
             new GetGroupMembersTask().execute();
 
             //가입을 했으므로, 가입 버튼을 보이지 않게 한다.
-            btnApplyGroup.setVisibility(View.INVISIBLE);
+            btnApplyGroup.setVisibility(View.GONE);
 
+            //멤버 가입 여부 변수를 true 로 한다.
+            isMemberGroup = true;
 
 
         }
@@ -269,20 +260,37 @@ public class GroupInfoFragment extends Fragment {
     }
 
 
+    //그룹 액티비티에서 탈퇴 처리를 했을 때 들어오는 메소드.
+    public void getGroupMembersAfterLeave() {
+
+        //탈퇴가 적용되었다. 멤버 리스트를 갱신한다.
+        new GetGroupMembersTask().execute();
+
+        //멤버 가입 여부 변수를 false 로 한다.
+        isMemberGroup = false;
+
+        //탈퇴를 했으므로, 가입 버튼을 보이게 한다.
+        btnApplyGroup.setVisibility(View.VISIBLE);
+
+
+    }
+    //그룹 액티비티에서 운영자가 강퇴 처리를 했을 때 들어오는 메소드.
+    public void getGroupMembersAfterBan() {
+
+        //탈퇴가 적용되었다. 멤버 리스트를 갱신한다.
+        new GetGroupMembersTask().execute();
+
+    }
 
 
 
-
-
-
-
-
-
+    //그룹의 멤버 목록을 가져오는 태스크
     public class GetGroupMembersTask extends AsyncTask<Void, String, String> {
 
         String json_result;
         private Context mContext = getActivity();
 
+        //가져온 멤버 아이템을 담을 리스트
         List<MemberItem> productItems = new ArrayList<>();
 
         @Override
@@ -311,16 +319,18 @@ public class GroupInfoFragment extends Fragment {
 
             // 레트로핏 콜 객체를 만든다. 파라미터로 게시물의 ID값, 게시물의 타입을 전송한다.
 
-            Call<ResponseBody> comment = apiService.getGroupMembers(idGroup);
+            Call<ResponseBody> retrofitCall = apiService.getGroupMembers(idGroup);
 
             try {
-                json_result = comment.execute().body().string();
+                // 레트로핏 콜을 수행하여 json 값을 가져온다.
+                json_result = retrofitCall.execute().body().string();
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
 
+            //가져온 json 스트링을 json 객체로 만든다.
             JSONArray jsonRes = null;
             try {
 
@@ -334,11 +344,14 @@ public class GroupInfoFragment extends Fragment {
                     //jsonArray 의 데이터를 댓글 아이템 객체에 담는다.
                     JSONObject jObject = jsonRes.getJSONObject(i);  // JSONObject 추출
 
-                   int idGroup = jObject.getInt("id_group");
+                    int idGroup = jObject.getInt("id_group");
 
                     String nameMember = jObject.getString("name_member");
 
                     String emailMember = jObject.getString("email_member");
+
+                    //회원 등급
+                    int levelMember = jObject.getInt("level_member");
 
                     String profileUrl = "";
                     if (!jObject.getString("profile_url").equals("")) {
@@ -347,7 +360,7 @@ public class GroupInfoFragment extends Fragment {
 
                     //아이템 객체에 데이터를 다 담은 후, 아이템을 리스트에 추가한다.
 
-                    MemberItem productItem = new MemberItem(idGroup, nameMember, emailMember, profileUrl);
+                    MemberItem productItem = new MemberItem(idGroup, nameMember, emailMember, profileUrl, levelMember);
 
                     productItems.add(productItem);
 
@@ -374,6 +387,9 @@ public class GroupInfoFragment extends Fragment {
             ITEMS.addAll(productItems);
 
 
+            //멤버 수를 리스트의 크기로 갱신한다. (서버에서 멤버 수를 가져오지 않아도 클라이언트에서 멤버 수 계산 가능)
+            tvNumMember.setText("회원  " + ITEMS.size());
+
             //리사이클러뷰의 어댑터를 세팅한다.
             rvGroupMember.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -386,21 +402,6 @@ public class GroupInfoFragment extends Fragment {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -410,38 +411,13 @@ public class GroupInfoFragment extends Fragment {
 
 
 
+    //멤버를 삭제할 때 리사이클러뷰를 다시 세팅한다.(삭제 버튼이 보이도록)
+    public void refreshMemberList(){
+
+        groupMemberAdapter.notifyDataSetChanged();
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    }
 
 
     @Override

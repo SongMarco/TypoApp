@@ -168,6 +168,8 @@ public class GroupFragment extends Fragment {
     }
 
 
+
+    //그룹 리스트를 가져오는 태스크
     public class GetGroupTask extends AsyncTask<Void, String, String> {
 
         String json_result;
